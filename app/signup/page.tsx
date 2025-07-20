@@ -218,12 +218,12 @@ export default function SignupPage() {
                      value={activeTab}
                      onValueChange={setActiveTab}
                      className="w-full">
-                     <TabsList className="grid w-full grid-cols-2 mb-6 transition-all duration-300">
+                     <TabsList className="tabs-list-enhanced grid w-full grid-cols-2 mb-6 transition-all duration-300">
                         <TabsTrigger
                            value="patient"
-                           className="flex items-center gap-2 cursor-pointer transition-all duration-200 hover:scale-[1.02]">
+                           className="tabs-trigger-enhanced flex items-center gap-2 cursor-pointer transition-all duration-200 hover:scale-[1.02]">
                            <svg
-                              className="w-4 h-4"
+                              className="w-5 h-5"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24">
@@ -238,9 +238,9 @@ export default function SignupPage() {
                         </TabsTrigger>
                         <TabsTrigger
                            value="coach"
-                           className="flex items-center gap-2 cursor-pointer transition-all duration-200 hover:scale-[1.02]">
+                           className="tabs-trigger-enhanced flex items-center gap-2 cursor-pointer transition-all duration-200 hover:scale-[1.02]">
                            <svg
-                              className="w-4 h-4"
+                              className="w-5 h-5"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24">

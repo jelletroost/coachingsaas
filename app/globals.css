@@ -167,3 +167,41 @@
    min-height: 3rem !important;
    width: 100% !important;
 }
+
+/* Custom tab styles for better height and appearance */
+.tabs-list-enhanced {
+   min-height: 3.5rem !important;
+   height: 3.5rem !important;
+}
+
+.tabs-trigger-enhanced {
+   font-size: 1rem !important;
+   font-weight: 500 !important;
+   padding: 0.75rem 1rem !important;
+   min-height: 3.5rem !important;
+   height: calc(3.5rem - 2px) !important;
+}
+
+/* Override default shadcn tab styles */
+[data-slot="tabs-list"].tabs-list-enhanced {
+   height: 3.5rem !important;
+   min-height: 3.5rem !important;
+   padding: 4px !important;
+}
+
+[data-slot="tabs-trigger"].tabs-trigger-enhanced {
+   height: calc(3.5rem - 8px) !important;
+   min-height: calc(3.5rem - 8px) !important;
+   font-size: 1rem !important;
+   font-weight: 500 !important;
+   padding: 0.75rem 1rem !important;
+   line-height: 1.5 !important;
+}
+
+/* Ensure proper spacing and alignment */
+.tabs-list-enhanced [data-slot="tabs-trigger"] {
+   display: flex !important;
+   align-items: center !important;
+   justify-content: center !important;
+   gap: 0.5rem !important;
+}
