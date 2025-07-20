@@ -159,3 +159,10 @@
       @apply bg-background text-foreground;
    }
 }
+
+/* Custom styles for form consistency */
+.select-trigger-fixed {
+   height: 3rem !important;
+   min-height: 3rem !important;
+   width: 100% !important;
+}

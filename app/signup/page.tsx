@@ -324,7 +324,7 @@ export default function SignupPage() {
                                     control={patientForm.control}
                                     name="password"
                                     render={({ field }) => (
-                                       <FormItem>
+                                       <FormItem className="form-field">
                                           <FormLabel>Password</FormLabel>
                                           <FormControl>
                                              <Input
@@ -365,7 +365,7 @@ export default function SignupPage() {
                                     control={patientForm.control}
                                     name="dateOfBirth"
                                     render={({ field }) => (
-                                       <FormItem>
+                                       <FormItem className="form-field">
                                           <FormLabel>Date of Birth</FormLabel>
                                           <Popover>
                                              <PopoverTrigger asChild>
@@ -373,7 +373,7 @@ export default function SignupPage() {
                                                    <Button
                                                       variant={"outline"}
                                                       className={cn(
-                                                         "w-[240px] h-12 justify-start text-left font-normal cursor-pointer text-base",
+                                                         "!w-full !h-12 justify-start text-left font-normal cursor-pointer text-base transition-all duration-200 focus:scale-[1.01]",
                                                          !field.value &&
                                                             "text-muted-foreground"
                                                       )}>
@@ -473,7 +473,7 @@ export default function SignupPage() {
                                     control={coachForm.control}
                                     name="firstName"
                                     render={({ field }) => (
-                                       <FormItem>
+                                       <FormItem className="form-field">
                                           <FormLabel>First Name</FormLabel>
                                           <FormControl>
                                              <Input
@@ -607,13 +607,13 @@ export default function SignupPage() {
                                     control={coachForm.control}
                                     name="specialization"
                                     render={({ field }) => (
-                                       <FormItem>
+                                       <FormItem className="form-field">
                                           <FormLabel>Specialization</FormLabel>
                                           <Select
                                              onValueChange={field.onChange}
                                              defaultValue={field.value}>
                                              <FormControl>
-                                                <SelectTrigger className="h-12 text-base">
+                                                <SelectTrigger className="select-trigger-fixed text-base transition-all duration-200 focus:scale-[1.01]">
                                                    <SelectValue placeholder="Select specialization" />
                                                 </SelectTrigger>
                                              </FormControl>
@@ -652,7 +652,7 @@ export default function SignupPage() {
                                     control={coachForm.control}
                                     name="experience"
                                     render={({ field }) => (
-                                       <FormItem>
+                                       <FormItem className="form-field">
                                           <FormLabel>
                                              Experience Level
                                           </FormLabel>
@@ -660,7 +660,7 @@ export default function SignupPage() {
                                              onValueChange={field.onChange}
                                              defaultValue={field.value}>
                                              <FormControl>
-                                                <SelectTrigger className="h-12 text-base">
+                                                <SelectTrigger className="select-trigger-fixed text-base transition-all duration-200 focus:scale-[1.01]">
                                                    <SelectValue placeholder="Select experience" />
                                                 </SelectTrigger>
                                              </FormControl>
