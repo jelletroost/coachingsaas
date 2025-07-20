@@ -110,7 +110,7 @@ export default function SignupPage() {
       const formElements = document.querySelectorAll(".form-field");
       if (formElements.length > 0) {
          inView(formElements, (info) => {
-            animate(info, { opacity: [0, 1], x: [20, 0] }, { duration: 0.5 });
+            animate(info, { opacity: [0, 1], x: [20, 0] }, { duration: 0.3 });
          });
       }
    }, []);
@@ -188,7 +188,7 @@ export default function SignupPage() {
    };
 
    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-card to-muted flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-background via-card to-muted flex items-center justify-center p-4 md:p-8">
          <div className="w-full max-w-4xl">
             {/* Header */}
             <div ref={headerRef} className="text-center mb-8">
@@ -263,7 +263,7 @@ export default function SignupPage() {
                                  onPatientSubmit
                               )}
                               className="space-y-6">
-                              <div className="grid grid-cols-2 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                  <FormField
                                     control={patientForm.control}
                                     name="firstName"
@@ -319,7 +319,7 @@ export default function SignupPage() {
                                  )}
                               />
 
-                              <div className="grid grid-cols-2 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                  <FormField
                                     control={patientForm.control}
                                     name="password"
@@ -360,7 +360,7 @@ export default function SignupPage() {
                                  />
                               </div>
 
-                              <div className="grid grid-cols-2 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                  <FormField
                                     control={patientForm.control}
                                     name="dateOfBirth"
@@ -524,7 +524,7 @@ export default function SignupPage() {
                                  )}
                               />
 
-                              <div className="grid grid-cols-2 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                  <FormField
                                     control={coachForm.control}
                                     name="password"
@@ -565,7 +565,7 @@ export default function SignupPage() {
                                  />
                               </div>
 
-                              <div className="grid grid-cols-2 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                  <FormField
                                     control={coachForm.control}
                                     name="phone"
@@ -602,7 +602,7 @@ export default function SignupPage() {
                                  />
                               </div>
 
-                              <div className="grid grid-cols-2 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                  <FormField
                                     control={coachForm.control}
                                     name="specialization"
@@ -617,7 +617,7 @@ export default function SignupPage() {
                                                    <SelectValue placeholder="Select specialization" />
                                                 </SelectTrigger>
                                              </FormControl>
-                                             <SelectContent>
+                                             <SelectContent className="max-h-[200px] overflow-y-auto">
                                                 <SelectItem value="nutrition">
                                                    Nutrition
                                                 </SelectItem>
@@ -664,7 +664,7 @@ export default function SignupPage() {
                                                    <SelectValue placeholder="Select experience" />
                                                 </SelectTrigger>
                                              </FormControl>
-                                             <SelectContent>
+                                             <SelectContent className="max-h-[200px] overflow-y-auto">
                                                 <SelectItem value="0-2">
                                                    0-2 years
                                                 </SelectItem>

@@ -61,7 +61,7 @@ export default function SigninPage() {
       const formElements = document.querySelectorAll(".form-field");
       if (formElements.length > 0) {
          inView(formElements, (info) => {
-            animate(info, { opacity: [0, 1], x: [20, 0] }, { duration: 0.5 });
+            animate(info, { opacity: [0, 1], x: [20, 0] }, { duration: 0.3 });
          });
       }
    }, []);
