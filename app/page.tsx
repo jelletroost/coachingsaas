@@ -1,24 +1,24 @@
 export default function Home() {
    return (
-      <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-background via-card to-muted dark:from-background dark:via-card dark:to-muted">
          <div className="container mx-auto px-4 py-16">
             <div className="text-center">
                {/* Logo/Brand */}
                <div className="mb-8">
-                  <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  <h1 className="text-4xl md:text-6xl font-bold text-primary bg-clip-text">
                      HealthCoach Pro
                   </h1>
-                  <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mt-2">
+                  <p className="text-lg md:text-xl text-muted-foreground mt-2">
                      Digital Health & Medication Platform
                   </p>
                </div>
 
                {/* Coming Soon Message */}
                <div className="mb-12">
-                  <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                  <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4">
                      Coming Soon
                   </h2>
-                  <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                  <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
                      We&apos;re building a revolutionary digital health platform
                      that connects patients with qualified coaches for
                      personalized lifestyle guidance and medication management.
@@ -27,10 +27,10 @@ export default function Home() {
 
                {/* Features Preview */}
                <div className="grid md:grid-cols-3 gap-8 mb-20 max-w-4xl mx-auto">
-                  <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-                     <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                  <div className="bg-card/50 backdrop-blur-sm rounded-xl p-6 border border-border">
+                     <div className="w-12 h-12 bg-[var(--brand-primary)]/10 rounded-lg flex items-center justify-center mb-4 mx-auto">
                         <svg
-                           className="w-6 h-6 text-blue-600 dark:text-blue-400"
+                           className="w-6 h-6 text-[var(--brand-primary)]"
                            fill="none"
                            stroke="currentColor"
                            viewBox="0 0 24 24">
@@ -42,19 +42,19 @@ export default function Home() {
                            />
                         </svg>
                      </div>
-                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                     <h3 className="text-lg font-semibold text-foreground mb-2">
                         Digital Screening
                      </h3>
-                     <p className="text-gray-600 dark:text-gray-300">
+                     <p className="text-muted-foreground">
                         Comprehensive health questionnaires reviewed by
                         qualified coaches and medical professionals.
                      </p>
                   </div>
 
-                  <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-                     <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                  <div className="bg-card/50 backdrop-blur-sm rounded-xl p-6 border border-border">
+                     <div className="w-12 h-12 bg-[var(--brand-accent)]/10 rounded-lg flex items-center justify-center mb-4 mx-auto">
                         <svg
-                           className="w-6 h-6 text-purple-600 dark:text-purple-400"
+                           className="w-6 h-6 text-[var(--brand-accent)]"
                            fill="none"
                            stroke="currentColor"
                            viewBox="0 0 24 24">
@@ -66,19 +66,19 @@ export default function Home() {
                            />
                         </svg>
                      </div>
-                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                     <h3 className="text-lg font-semibold text-foreground mb-2">
                         Coach Communication
                      </h3>
-                     <p className="text-gray-600 dark:text-gray-300">
+                     <p className="text-muted-foreground">
                         Direct messaging with qualified health coaches for
                         personalized guidance and support.
                      </p>
                   </div>
 
-                  <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-                     <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                  <div className="bg-card/50 backdrop-blur-sm rounded-xl p-6 border border-border">
+                     <div className="w-12 h-12 bg-secondary/20 rounded-lg flex items-center justify-center mb-4 mx-auto">
                         <svg
-                           className="w-6 h-6 text-green-600 dark:text-green-400"
+                           className="w-6 h-6 text-secondary-foreground"
                            fill="none"
                            stroke="currentColor"
                            viewBox="0 0 24 24">
@@ -90,10 +90,10 @@ export default function Home() {
                            />
                         </svg>
                      </div>
-                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                     <h3 className="text-lg font-semibold text-foreground mb-2">
                         Medication Management
                      </h3>
-                     <p className="text-gray-600 dark:text-gray-300">
+                     <p className="text-muted-foreground">
                         Subscription-based medication delivery with real-time
                         tracking and automated refills.
                      </p>
