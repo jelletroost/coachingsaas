@@ -1,3 +1,6 @@
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+
 export default function Home() {
    return (
       <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-background via-card to-muted dark:from-background dark:via-card dark:to-muted">
@@ -98,6 +101,21 @@ export default function Home() {
                         tracking and automated refills.
                      </p>
                   </div>
+               </div>
+
+               {/* CTA Section */}
+               <div className="text-center">
+                  <Link href="/signup">
+                     <Button
+                        size="lg"
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer h-14 text-lg px-8 transition-all duration-300 hover:scale-105 active:scale-95">
+                        Get Started Today
+                     </Button>
+                  </Link>
+                  <p className="text-sm text-muted-foreground mt-4">
+                     Join thousands of patients and coaches already using our
+                     platform
+                  </p>
                </div>
             </div>
          </div>
