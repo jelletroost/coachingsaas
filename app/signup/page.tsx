@@ -373,7 +373,7 @@ export default function SignupPage() {
                                                    <Button
                                                       variant={"outline"}
                                                       className={cn(
-                                                         "!w-full !h-12 justify-start text-left font-normal cursor-pointer text-base transition-all duration-200 focus:scale-[1.01]",
+                                                         "!w-full !h-12 justify-start text-left font-normal cursor-pointer text-base transition-all duration-200 focus:scale-[1.01] hover:bg-accent hover:border-primary/30 active:bg-primary/20 active:border-primary/50",
                                                          !field.value &&
                                                             "text-muted-foreground"
                                                       )}>
