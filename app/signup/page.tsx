@@ -84,7 +84,6 @@ export default function SignupPage() {
    const [isLoading, setIsLoading] = useState(false);
    const headerRef = useRef<HTMLDivElement>(null);
    const cardRef = useRef<HTMLDivElement>(null);
-   const formRef = useRef<HTMLFormElement>(null);
 
    // Animation effects
    useEffect(() => {
