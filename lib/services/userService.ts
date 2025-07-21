@@ -15,7 +15,7 @@ export class UserService {
             .from(TABLES.USER_PROFILES)
             .select("*")
             .eq("user_id", userId)
-            .single();
+            .maybeSingle();
 
          if (error) {
             console.error("Error fetching user profile:", error);
@@ -44,18 +44,20 @@ export class UserService {
         `
             )
             .eq("user_id", userId)
-            .single();
+            .maybeSingle();
 
          if (error) {
             console.error("Error fetching user profile with details:", error);
             return null;
          }
 
-         return {
-            ...data,
-            patient_profile: data.patient_profiles?.[0] || undefined,
-            coach_profile: data.coach_profiles?.[0] || undefined,
-         };
+         return data
+            ? {
+                 ...data,
+                 patient_profile: data.patient_profiles?.[0] || undefined,
+                 coach_profile: data.coach_profiles?.[0] || undefined,
+              }
+            : null;
       } catch (error) {
          console.error("Error in getUserProfileWithDetails:", error);
          return null;
@@ -77,7 +79,6 @@ export class UserService {
             throw new Error("User profile already exists");
          }
 
-         // Direct insert since RLS is temporarily disabled
          const { data, error } = await supabase
             .from(TABLES.USER_PROFILES)
             .insert(profile)
@@ -293,25 +294,6 @@ export class UserService {
       }
    }
 
-   // Check if user profile exists
-   static async userProfileExists(userId: string): Promise<boolean> {
-      try {
-         const { data, error } = await supabase
-            .from(TABLES.USER_PROFILES)
-            .select("id")
-            .eq("user_id", userId)
-            .single();
-
-         if (error) {
-            return false;
-         }
-
-         return !!data;
-      } catch {
-         return false;
-      }
-   }
-
    // Get user role
    static async getUserRole(userId: string): Promise<string | null> {
       try {
@@ -319,7 +301,7 @@ export class UserService {
             .from(TABLES.USER_PROFILES)
             .select("role")
             .eq("user_id", userId)
-            .single();
+            .maybeSingle();
 
          if (error) {
             console.error("Error fetching user role:", error);

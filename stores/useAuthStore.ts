@@ -364,19 +364,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       setLoading(true);
 
       try {
-         console.log("Starting patient signup for:", data.email);
-
          // Sign up with Supabase using email and password from form
          const result = await signUpWithEmail(data.email, data.password);
-         console.log("Supabase auth signup result:", {
-            user: result.user?.id,
-            session: !!result.session,
-         });
 
          if (result.user) {
             try {
-               console.log("Creating user profile for:", result.user.id);
-
                // Create user profile
                const userProfile = await UserService.createUserProfile({
                   user_id: result.user.id,
@@ -390,11 +382,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                   email_verified: false,
                });
 
-               console.log("User profile created:", userProfile?.id);
-
                if (userProfile) {
-                  console.log("Creating patient profile for:", userProfile.id);
-
                   // Create patient profile
                   const patientProfile = await UserService.createPatientProfile(
                      {
@@ -404,8 +392,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                         timezone: "UTC",
                      }
                   );
-
-                  console.log("Patient profile created:", patientProfile?.id);
 
                   if (patientProfile) {
                      if (!result.session) {
@@ -481,19 +467,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       setLoading(true);
 
       try {
-         console.log("Starting coach signup for:", data.email);
-
          // Sign up with Supabase using email and password from form
          const result = await signUpWithEmail(data.email, data.password);
-         console.log("Supabase auth signup result:", {
-            user: result.user?.id,
-            session: !!result.session,
-         });
 
          if (result.user) {
             try {
-               console.log("Creating user profile for:", result.user.id);
-
                // Create user profile
                const userProfile = await UserService.createUserProfile({
                   user_id: result.user.id,
@@ -506,11 +484,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                   email_verified: false,
                });
 
-               console.log("User profile created:", userProfile?.id);
-
                if (userProfile) {
-                  console.log("Creating coach profile for:", userProfile.id);
-
                   // Create coach profile
                   const coachProfile = await UserService.createCoachProfile({
                      user_profile_id: userProfile.id,
@@ -523,14 +497,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                      is_verified: false,
                   });
 
-                  console.log("Coach profile created:", coachProfile?.id);
-
                   if (coachProfile) {
-                     console.log("Coach signup completed:", {
-                        userProfile,
-                        coachProfile,
-                     });
-
                      if (!result.session) {
                         setSuccess(
                            "Please check your email to confirm your coach account!"
