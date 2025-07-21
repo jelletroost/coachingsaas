@@ -43,7 +43,7 @@ export default function SigninPage() {
       setPassword,
       setRememberMe,
       togglePasswordVisibility,
-      submitForm,
+      signIn,
       clearMessages,
    } = useAuthStore();
 
@@ -95,8 +95,8 @@ export default function SigninPage() {
       setPassword(data.password);
       setRememberMe(data.rememberMe || false);
 
-      // Submit form
-      await submitForm();
+      // Sign in with Supabase
+      await signIn();
    };
 
    return (

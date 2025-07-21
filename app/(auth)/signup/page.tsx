@@ -34,6 +34,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { coachSchema, patientSchema } from "@/lib/validators/authSchema";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
@@ -45,9 +46,18 @@ import * as z from "zod";
 
 export default function SignupPage() {
    const [activeTab, setActiveTab] = useState<"patient" | "coach">("patient");
-   const [isLoading, setIsLoading] = useState<boolean>(false);
    const headerRef = useRef<HTMLDivElement>(null);
    const cardRef = useRef<HTMLDivElement>(null);
+
+   // Get state and actions from auth store
+   const {
+      isLoading,
+      error,
+      success,
+      clearMessages,
+      signUpPatient,
+      signUpCoach,
+   } = useAuthStore();
 
    // Animation effects
    useEffect(() => {
@@ -77,6 +87,11 @@ export default function SignupPage() {
          });
       }
    }, []);
+
+   // Clear messages on mount
+   useEffect(() => {
+      clearMessages();
+   }, [clearMessages]);
 
    // Animate tab content when switching
    useEffect(() => {
@@ -123,31 +138,11 @@ export default function SignupPage() {
    });
 
    const onPatientSubmit = async (data: z.infer<typeof patientSchema>) => {
-      setIsLoading(true);
-      try {
-         // Simulate API call
-         await new Promise((resolve) => setTimeout(resolve, 2000));
-         console.log("Patient signup:", data);
-         // Handle successful signup
-      } catch (error) {
-         console.error("Signup error:", error);
-      } finally {
-         setIsLoading(false);
-      }
+      await signUpPatient(data);
    };
 
    const onCoachSubmit = async (data: z.infer<typeof coachSchema>) => {
-      setIsLoading(true);
-      try {
-         // Simulate API call
-         await new Promise((resolve) => setTimeout(resolve, 2000));
-         console.log("Coach signup:", data);
-         // Handle successful signup
-      } catch (error) {
-         console.error("Signup error:", error);
-      } finally {
-         setIsLoading(false);
-      }
+      await signUpCoach(data);
    };
 
    return (
@@ -177,6 +172,18 @@ export default function SignupPage() {
                   </CardDescription>
                </CardHeader>
                <CardContent className="p-8">
+                  {/* Error/Success Messages */}
+                  {error && (
+                     <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                        <p className="text-sm text-red-600">{error}</p>
+                     </div>
+                  )}
+                  {success && (
+                     <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
+                        <p className="text-sm text-green-600">{success}</p>
+                     </div>
+                  )}
+
                   <Tabs
                      value={activeTab}
                      onValueChange={(value) =>
