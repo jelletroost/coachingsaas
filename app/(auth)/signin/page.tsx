@@ -17,25 +17,35 @@ import {
    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { signinSchema } from "@/lib/validators/authSchema";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { animate, inView } from "motion";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-// Validation schema
-const signinSchema = z.object({
-   email: z.string().email("Please enter a valid email address"),
-   password: z.string().min(1, "Password is required"),
-   rememberMe: z.boolean().optional(),
-});
-
 export default function SigninPage() {
-   const [isLoading, setIsLoading] = useState(false);
-   const [showPassword, setShowPassword] = useState(false);
    const headerRef = useRef<HTMLDivElement>(null);
    const cardRef = useRef<HTMLDivElement>(null);
+
+   // Get state and actions from auth store
+   const {
+      email,
+      password,
+      rememberMe,
+      showPassword,
+      isLoading,
+      error,
+      success,
+      setEmail,
+      setPassword,
+      setRememberMe,
+      togglePasswordVisibility,
+      signIn,
+      clearMessages,
+   } = useAuthStore();
 
    // Animation effects
    useEffect(() => {
@@ -66,27 +76,27 @@ export default function SigninPage() {
       }
    }, []);
 
+   // Clear messages on mount
+   useEffect(() => {
+      clearMessages();
+   }, [clearMessages]);
+
    const form = useForm<z.infer<typeof signinSchema>>({
       resolver: zodResolver(signinSchema),
       defaultValues: {
-         email: "",
-         password: "",
-         rememberMe: false,
+         email,
+         password,
+         rememberMe,
       },
    });
 
    const onSubmit = async (data: z.infer<typeof signinSchema>) => {
-      setIsLoading(true);
-      try {
-         // Simulate API call
-         await new Promise((resolve) => setTimeout(resolve, 2000));
-         console.log("Signin:", data);
-         // Handle successful signin
-      } catch (error) {
-         console.error("Signin error:", error);
-      } finally {
-         setIsLoading(false);
-      }
+      setEmail(data.email);
+      setPassword(data.password);
+      setRememberMe(data.rememberMe || false);
+
+      // Sign in with Supabase
+      await signIn();
    };
 
    return (
@@ -113,6 +123,18 @@ export default function SigninPage() {
                   </CardDescription>
                </CardHeader>
                <CardContent className="p-8">
+                  {/* Error/Success Messages */}
+                  {error && (
+                     <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                        <p className="text-sm text-red-600">{error}</p>
+                     </div>
+                  )}
+                  {success && (
+                     <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
+                        <p className="text-sm text-green-600">{success}</p>
+                     </div>
+                  )}
+
                   <Form {...form}>
                      <form
                         onSubmit={form.handleSubmit(onSubmit)}
@@ -129,6 +151,11 @@ export default function SigninPage() {
                                        placeholder="john@example.com"
                                        className="h-12 text-base transition-all duration-200 focus:scale-[1.01]"
                                        {...field}
+                                       value={email}
+                                       onChange={(e) => {
+                                          field.onChange(e);
+                                          setEmail(e.target.value);
+                                       }}
                                     />
                                  </FormControl>
                                  <FormMessage />
@@ -151,15 +178,18 @@ export default function SigninPage() {
                                           placeholder="••••••••"
                                           className="h-12 text-base transition-all duration-200 focus:scale-[1.01] pr-12"
                                           {...field}
+                                          value={password}
+                                          onChange={(e) => {
+                                             field.onChange(e);
+                                             setPassword(e.target.value);
+                                          }}
                                        />
                                        <Button
                                           type="button"
                                           variant="ghost"
                                           size="sm"
                                           className="absolute right-0 top-0 h-12 px-3 py-2 hover:bg-transparent"
-                                          onClick={() =>
-                                             setShowPassword(!showPassword)
-                                          }>
+                                          onClick={togglePasswordVisibility}>
                                           {showPassword ? (
                                              <svg
                                                 className="h-4 w-4"
@@ -210,8 +240,11 @@ export default function SigninPage() {
                                     <FormControl>
                                        <input
                                           type="checkbox"
-                                          checked={field.value}
-                                          onChange={field.onChange}
+                                          checked={rememberMe}
+                                          onChange={(e) => {
+                                             field.onChange(e);
+                                             setRememberMe(e.target.checked);
+                                          }}
                                           className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                                        />
                                     </FormControl>
