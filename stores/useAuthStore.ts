@@ -440,6 +440,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                         );
                      } else {
                         toast.success("Coach account created successfully!");
+                        redirectTo("/signin");
                      }
                   } else {
                      toast.error("Failed to create coach profile");
