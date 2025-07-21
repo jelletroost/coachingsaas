@@ -12,6 +12,7 @@ import {
 } from "@/lib/validators/authSchema";
 import { signInWithEmail, signUpWithEmail } from "@/supabase/auth";
 import { Session, User } from "@supabase/supabase-js";
+import { toast } from "sonner";
 import { z } from "zod";
 import { create } from "zustand";
 
@@ -141,14 +142,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
    },
 
    logout: async () => {
-      const {
-         setLoading,
-         setError,
-         setUser,
-         setSession,
-         setUserProfile,
-         resetForm,
-      } = get();
+      const { setLoading, setUser, setSession, setUserProfile, resetForm } =
+         get();
       setLoading(true);
 
       try {
@@ -163,9 +158,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
          setSession(null);
          setUserProfile(null);
          resetForm();
+         toast.success("Successfully logged out!");
       } catch (error) {
          console.error("Logout error:", error);
-         setError(error instanceof Error ? error.message : "Logout failed");
+         toast.error(error instanceof Error ? error.message : "Logout failed");
       } finally {
          setLoading(false);
       }
@@ -237,8 +233,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
    signIn: async () => {
       const {
          setLoading,
-         setError,
-         setSuccess,
          setUser,
          setSession,
          fetchUserProfile,
@@ -248,14 +242,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
          rememberMe,
       } = get();
 
-      // Clear previous messages
-      setError(null);
-      setSuccess(null);
-
       // Validate form
       const { isValid, errors } = validateForm();
       if (!isValid) {
-         setError(errors.general || "Please fix the form errors");
+         toast.error(errors.general || "Please fix the form errors");
          return;
       }
 
@@ -269,7 +259,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
          // Update user state
          setUser(result.user);
          setSession(result.session);
-         setSuccess("Successfully signed in!");
+         toast.success("Successfully signed in!");
 
          // Fetch user profile
          if (result.user) {
@@ -290,7 +280,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
          // 3. Fetch user profile data
       } catch (error) {
          console.error("Signin error:", error);
-         setError(error instanceof Error ? error.message : "Signin failed");
+         toast.error(error instanceof Error ? error.message : "Signin failed");
       } finally {
          setLoading(false);
       }
@@ -298,16 +288,12 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
    // Sign Up Patient action
    signUpPatient: async (data: PatientFormData) => {
-      const { setLoading, setError, setSuccess, validatePatientForm } = get();
-
-      // Clear previous messages
-      setError(null);
-      setSuccess(null);
+      const { setLoading, validatePatientForm } = get();
 
       // Validate form
       const { isValid, errors } = validatePatientForm(data);
       if (!isValid) {
-         setError(errors.general || "Please fix the form errors");
+         toast.error(errors.general || "Please fix the form errors");
          return;
       }
 
@@ -345,17 +331,17 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
                   if (patientProfile) {
                      if (!result.session) {
-                        setSuccess(
+                        toast.success(
                            "Please check your email to confirm your patient account!"
                         );
                      } else {
-                        setSuccess("Patient account created successfully!");
+                        toast.success("Patient account created successfully!");
                      }
                   } else {
-                     setError("Failed to create patient profile");
+                     toast.error("Failed to create patient profile");
                   }
                } else {
-                  setError("Failed to create user profile");
+                  toast.error("Failed to create user profile");
                }
             } catch (profileError) {
                console.error("Profile creation error:", profileError);
@@ -363,11 +349,13 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                   profileError instanceof Error &&
                   profileError.message.includes("already exists")
                ) {
-                  setError(
+                  toast.error(
                      "An account with this email already exists. Please sign in instead."
                   );
                } else {
-                  setError("Failed to create user profile. Please try again.");
+                  toast.error(
+                     "Failed to create user profile. Please try again."
+                  );
                }
                // Clean up the auth user if profile creation failed
                try {
@@ -378,20 +366,20 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                }
             }
          } else {
-            setError("Failed to create user account");
+            toast.error("Failed to create user account");
          }
       } catch (error) {
          console.error("Patient signup error:", error);
          if (error instanceof Error) {
             if (error.message.includes("already registered")) {
-               setError(
+               toast.error(
                   "An account with this email already exists. Please sign in instead."
                );
             } else {
-               setError(error.message || "Patient signup failed");
+               toast.error(error.message || "Patient signup failed");
             }
          } else {
-            setError("Patient signup failed");
+            toast.error("Patient signup failed");
          }
       } finally {
          setLoading(false);
@@ -400,16 +388,12 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
    // Sign Up Coach action
    signUpCoach: async (data: CoachFormData) => {
-      const { setLoading, setError, setSuccess, validateCoachForm } = get();
-
-      // Clear previous messages
-      setError(null);
-      setSuccess(null);
+      const { setLoading, validateCoachForm } = get();
 
       // Validate form
       const { isValid, errors } = validateCoachForm(data);
       if (!isValid) {
-         setError(errors.general || "Please fix the form errors");
+         toast.error(errors.general || "Please fix the form errors");
          return;
       }
 
@@ -449,17 +433,17 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
                   if (coachProfile) {
                      if (!result.session) {
-                        setSuccess(
+                        toast.success(
                            "Please check your email to confirm your coach account!"
                         );
                      } else {
-                        setSuccess("Coach account created successfully!");
+                        toast.success("Coach account created successfully!");
                      }
                   } else {
-                     setError("Failed to create coach profile");
+                     toast.error("Failed to create coach profile");
                   }
                } else {
-                  setError("Failed to create user profile");
+                  toast.error("Failed to create user profile");
                }
             } catch (profileError) {
                console.error("Profile creation error:", profileError);
@@ -467,11 +451,13 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                   profileError instanceof Error &&
                   profileError.message.includes("already exists")
                ) {
-                  setError(
+                  toast.error(
                      "An account with this email already exists. Please sign in instead."
                   );
                } else {
-                  setError("Failed to create user profile. Please try again.");
+                  toast.error(
+                     "Failed to create user profile. Please try again."
+                  );
                }
                // Clean up the auth user if profile creation failed
                try {
@@ -482,20 +468,20 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                }
             }
          } else {
-            setError("Failed to create user account");
+            toast.error("Failed to create user account");
          }
       } catch (error) {
          console.error("Coach signup error:", error);
          if (error instanceof Error) {
             if (error.message.includes("already registered")) {
-               setError(
+               toast.error(
                   "An account with this email already exists. Please sign in instead."
                );
             } else {
-               setError(error.message || "Coach signup failed");
+               toast.error(error.message || "Coach signup failed");
             }
          } else {
-            setError("Coach signup failed");
+            toast.error("Coach signup failed");
          }
       } finally {
          setLoading(false);

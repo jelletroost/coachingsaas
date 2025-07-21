@@ -224,3 +224,34 @@
       grid-template-columns: 1fr !important;
    } */
 }
+
+/* Sonner Toast Customization */
+[data-sonner-toaster] {
+   --normal-bg: var(--background);
+   --normal-text: var(--foreground);
+   --normal-border: var(--border);
+   --success-bg: var(--background);
+   --success-text: var(--foreground);
+   --success-border: var(--primary);
+   --error-bg: var(--background);
+   --error-text: var(--foreground);
+   --error-border: var(--destructive);
+}
+
+/* Custom icon colors for success toasts */
+[data-sonner-toaster] [data-sonner-toast][data-type="success"] svg {
+   color: var(--primary) !important;
+}
+
+/* Custom icon colors for error toasts */
+[data-sonner-toaster] [data-sonner-toast][data-type="error"] svg {
+   color: var(--destructive) !important;
+}
+
+/* Position toasts at top center */
+[data-sonner-toaster] {
+   top: 1rem !important;
+   left: 50% !important;
+   transform: translateX(-50%) !important;
+   right: auto !important;
+}
