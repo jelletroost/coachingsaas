@@ -364,52 +364,99 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       setLoading(true);
 
       try {
+         console.log("Starting patient signup for:", data.email);
+
          // Sign up with Supabase using email and password from form
          const result = await signUpWithEmail(data.email, data.password);
+         console.log("Supabase auth signup result:", {
+            user: result.user?.id,
+            session: !!result.session,
+         });
 
          if (result.user) {
-            // Create user profile
-            const userProfile = await UserService.createUserProfile({
-               user_id: result.user.id,
-               role: "patient",
-               first_name: data.firstName,
-               last_name: data.lastName,
-               email: data.email,
-               phone: data.phone,
-               date_of_birth: data.dateOfBirth?.toISOString().split("T")[0],
-               account_status: "pending",
-               email_verified: false,
-            });
+            try {
+               console.log("Creating user profile for:", result.user.id);
 
-            if (userProfile) {
-               // Create patient profile
-               const patientProfile = await UserService.createPatientProfile({
-                  user_profile_id: userProfile.id,
-                  health_conditions: data.healthConditions,
-                  preferred_language: "en",
-                  timezone: "UTC",
+               // Create user profile
+               const userProfile = await UserService.createUserProfile({
+                  user_id: result.user.id,
+                  role: "patient",
+                  first_name: data.firstName,
+                  last_name: data.lastName,
+                  email: data.email,
+                  phone: data.phone,
+                  date_of_birth: data.dateOfBirth?.toISOString().split("T")[0],
+                  account_status: "pending",
+                  email_verified: false,
                });
 
-               if (patientProfile) {
-                  if (!result.session) {
-                     setSuccess(
-                        "Please check your email to confirm your patient account!"
-                     );
+               console.log("User profile created:", userProfile?.id);
+
+               if (userProfile) {
+                  console.log("Creating patient profile for:", userProfile.id);
+
+                  // Create patient profile
+                  const patientProfile = await UserService.createPatientProfile(
+                     {
+                        user_profile_id: userProfile.id,
+                        health_conditions: data.healthConditions,
+                        preferred_language: "en",
+                        timezone: "UTC",
+                     }
+                  );
+
+                  console.log("Patient profile created:", patientProfile?.id);
+
+                  if (patientProfile) {
+                     if (!result.session) {
+                        setSuccess(
+                           "Please check your email to confirm your patient account!"
+                        );
+                     } else {
+                        setSuccess("Patient account created successfully!");
+                     }
                   } else {
-                     setSuccess("Patient account created successfully!");
+                     setError("Failed to create patient profile");
                   }
                } else {
-                  setError("Failed to create patient profile");
+                  setError("Failed to create user profile");
                }
-            } else {
-               setError("Failed to create user profile");
+            } catch (profileError) {
+               console.error("Profile creation error:", profileError);
+               if (
+                  profileError instanceof Error &&
+                  profileError.message.includes("already exists")
+               ) {
+                  setError(
+                     "An account with this email already exists. Please sign in instead."
+                  );
+               } else {
+                  setError("Failed to create user profile. Please try again.");
+               }
+               // Clean up the auth user if profile creation failed
+               try {
+                  const { supabase } = await import("@/supabase/client");
+                  await supabase.auth.admin.deleteUser(result.user.id);
+               } catch (cleanupError) {
+                  console.error("Failed to cleanup auth user:", cleanupError);
+               }
             }
+         } else {
+            setError("Failed to create user account");
          }
       } catch (error) {
          console.error("Patient signup error:", error);
-         setError(
-            error instanceof Error ? error.message : "Patient signup failed"
-         );
+         if (error instanceof Error) {
+            if (error.message.includes("already registered")) {
+               setError(
+                  "An account with this email already exists. Please sign in instead."
+               );
+            } else {
+               setError(error.message || "Patient signup failed");
+            }
+         } else {
+            setError("Patient signup failed");
+         }
       } finally {
          setLoading(false);
       }
@@ -434,60 +481,105 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       setLoading(true);
 
       try {
+         console.log("Starting coach signup for:", data.email);
+
          // Sign up with Supabase using email and password from form
          const result = await signUpWithEmail(data.email, data.password);
+         console.log("Supabase auth signup result:", {
+            user: result.user?.id,
+            session: !!result.session,
+         });
 
          if (result.user) {
-            // Create user profile
-            const userProfile = await UserService.createUserProfile({
-               user_id: result.user.id,
-               role: "coach",
-               first_name: data.firstName,
-               last_name: data.lastName,
-               email: data.email,
-               phone: data.phone,
-               account_status: "pending",
-               email_verified: false,
-            });
+            try {
+               console.log("Creating user profile for:", result.user.id);
 
-            if (userProfile) {
-               // Create coach profile
-               const coachProfile = await UserService.createCoachProfile({
-                  user_profile_id: userProfile.id,
-                  specialization: data.specialization as CoachSpecialization,
-                  experience_level: data.experience as ExperienceLevel,
-                  license_number: data.license,
-                  bio: data.bio,
-                  languages_spoken: ["en"],
-                  timezone: "UTC",
-                  is_verified: false,
+               // Create user profile
+               const userProfile = await UserService.createUserProfile({
+                  user_id: result.user.id,
+                  role: "coach",
+                  first_name: data.firstName,
+                  last_name: data.lastName,
+                  email: data.email,
+                  phone: data.phone,
+                  account_status: "pending",
+                  email_verified: false,
                });
 
-               if (coachProfile) {
-                  console.log("Coach signup completed:", {
-                     userProfile,
-                     coachProfile,
+               console.log("User profile created:", userProfile?.id);
+
+               if (userProfile) {
+                  console.log("Creating coach profile for:", userProfile.id);
+
+                  // Create coach profile
+                  const coachProfile = await UserService.createCoachProfile({
+                     user_profile_id: userProfile.id,
+                     specialization: data.specialization as CoachSpecialization,
+                     experience_level: data.experience as ExperienceLevel,
+                     license_number: data.license,
+                     bio: data.bio,
+                     languages_spoken: ["en"],
+                     timezone: "UTC",
+                     is_verified: false,
                   });
 
-                  if (!result.session) {
-                     setSuccess(
-                        "Please check your email to confirm your coach account!"
-                     );
+                  console.log("Coach profile created:", coachProfile?.id);
+
+                  if (coachProfile) {
+                     console.log("Coach signup completed:", {
+                        userProfile,
+                        coachProfile,
+                     });
+
+                     if (!result.session) {
+                        setSuccess(
+                           "Please check your email to confirm your coach account!"
+                        );
+                     } else {
+                        setSuccess("Coach account created successfully!");
+                     }
                   } else {
-                     setSuccess("Coach account created successfully!");
+                     setError("Failed to create coach profile");
                   }
                } else {
-                  setError("Failed to create coach profile");
+                  setError("Failed to create user profile");
                }
-            } else {
-               setError("Failed to create user profile");
+            } catch (profileError) {
+               console.error("Profile creation error:", profileError);
+               if (
+                  profileError instanceof Error &&
+                  profileError.message.includes("already exists")
+               ) {
+                  setError(
+                     "An account with this email already exists. Please sign in instead."
+                  );
+               } else {
+                  setError("Failed to create user profile. Please try again.");
+               }
+               // Clean up the auth user if profile creation failed
+               try {
+                  const { supabase } = await import("@/supabase/client");
+                  await supabase.auth.admin.deleteUser(result.user.id);
+               } catch (cleanupError) {
+                  console.error("Failed to cleanup auth user:", cleanupError);
+               }
             }
+         } else {
+            setError("Failed to create user account");
          }
       } catch (error) {
          console.error("Coach signup error:", error);
-         setError(
-            error instanceof Error ? error.message : "Coach signup failed"
-         );
+         if (error instanceof Error) {
+            if (error.message.includes("already registered")) {
+               setError(
+                  "An account with this email already exists. Please sign in instead."
+               );
+            } else {
+               setError(error.message || "Coach signup failed");
+            }
+         } else {
+            setError("Coach signup failed");
+         }
       } finally {
          setLoading(false);
       }

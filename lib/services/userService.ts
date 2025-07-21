@@ -67,6 +67,17 @@ export class UserService {
       profile: Omit<UserProfile, "id" | "created_at" | "updated_at">
    ): Promise<UserProfile | null> {
       try {
+         // Check if user profile already exists
+         const existingProfile = await this.getUserProfile(profile.user_id);
+         if (existingProfile) {
+            console.error(
+               "User profile already exists for user:",
+               profile.user_id
+            );
+            throw new Error("User profile already exists");
+         }
+
+         // Direct insert since RLS is temporarily disabled
          const { data, error } = await supabase
             .from(TABLES.USER_PROFILES)
             .insert(profile)
@@ -75,13 +86,17 @@ export class UserService {
 
          if (error) {
             console.error("Error creating user profile:", error);
-            return null;
+            if (error.code === "23505") {
+               // Unique constraint violation
+               throw new Error("User profile already exists");
+            }
+            throw new Error(error.message || "Failed to create user profile");
          }
 
          return data;
       } catch (error) {
          console.error("Error in createUserProfile:", error);
-         return null;
+         throw error; // Re-throw to let the caller handle it
       }
    }
 
@@ -115,6 +130,7 @@ export class UserService {
       profile: Omit<PatientProfile, "id" | "created_at" | "updated_at">
    ): Promise<PatientProfile | null> {
       try {
+         // Direct insert since RLS is temporarily disabled
          const { data, error } = await supabase
             .from(TABLES.PATIENT_PROFILES)
             .insert(profile)
@@ -123,13 +139,15 @@ export class UserService {
 
          if (error) {
             console.error("Error creating patient profile:", error);
-            return null;
+            throw new Error(
+               error.message || "Failed to create patient profile"
+            );
          }
 
          return data;
       } catch (error) {
          console.error("Error in createPatientProfile:", error);
-         return null;
+         throw error;
       }
    }
 
@@ -163,6 +181,7 @@ export class UserService {
       profile: Omit<CoachProfile, "id" | "created_at" | "updated_at">
    ): Promise<CoachProfile | null> {
       try {
+         // Direct insert since RLS is temporarily disabled
          const { data, error } = await supabase
             .from(TABLES.COACH_PROFILES)
             .insert(profile)
@@ -171,13 +190,13 @@ export class UserService {
 
          if (error) {
             console.error("Error creating coach profile:", error);
-            return null;
+            throw new Error(error.message || "Failed to create coach profile");
          }
 
          return data;
       } catch (error) {
          console.error("Error in createCoachProfile:", error);
-         return null;
+         throw error;
       }
    }
 
@@ -214,29 +233,15 @@ export class UserService {
       try {
          let query = supabase
             .from(TABLES.COACH_PROFILES)
-            .select(
-               `
-          *,
-          user_profiles!inner (
-            id,
-            first_name,
-            last_name,
-            email,
-            avatar_url,
-            account_status
-          )
-        `
-            )
-            .eq("user_profiles.account_status", "active")
-            .eq("is_verified", true);
+            .select("*")
+            .eq("is_verified", true)
+            .limit(limit);
 
          if (specialization) {
             query = query.eq("specialization", specialization);
          }
 
-         const { data, error } = await query
-            .limit(limit)
-            .order("created_at", { ascending: false });
+         const { data, error } = await query;
 
          if (error) {
             console.error("Error searching coaches:", error);
@@ -244,8 +249,7 @@ export class UserService {
          }
 
          return data || [];
-      } catch (error) {
-         console.error("Error in searchCoaches:", error);
+      } catch {
          return [];
       }
    }
@@ -255,23 +259,9 @@ export class UserService {
       try {
          const { data, error } = await supabase
             .from(TABLES.COACH_PROFILES)
-            .select(
-               `
-          *,
-          user_profiles!inner (
-            id,
-            first_name,
-            last_name,
-            email,
-            avatar_url,
-            account_status
-          )
-        `
-            )
-            .eq("user_profiles.account_status", "active")
+            .select("*")
             .eq("is_verified", true)
-            .limit(limit)
-            .order("created_at", { ascending: false });
+            .limit(limit);
 
          if (error) {
             console.error("Error fetching verified coaches:", error);
@@ -279,13 +269,12 @@ export class UserService {
          }
 
          return data || [];
-      } catch (error) {
-         console.error("Error in getVerifiedCoaches:", error);
+      } catch {
          return [];
       }
    }
 
-   // Delete user profile (cascade will handle related profiles)
+   // Delete user profile (and related profiles)
    static async deleteUserProfile(userId: string): Promise<boolean> {
       try {
          const { error } = await supabase
@@ -299,8 +288,7 @@ export class UserService {
          }
 
          return true;
-      } catch (error) {
-         console.error("Error in deleteUserProfile:", error);
+      } catch {
          return false;
       }
    }
