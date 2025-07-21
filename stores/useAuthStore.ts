@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+import { redirectTo } from "@/app/actions/actions";
 import { UserService } from "@/lib/services/userService";
 import {
    CoachSpecialization,
@@ -336,6 +337,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                         );
                      } else {
                         toast.success("Patient account created successfully!");
+                        redirectTo("/signin");
                      }
                   } else {
                      toast.error("Failed to create patient profile");
