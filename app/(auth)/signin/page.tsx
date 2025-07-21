@@ -17,19 +17,13 @@ import {
    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { signinSchema } from "@/lib/validators/authSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { animate, inView } from "motion";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-
-// Validation schema
-const signinSchema = z.object({
-   email: z.string().email("Please enter a valid email address"),
-   password: z.string().min(1, "Password is required"),
-   rememberMe: z.boolean().optional(),
-});
 
 export default function SigninPage() {
    const [isLoading, setIsLoading] = useState(false);
