@@ -17,8 +17,8 @@ import {
    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useAuthStore } from "@/lib/stores/useAuthStore";
 import { signinSchema } from "@/lib/validators/authSchema";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { animate, inView } from "motion";
 import Link from "next/link";
