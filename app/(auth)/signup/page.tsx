@@ -44,8 +44,8 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 export default function SignupPage() {
-   const [activeTab, setActiveTab] = useState("patient");
-   const [isLoading, setIsLoading] = useState(false);
+   const [activeTab, setActiveTab] = useState<"patient" | "coach">("patient");
+   const [isLoading, setIsLoading] = useState<boolean>(false);
    const headerRef = useRef<HTMLDivElement>(null);
    const cardRef = useRef<HTMLDivElement>(null);
 
@@ -179,7 +179,9 @@ export default function SignupPage() {
                <CardContent className="p-8">
                   <Tabs
                      value={activeTab}
-                     onValueChange={setActiveTab}
+                     onValueChange={(value) =>
+                        setActiveTab(value as "patient" | "coach")
+                     }
                      className="w-full">
                      <TabsList className="tabs-list-enhanced grid w-full grid-cols-2 mb-6 transition-all duration-300">
                         <TabsTrigger
