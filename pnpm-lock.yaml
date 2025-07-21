@@ -103,8 +103,8 @@ importers:
         specifier: ^16.3.0
         version: 16.3.0
       supabase:
-        specifier: ^2.31.4
-        version: 2.31.4
+        specifier: github:supabase/cli
+        version: https://codeload.github.com/supabase/cli/tar.gz/bcbc26783cc19f35df1baf69b36bd11f57808ff5
       tailwindcss:
         specifier: ^4
         version: 4.1.11
@@ -2306,8 +2306,9 @@ packages:
       babel-plugin-macros:
         optional: true
 
-  supabase@2.31.4:
-    resolution: {integrity: sha512-5OIhaXuJHq/rdu6yIozmD4kZa1//IzfQTmrSE74DgJOP4Nz6Y5ynMdaCCg8kTWv34MyOMn0GXrbjhObLdsyElA==}
+  supabase@https://codeload.github.com/supabase/cli/tar.gz/bcbc26783cc19f35df1baf69b36bd11f57808ff5:
+    resolution: {tarball: https://codeload.github.com/supabase/cli/tar.gz/bcbc26783cc19f35df1baf69b36bd11f57808ff5}
+    version: 0.0.0-automated
     engines: {npm: '>=8'}
     hasBin: true
 
@@ -4821,7 +4822,7 @@ snapshots:
       client-only: 0.0.1
       react: 19.1.0
 
-  supabase@2.31.4:
+  supabase@https://codeload.github.com/supabase/cli/tar.gz/bcbc26783cc19f35df1baf69b36bd11f57808ff5:
     dependencies:
       bin-links: 5.0.0
       https-proxy-agent: 7.0.6

@@ -1,4 +1,10 @@
 /* eslint-disable no-unused-vars */
+import { UserService } from "@/lib/services/userService";
+import {
+   CoachSpecialization,
+   ExperienceLevel,
+   UserProfile,
+} from "@/lib/types/database";
 import {
    coachSchema,
    patientSchema,
@@ -29,6 +35,7 @@ interface AuthUserState {
    user: User | null;
    session: Session | null;
    isAuthenticated: boolean;
+   userProfile: UserProfile | null;
 }
 
 interface AuthStore extends AuthFormState, AuthUIState, AuthUserState {
@@ -48,7 +55,9 @@ interface AuthStore extends AuthFormState, AuthUIState, AuthUserState {
    // User actions
    setUser: (user: User | null) => void;
    setSession: (session: Session | null) => void;
+   setUserProfile: (profile: UserProfile | null) => void;
    logout: () => Promise<void>;
+   fetchUserProfile: () => Promise<void>;
 
    // Form validation
    validateForm: () => { isValid: boolean; errors: Record<string, string> };
@@ -85,6 +94,7 @@ const initialUserState: AuthUserState = {
    user: null,
    session: null,
    isAuthenticated: false,
+   userProfile: null,
 };
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
@@ -120,8 +130,26 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
          isAuthenticated: !!user,
       }),
    setSession: (session: Session | null) => set({ session }),
+   setUserProfile: (profile: UserProfile | null) =>
+      set({ userProfile: profile }),
+
+   fetchUserProfile: async () => {
+      const { user, setUserProfile } = get();
+      if (user) {
+         const profile = await UserService.getUserProfile(user.id);
+         setUserProfile(profile);
+      }
+   },
+
    logout: async () => {
-      const { setLoading, setError, setUser, setSession, resetForm } = get();
+      const {
+         setLoading,
+         setError,
+         setUser,
+         setSession,
+         setUserProfile,
+         resetForm,
+      } = get();
       setLoading(true);
 
       try {
@@ -134,6 +162,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
          // Clear user state
          setUser(null);
          setSession(null);
+         setUserProfile(null);
          resetForm();
       } catch (error) {
          console.error("Logout error:", error);
@@ -213,6 +242,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
          setSuccess,
          setUser,
          setSession,
+         fetchUserProfile,
          validateForm,
          email,
          password,
@@ -241,6 +271,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
          setUser(result.user);
          setSession(result.session);
          setSuccess("Successfully signed in!");
+
+         // Fetch user profile
+         if (result.user) {
+            await fetchUserProfile();
+         }
 
          // Store session if remember me is checked
          if (rememberMe && result.session) {
@@ -333,19 +368,41 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
          const result = await signUpWithEmail(data.email, data.password);
 
          if (result.user) {
-            // Here you would typically:
-            // 1. Create patient profile in your database
-            // 2. Store additional patient data
-            // 3. Send welcome email
+            // Create user profile
+            const userProfile = await UserService.createUserProfile({
+               user_id: result.user.id,
+               role: "patient",
+               first_name: data.firstName,
+               last_name: data.lastName,
+               email: data.email,
+               phone: data.phone,
+               date_of_birth: data.dateOfBirth?.toISOString().split("T")[0],
+               account_status: "pending",
+               email_verified: false,
+            });
 
-            console.log("Patient signup data:", data);
+            if (userProfile) {
+               // Create patient profile
+               const patientProfile = await UserService.createPatientProfile({
+                  user_profile_id: userProfile.id,
+                  health_conditions: data.healthConditions,
+                  preferred_language: "en",
+                  timezone: "UTC",
+               });
 
-            if (!result.session) {
-               setSuccess(
-                  "Please check your email to confirm your patient account!"
-               );
+               if (patientProfile) {
+                  if (!result.session) {
+                     setSuccess(
+                        "Please check your email to confirm your patient account!"
+                     );
+                  } else {
+                     setSuccess("Patient account created successfully!");
+                  }
+               } else {
+                  setError("Failed to create patient profile");
+               }
             } else {
-               setSuccess("Patient account created successfully!");
+               setError("Failed to create user profile");
             }
          }
       } catch (error) {
@@ -381,20 +438,49 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
          const result = await signUpWithEmail(data.email, data.password);
 
          if (result.user) {
-            // Here you would typically:
-            // 1. Create coach profile in your database
-            // 2. Store additional coach data
-            // 3. Send welcome email
-            // 4. Trigger coach verification process
+            // Create user profile
+            const userProfile = await UserService.createUserProfile({
+               user_id: result.user.id,
+               role: "coach",
+               first_name: data.firstName,
+               last_name: data.lastName,
+               email: data.email,
+               phone: data.phone,
+               account_status: "pending",
+               email_verified: false,
+            });
 
-            console.log("Coach signup data:", data);
+            if (userProfile) {
+               // Create coach profile
+               const coachProfile = await UserService.createCoachProfile({
+                  user_profile_id: userProfile.id,
+                  specialization: data.specialization as CoachSpecialization,
+                  experience_level: data.experience as ExperienceLevel,
+                  license_number: data.license,
+                  bio: data.bio,
+                  languages_spoken: ["en"],
+                  timezone: "UTC",
+                  is_verified: false,
+               });
 
-            if (!result.session) {
-               setSuccess(
-                  "Please check your email to confirm your coach account!"
-               );
+               if (coachProfile) {
+                  console.log("Coach signup completed:", {
+                     userProfile,
+                     coachProfile,
+                  });
+
+                  if (!result.session) {
+                     setSuccess(
+                        "Please check your email to confirm your coach account!"
+                     );
+                  } else {
+                     setSuccess("Coach account created successfully!");
+                  }
+               } else {
+                  setError("Failed to create coach profile");
+               }
             } else {
-               setSuccess("Coach account created successfully!");
+               setError("Failed to create user profile");
             }
          }
       } catch (error) {

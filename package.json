@@ -42,7 +42,7 @@
       "eslint-config-next": "15.4.2",
       "eslint-plugin-react": "^7.37.5",
       "globals": "^16.3.0",
-      "supabase": "^2.31.4",
+      "supabase": "github:supabase/cli",
       "tailwindcss": "^4",
       "tw-animate-css": "^1.3.5",
       "typescript": "^5",
