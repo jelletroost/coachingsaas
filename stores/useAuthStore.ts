@@ -72,7 +72,6 @@ interface AuthStore extends AuthFormState, AuthUIState, AuthUserState {
 
    // Auth actions
    signIn: () => Promise<void>;
-   signUp: () => Promise<void>;
    signUpPatient: (data: PatientFormData) => Promise<void>;
    signUpCoach: (data: CoachFormData) => Promise<void>;
 }
@@ -297,54 +296,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       }
    },
 
-   // Sign Up action (basic)
-   signUp: async () => {
-      const {
-         setLoading,
-         setError,
-         setSuccess,
-         validateForm,
-         email,
-         password,
-      } = get();
-
-      // Clear previous messages
-      setError(null);
-      setSuccess(null);
-
-      // Validate form
-      const { isValid, errors } = validateForm();
-      if (!isValid) {
-         setError(errors.general || "Please fix the form errors");
-         return;
-      }
-
-      // Set loading state
-      setLoading(true);
-
-      try {
-         // Sign up with Supabase
-         const result = await signUpWithEmail(email, password);
-
-         // Check if email confirmation is required
-         if (result.user && !result.session) {
-            setSuccess("Please check your email to confirm your account!");
-         } else if (result.user && result.session) {
-            // Auto-confirmed user
-            setSuccess("Account created successfully!");
-         }
-
-         // Here you would typically:
-         // 1. Redirect user to email confirmation page
-         // 2. Or auto-login if email confirmation is not required
-      } catch (error) {
-         console.error("Signup error:", error);
-         setError(error instanceof Error ? error.message : "Signup failed");
-      } finally {
-         setLoading(false);
-      }
-   },
-
    // Sign Up Patient action
    signUpPatient: async (data: PatientFormData) => {
       const { setLoading, setError, setSuccess, validatePatientForm } = get();
@@ -364,7 +315,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       setLoading(true);
 
       try {
-         // Sign up with Supabase using email and password from form
          const result = await signUpWithEmail(data.email, data.password);
 
          if (result.user) {
