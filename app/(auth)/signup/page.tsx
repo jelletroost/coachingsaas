@@ -90,8 +90,17 @@ export default function SignupPage() {
    });
 
    const onSubmit = async (data: z.infer<typeof userSchema>) => {
-      const formData = { ...data, role: activeTab };
-      console.log(formData);
+      setIsLoading(true);
+      setError(null);
+      setSuccess(null);
+      try {
+         const formData = { ...data, role: activeTab };
+         console.log(formData);
+      } catch {
+         setError("An error occurred during signup. Please try again.");
+      } finally {
+         setIsLoading(false);
+      }
    };
 
    return (
