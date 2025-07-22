@@ -1,11 +1,7 @@
-import { Hono } from "jsr:@hono/hono";
-import supabaseClient from "../_shared/supabaseClient.ts";
+import { Context } from "jsr:@hono/hono";
+import supabaseClient from "../../_shared/supabaseClient.ts";
 
-const functionName = "api";
-const app = new Hono().basePath(`/${functionName}`);
-
-// User Signup
-app.post("/signup", async (c) => {
+const signup = async (c: Context) => {
    const { email, password } = await c.req.json();
 
    if (!email || !password) {
@@ -20,7 +16,7 @@ app.post("/signup", async (c) => {
    if (error) {
       return c.json({ error: error.message }, 500);
    }
-   return c.json({ user: data.user }, 200);
-});
+   return c.json({ data }, 200);
+};
 
-Deno.serve(app.fetch);
+export default signup;
