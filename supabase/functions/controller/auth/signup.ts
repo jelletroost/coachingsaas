@@ -37,7 +37,7 @@ const signup = async (c: Context) => {
    } else {
       const { error: coachError } = await supabaseClient
          .from("coach_profiles")
-         .insert({ ...commonFields, role });
+         .insert(commonFields);
       insertError = coachError;
    }
 
