@@ -17,3 +17,5 @@ export const coachSchema = z
       message: "Passwords don't match",
       path: ["confirmPassword"],
    });
+
+export type CoachFormData = z.infer<typeof coachSchema>;

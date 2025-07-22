@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
    Card,
    CardContent,
@@ -18,26 +17,9 @@ import {
    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-   Popover,
-   PopoverContent,
-   PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-   Select,
-   SelectContent,
-   SelectItem,
-   SelectTrigger,
-   SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
-import { coachSchema, patientSchema } from "@/lib/validators/authSchema";
-import { useAuthStore } from "@/stores/useAuthStore";
+import { userSchema } from "@/lib/zod_schemas/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
 import { animate, inView } from "motion";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -48,16 +30,9 @@ export default function SignupPage() {
    const [activeTab, setActiveTab] = useState<"patient" | "coach">("patient");
    const headerRef = useRef<HTMLDivElement>(null);
    const cardRef = useRef<HTMLDivElement>(null);
-
-   // Get state and actions from auth store
-   const {
-      isLoading,
-      error,
-      success,
-      clearMessages,
-      signUpPatient,
-      signUpCoach,
-   } = useAuthStore();
+   const [isLoading, setIsLoading] = useState(false);
+   const [error, setError] = useState<string | null>(null);
+   const [success, setSuccess] = useState<string | null>(null);
 
    // Animation effects
    useEffect(() => {
@@ -88,11 +63,6 @@ export default function SignupPage() {
       }
    }, []);
 
-   // Clear messages on mount
-   useEffect(() => {
-      clearMessages();
-   }, [clearMessages]);
-
    // Animate tab content when switching
    useEffect(() => {
       const activeContent = document.querySelector(
@@ -107,42 +77,21 @@ export default function SignupPage() {
       }
    }, [activeTab]);
 
-   const patientForm = useForm<z.infer<typeof patientSchema>>({
-      resolver: zodResolver(patientSchema),
+   const userForm = useForm<z.infer<typeof userSchema>>({
+      resolver: zodResolver(userSchema),
       defaultValues: {
          firstName: "",
          lastName: "",
          email: "",
          password: "",
          confirmPassword: "",
-         dateOfBirth: undefined,
-         phone: "",
-         healthConditions: "",
+         role: "patient",
       },
    });
 
-   const coachForm = useForm<z.infer<typeof coachSchema>>({
-      resolver: zodResolver(coachSchema),
-      defaultValues: {
-         firstName: "",
-         lastName: "",
-         email: "",
-         password: "",
-         confirmPassword: "",
-         phone: "",
-         specialization: "",
-         experience: "",
-         license: "",
-         bio: "",
-      },
-   });
-
-   const onPatientSubmit = async (data: z.infer<typeof patientSchema>) => {
-      await signUpPatient(data);
-   };
-
-   const onCoachSubmit = async (data: z.infer<typeof coachSchema>) => {
-      await signUpCoach(data);
+   const onSubmit = async (data: z.infer<typeof userSchema>) => {
+      const formData = { ...data, role: activeTab };
+      console.log(formData);
    };
 
    return (
@@ -229,15 +178,13 @@ export default function SignupPage() {
 
                      {/* Patient Signup Form */}
                      <TabsContent value="patient" data-value="patient">
-                        <Form {...patientForm}>
+                        <Form {...userForm}>
                            <form
-                              onSubmit={patientForm.handleSubmit(
-                                 onPatientSubmit
-                              )}
+                              onSubmit={userForm.handleSubmit(onSubmit)}
                               className="space-y-6">
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                  <FormField
-                                    control={patientForm.control}
+                                    control={userForm.control}
                                     name="firstName"
                                     render={({ field }) => (
                                        <FormItem className="form-field">
@@ -254,7 +201,7 @@ export default function SignupPage() {
                                     )}
                                  />
                                  <FormField
-                                    control={patientForm.control}
+                                    control={userForm.control}
                                     name="lastName"
                                     render={({ field }) => (
                                        <FormItem className="form-field">
@@ -273,7 +220,7 @@ export default function SignupPage() {
                               </div>
 
                               <FormField
-                                 control={patientForm.control}
+                                 control={userForm.control}
                                  name="email"
                                  render={({ field }) => (
                                     <FormItem className="form-field">
@@ -293,7 +240,7 @@ export default function SignupPage() {
 
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                  <FormField
-                                    control={patientForm.control}
+                                    control={userForm.control}
                                     name="password"
                                     render={({ field }) => (
                                        <FormItem className="form-field">
@@ -311,7 +258,7 @@ export default function SignupPage() {
                                     )}
                                  />
                                  <FormField
-                                    control={patientForm.control}
+                                    control={userForm.control}
                                     name="confirmPassword"
                                     render={({ field }) => (
                                        <FormItem>
@@ -331,89 +278,6 @@ export default function SignupPage() {
                                     )}
                                  />
                               </div>
-
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                 <FormField
-                                    control={patientForm.control}
-                                    name="dateOfBirth"
-                                    render={({ field }) => (
-                                       <FormItem className="form-field">
-                                          <FormLabel>Date of Birth</FormLabel>
-                                          <Popover>
-                                             <PopoverTrigger asChild>
-                                                <FormControl>
-                                                   <Button
-                                                      variant={"outline"}
-                                                      className={cn(
-                                                         "!w-full !h-12 justify-start text-left font-normal cursor-pointer text-base transition-all duration-200 focus:scale-[1.01] hover:bg-accent hover:border-primary/30 active:bg-primary/20 active:border-primary/50",
-                                                         !field.value &&
-                                                            "text-muted-foreground"
-                                                      )}>
-                                                      <CalendarIcon className="mr-2 h-4 w-4" />
-                                                      {field.value ? (
-                                                         format(
-                                                            field.value,
-                                                            "PPP"
-                                                         )
-                                                      ) : (
-                                                         <span>
-                                                            Pick a date
-                                                         </span>
-                                                      )}
-                                                   </Button>
-                                                </FormControl>
-                                             </PopoverTrigger>
-                                             <PopoverContent className="w-auto p-0">
-                                                <Calendar
-                                                   mode="single"
-                                                   selected={field.value}
-                                                   onSelect={field.onChange}
-                                                   initialFocus
-                                                />
-                                             </PopoverContent>
-                                          </Popover>
-                                          <FormMessage />
-                                       </FormItem>
-                                    )}
-                                 />
-                                 <FormField
-                                    control={patientForm.control}
-                                    name="phone"
-                                    render={({ field }) => (
-                                       <FormItem>
-                                          <FormLabel>Phone Number</FormLabel>
-                                          <FormControl>
-                                             <Input
-                                                placeholder="+1 (555) 123-4567"
-                                                className="h-12 text-base"
-                                                {...field}
-                                             />
-                                          </FormControl>
-                                          <FormMessage />
-                                       </FormItem>
-                                    )}
-                                 />
-                              </div>
-
-                              <FormField
-                                 control={patientForm.control}
-                                 name="healthConditions"
-                                 render={({ field }) => (
-                                    <FormItem>
-                                       <FormLabel>
-                                          Health Conditions (Optional)
-                                       </FormLabel>
-                                       <FormControl>
-                                          <Input
-                                             placeholder="e.g., Diabetes, Hypertension"
-                                             className="h-12 text-base"
-                                             {...field}
-                                          />
-                                       </FormControl>
-                                       <FormMessage />
-                                    </FormItem>
-                                 )}
-                              />
 
                               <Button
                                  type="submit"
@@ -436,21 +300,21 @@ export default function SignupPage() {
 
                      {/* Coach Signup Form */}
                      <TabsContent value="coach" data-value="coach">
-                        <Form {...coachForm}>
+                        <Form {...userForm}>
                            <form
-                              onSubmit={coachForm.handleSubmit(onCoachSubmit)}
+                              onSubmit={userForm.handleSubmit(onSubmit)}
                               className="space-y-6">
-                              <div className="grid grid-cols-2 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                  <FormField
-                                    control={coachForm.control}
+                                    control={userForm.control}
                                     name="firstName"
                                     render={({ field }) => (
                                        <FormItem className="form-field">
                                           <FormLabel>First Name</FormLabel>
                                           <FormControl>
                                              <Input
-                                                placeholder="Sarah"
-                                                className="h-12 text-base"
+                                                placeholder="John"
+                                                className="h-12 text-base transition-all duration-200 focus:scale-[1.01]"
                                                 {...field}
                                              />
                                           </FormControl>
@@ -459,14 +323,14 @@ export default function SignupPage() {
                                     )}
                                  />
                                  <FormField
-                                    control={coachForm.control}
+                                    control={userForm.control}
                                     name="lastName"
                                     render={({ field }) => (
-                                       <FormItem>
+                                       <FormItem className="form-field">
                                           <FormLabel>Last Name</FormLabel>
                                           <FormControl>
                                              <Input
-                                                placeholder="Johnson"
+                                                placeholder="Doe"
                                                 className="h-12 text-base"
                                                 {...field}
                                              />
@@ -478,15 +342,15 @@ export default function SignupPage() {
                               </div>
 
                               <FormField
-                                 control={coachForm.control}
+                                 control={userForm.control}
                                  name="email"
                                  render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className="form-field">
                                        <FormLabel>Email</FormLabel>
                                        <FormControl>
                                           <Input
                                              type="email"
-                                             placeholder="sarah@example.com"
+                                             placeholder="john@example.com"
                                              className="h-12 text-base"
                                              {...field}
                                           />
@@ -498,10 +362,10 @@ export default function SignupPage() {
 
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                  <FormField
-                                    control={coachForm.control}
+                                    control={userForm.control}
                                     name="password"
                                     render={({ field }) => (
-                                       <FormItem>
+                                       <FormItem className="form-field">
                                           <FormLabel>Password</FormLabel>
                                           <FormControl>
                                              <Input
@@ -516,7 +380,7 @@ export default function SignupPage() {
                                     )}
                                  />
                                  <FormField
-                                    control={coachForm.control}
+                                    control={userForm.control}
                                     name="confirmPassword"
                                     render={({ field }) => (
                                        <FormItem>
@@ -536,144 +400,6 @@ export default function SignupPage() {
                                     )}
                                  />
                               </div>
-
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                 <FormField
-                                    control={coachForm.control}
-                                    name="phone"
-                                    render={({ field }) => (
-                                       <FormItem>
-                                          <FormLabel>Phone Number</FormLabel>
-                                          <FormControl>
-                                             <Input
-                                                placeholder="+1 (555) 123-4567"
-                                                className="h-12 text-base"
-                                                {...field}
-                                             />
-                                          </FormControl>
-                                          <FormMessage />
-                                       </FormItem>
-                                    )}
-                                 />
-                                 <FormField
-                                    control={coachForm.control}
-                                    name="license"
-                                    render={({ field }) => (
-                                       <FormItem>
-                                          <FormLabel>License Number</FormLabel>
-                                          <FormControl>
-                                             <Input
-                                                placeholder="HC123456"
-                                                className="h-12 text-base"
-                                                {...field}
-                                             />
-                                          </FormControl>
-                                          <FormMessage />
-                                       </FormItem>
-                                    )}
-                                 />
-                              </div>
-
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                 <FormField
-                                    control={coachForm.control}
-                                    name="specialization"
-                                    render={({ field }) => (
-                                       <FormItem className="form-field">
-                                          <FormLabel>Specialization</FormLabel>
-                                          <Select
-                                             onValueChange={field.onChange}
-                                             defaultValue={field.value}>
-                                             <FormControl>
-                                                <SelectTrigger className="select-trigger-fixed text-base transition-all duration-200 focus:scale-[1.01]">
-                                                   <SelectValue placeholder="Select specialization" />
-                                                </SelectTrigger>
-                                             </FormControl>
-                                             <SelectContent className="max-h-[200px] overflow-y-auto">
-                                                <SelectItem value="nutrition">
-                                                   Nutrition
-                                                </SelectItem>
-                                                <SelectItem value="fitness">
-                                                   Fitness
-                                                </SelectItem>
-                                                <SelectItem value="mental-health">
-                                                   Mental Health
-                                                </SelectItem>
-                                                <SelectItem value="diabetes">
-                                                   Diabetes Management
-                                                </SelectItem>
-                                                <SelectItem value="cardiology">
-                                                   Cardiology
-                                                </SelectItem>
-                                                <SelectItem value="pediatrics">
-                                                   Pediatrics
-                                                </SelectItem>
-                                                <SelectItem value="geriatrics">
-                                                   Geriatrics
-                                                </SelectItem>
-                                                <SelectItem value="general">
-                                                   General Wellness
-                                                </SelectItem>
-                                             </SelectContent>
-                                          </Select>
-                                          <FormMessage />
-                                       </FormItem>
-                                    )}
-                                 />
-                                 <FormField
-                                    control={coachForm.control}
-                                    name="experience"
-                                    render={({ field }) => (
-                                       <FormItem className="form-field">
-                                          <FormLabel>
-                                             Experience Level
-                                          </FormLabel>
-                                          <Select
-                                             onValueChange={field.onChange}
-                                             defaultValue={field.value}>
-                                             <FormControl>
-                                                <SelectTrigger className="select-trigger-fixed text-base transition-all duration-200 focus:scale-[1.01]">
-                                                   <SelectValue placeholder="Select experience" />
-                                                </SelectTrigger>
-                                             </FormControl>
-                                             <SelectContent className="max-h-[200px] overflow-y-auto">
-                                                <SelectItem value="0-2">
-                                                   0-2 years
-                                                </SelectItem>
-                                                <SelectItem value="3-5">
-                                                   3-5 years
-                                                </SelectItem>
-                                                <SelectItem value="6-10">
-                                                   6-10 years
-                                                </SelectItem>
-                                                <SelectItem value="10+">
-                                                   10+ years
-                                                </SelectItem>
-                                             </SelectContent>
-                                          </Select>
-                                          <FormMessage />
-                                       </FormItem>
-                                    )}
-                                 />
-                              </div>
-
-                              <FormField
-                                 control={coachForm.control}
-                                 name="bio"
-                                 render={({ field }) => (
-                                    <FormItem>
-                                       <FormLabel>Professional Bio</FormLabel>
-                                       <FormControl>
-                                          <Textarea
-                                             className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-3 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                             placeholder="Tell us about your experience, qualifications, and approach to health coaching..."
-                                             {...field}
-                                          />
-                                       </FormControl>
-                                       <FormMessage />
-                                    </FormItem>
-                                 )}
-                              />
 
                               <Button
                                  type="submit"
