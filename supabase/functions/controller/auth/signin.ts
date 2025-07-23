@@ -16,7 +16,7 @@ const signin = async (c: Context) => {
    if (error) {
       return c.json({ error: error.message }, 500);
    }
-   return c.json({ data }, 200);
+   return c.json({ message: "Signin successful", data }, 200);
 };
 
 export default signin;
