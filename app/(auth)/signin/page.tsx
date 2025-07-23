@@ -18,20 +18,20 @@ import {
    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signinSchema } from "@/lib/zod_schemas/signin.schema";
+import { signinSchema } from "@/lib/zod_schemas/auth.schema";
+import { signin } from "@/services/auth_service";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { animate, inView } from "motion";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import * as z from "zod";
 
 export default function SigninPage() {
    const headerRef = useRef<HTMLDivElement>(null);
    const cardRef = useRef<HTMLDivElement>(null);
-   const [error, setError] = useState<string | null>(null);
-   const [success, setSuccess] = useState<string | null>(null);
-   const [isLoading, setIsLoading] = useState(false);
    const [showPassword, setShowPassword] = useState(false);
 
    const userForm = useForm<z.infer<typeof signinSchema>>({
@@ -76,18 +76,20 @@ export default function SigninPage() {
       }
    }, []);
 
+   // Signin Query
+   const { mutate: signinMutation, isPending } = useMutation({
+      mutationFn: signin,
+      onSuccess: () => {
+         toast.success("Signin successful");
+         // redirectTo("/");
+      },
+      onError: (error) => {
+         toast.error(error.message);
+      },
+   });
+
    const onSubmit = async (data: z.infer<typeof signinSchema>) => {
-      console.log("onSubmit", data);
-      setIsLoading(true);
-      setError(null);
-      setSuccess(null);
-      try {
-         console.log(data);
-      } catch (error) {
-         setError(error as string);
-      } finally {
-         setIsLoading(false);
-      }
+      signinMutation(data);
    };
 
    return (
@@ -114,18 +116,6 @@ export default function SigninPage() {
                   </CardDescription>
                </CardHeader>
                <CardContent className="p-8">
-                  {/* Error/Success Messages */}
-                  {error && (
-                     <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-                        <p className="text-sm text-red-600">{error}</p>
-                     </div>
-                  )}
-                  {success && (
-                     <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
-                        <p className="text-sm text-green-600">{success}</p>
-                     </div>
-                  )}
-
                   <Form {...userForm}>
                      <form
                         onSubmit={userForm.handleSubmit(onSubmit)}
@@ -244,8 +234,8 @@ export default function SigninPage() {
                         <Button
                            type="submit"
                            className="w-full h-12 text-base cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                           disabled={isLoading}>
-                           {isLoading ? (
+                           disabled={isPending}>
+                           {isPending ? (
                               <div className="flex items-center gap-2">
                                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                                  <span className="animate-pulse">

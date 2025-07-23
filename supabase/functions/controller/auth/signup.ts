@@ -1,5 +1,5 @@
 import { Context } from "jsr:@hono/hono";
-import supabaseClient from "../../_shared/supabaseClient.ts";
+import edgeClient from "../../_shared/supabaseClient.ts";
 
 const signup = async (c: Context) => {
    const { email, password, first_name, last_name, role } = await c.req.json();
@@ -8,9 +8,14 @@ const signup = async (c: Context) => {
       return c.json({ error: "Email and password are required" }, 400);
    }
 
-   const { data, error } = await supabaseClient.auth.signUp({
+   const { data, error } = await edgeClient.auth.signUp({
       email,
       password,
+      options: {
+         data: {
+            role,
+         },
+      },
    });
 
    if (error || !data?.user?.id) {
@@ -26,7 +31,7 @@ const signup = async (c: Context) => {
       role,
    };
 
-   const { error: insertError } = await supabaseClient
+   const { error: insertError } = await edgeClient
       .from("users")
       .insert(userData);
 

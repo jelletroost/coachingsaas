@@ -1,5 +1,5 @@
 import { Context } from "jsr:@hono/hono";
-import supabaseClient from "../../_shared/supabaseClient.ts";
+import edgeClient from "../../_shared/supabaseClient.ts";
 
 const signin = async (c: Context) => {
    const { email, password } = await c.req.json();
@@ -8,7 +8,7 @@ const signin = async (c: Context) => {
       return c.json({ error: "Email and password are required" }, 400);
    }
 
-   const { data, error } = await supabaseClient.auth.signInWithPassword({
+   const { data, error } = await edgeClient.auth.signInWithPassword({
       email,
       password,
    });

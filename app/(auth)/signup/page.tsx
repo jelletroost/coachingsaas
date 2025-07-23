@@ -1,5 +1,6 @@
 "use client";
 
+import { redirectTo } from "@/app/actions/actions";
 import { Button } from "@/components/ui/button";
 import {
    Card,
@@ -18,21 +19,21 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { userSchema } from "@/lib/zod_schemas/auth.schema";
+import { signupSchema } from "@/lib/zod_schemas/auth.schema";
+import { signup } from "@/services/auth_service";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { animate, inView } from "motion";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import * as z from "zod";
 
 export default function SignupPage() {
    const [activeTab, setActiveTab] = useState<"patient" | "coach">("patient");
    const headerRef = useRef<HTMLDivElement>(null);
    const cardRef = useRef<HTMLDivElement>(null);
-   const [isLoading, setIsLoading] = useState(false);
-   const [error, setError] = useState<string | null>(null);
-   const [success, setSuccess] = useState<string | null>(null);
 
    // Animation effects
    useEffect(() => {
@@ -77,11 +78,11 @@ export default function SignupPage() {
       }
    }, [activeTab]);
 
-   const userForm = useForm<z.infer<typeof userSchema>>({
-      resolver: zodResolver(userSchema),
+   const userForm = useForm<z.infer<typeof signupSchema>>({
+      resolver: zodResolver(signupSchema),
       defaultValues: {
-         firstName: "",
-         lastName: "",
+         first_name: "",
+         last_name: "",
          email: "",
          password: "",
          confirmPassword: "",
@@ -89,18 +90,20 @@ export default function SignupPage() {
       },
    });
 
-   const onSubmit = async (data: z.infer<typeof userSchema>) => {
-      setIsLoading(true);
-      setError(null);
-      setSuccess(null);
-      try {
-         const formData = { ...data, role: activeTab };
-         console.log(formData);
-      } catch (error) {
-         setError(error as string);
-      } finally {
-         setIsLoading(false);
-      }
+   // Signup Query
+   const { mutate: signupMutation, isPending } = useMutation({
+      mutationFn: signup,
+      onSuccess: () => {
+         toast.success("Signup successful");
+         redirectTo("/signin");
+      },
+      onError: () => {
+         toast.error("Something went wrong");
+      },
+   });
+
+   const onSubmit = async (data: z.infer<typeof signupSchema>) => {
+      signupMutation(data);
    };
 
    return (
@@ -130,18 +133,6 @@ export default function SignupPage() {
                   </CardDescription>
                </CardHeader>
                <CardContent className="p-8">
-                  {/* Error/Success Messages */}
-                  {error && (
-                     <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-                        <p className="text-sm text-red-600">{error}</p>
-                     </div>
-                  )}
-                  {success && (
-                     <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
-                        <p className="text-sm text-green-600">{success}</p>
-                     </div>
-                  )}
-
                   <Tabs
                      value={activeTab}
                      onValueChange={(value) =>
@@ -194,7 +185,7 @@ export default function SignupPage() {
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                  <FormField
                                     control={userForm.control}
-                                    name="firstName"
+                                    name="first_name"
                                     render={({ field }) => (
                                        <FormItem className="form-field">
                                           <FormLabel>First Name</FormLabel>
@@ -211,7 +202,7 @@ export default function SignupPage() {
                                  />
                                  <FormField
                                     control={userForm.control}
-                                    name="lastName"
+                                    name="last_name"
                                     render={({ field }) => (
                                        <FormItem className="form-field">
                                           <FormLabel>Last Name</FormLabel>
@@ -291,8 +282,8 @@ export default function SignupPage() {
                               <Button
                                  type="submit"
                                  className="w-full h-12 text-base cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                                 disabled={isLoading}>
-                                 {isLoading ? (
+                                 disabled={isPending}>
+                                 {isPending ? (
                                     <div className="flex items-center gap-2">
                                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                                        <span className="animate-pulse">
@@ -316,7 +307,7 @@ export default function SignupPage() {
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                  <FormField
                                     control={userForm.control}
-                                    name="firstName"
+                                    name="first_name"
                                     render={({ field }) => (
                                        <FormItem className="form-field">
                                           <FormLabel>First Name</FormLabel>
@@ -333,7 +324,7 @@ export default function SignupPage() {
                                  />
                                  <FormField
                                     control={userForm.control}
-                                    name="lastName"
+                                    name="last_name"
                                     render={({ field }) => (
                                        <FormItem className="form-field">
                                           <FormLabel>Last Name</FormLabel>
@@ -413,8 +404,8 @@ export default function SignupPage() {
                               <Button
                                  type="submit"
                                  className="w-full h-12 text-base cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                                 disabled={isLoading}>
-                                 {isLoading ? (
+                                 disabled={isPending}>
+                                 {isPending ? (
                                     <div className="flex items-center gap-2">
                                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                                        <span className="animate-pulse">
