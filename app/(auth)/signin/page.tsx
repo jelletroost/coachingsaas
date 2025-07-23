@@ -79,12 +79,12 @@ export default function SigninPage() {
    // Signin Query
    const { mutate: signinMutation, isPending } = useMutation({
       mutationFn: signin,
-      onSuccess: (data) => {
-         console.log("Signin successful", data);
+      onSuccess: () => {
+         toast.success("Signin successful");
          // redirectTo("/");
       },
-      onError: () => {
-         toast.error("Invalid credentials");
+      onError: (error) => {
+         toast.error(error.message);
       },
    });
 

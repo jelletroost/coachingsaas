@@ -1,11 +1,11 @@
+import apiClient from "@/lib/axios";
 import { SIGNIN_URL, SIGNUP_URL } from "@/lib/constant";
 import { SigninFormData, SignupFormData } from "@/lib/zod_schemas/auth.schema";
-import axios from "axios";
 
 // User Signup
 export const signup = async (data: SignupFormData) => {
    try {
-      const response = await axios.post(SIGNUP_URL, data);
+      const response = await apiClient.post(SIGNUP_URL, data);
       return response.data;
    } catch (error) {
       console.error(error);
@@ -14,9 +14,9 @@ export const signup = async (data: SignupFormData) => {
 };
 
 // User Signin
-export const signin = async (data: SigninFormData) => {
+export const signin = async (formData: SigninFormData) => {
    try {
-      const response = await axios.post(SIGNIN_URL, data);
+      const response = await apiClient.post(SIGNIN_URL, formData);
       return response.data;
    } catch (error) {
       console.error(error);
