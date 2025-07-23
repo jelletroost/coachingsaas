@@ -8,6 +8,7 @@ import {
    CardHeader,
    CardTitle,
 } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
    Form,
    FormControl,
@@ -17,35 +18,34 @@ import {
    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signinSchema } from "@/lib/validators/authSchema";
-import { useAuthStore } from "@/stores/useAuthStore_OLD";
+import { signinSchema } from "@/lib/zod_schemas/signin.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { animate, inView } from "motion";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 export default function SigninPage() {
    const headerRef = useRef<HTMLDivElement>(null);
    const cardRef = useRef<HTMLDivElement>(null);
+   const [error, setError] = useState<string | null>(null);
+   const [success, setSuccess] = useState<string | null>(null);
+   const [isLoading, setIsLoading] = useState(false);
+   const [showPassword, setShowPassword] = useState(false);
 
-   // Get state and actions from auth store
-   const {
-      email,
-      password,
-      rememberMe,
-      showPassword,
-      isLoading,
-      error,
-      success,
-      setEmail,
-      setPassword,
-      setRememberMe,
-      togglePasswordVisibility,
-      signIn,
-      clearMessages,
-   } = useAuthStore();
+   const userForm = useForm<z.infer<typeof signinSchema>>({
+      resolver: zodResolver(signinSchema),
+      defaultValues: {
+         email: "",
+         password: "",
+         rememberMe: false,
+      },
+   });
+
+   const togglePasswordVisibility = () => {
+      setShowPassword(!showPassword);
+   };
 
    // Animation effects
    useEffect(() => {
@@ -76,27 +76,18 @@ export default function SigninPage() {
       }
    }, []);
 
-   // Clear messages on mount
-   useEffect(() => {
-      clearMessages();
-   }, [clearMessages]);
-
-   const form = useForm<z.infer<typeof signinSchema>>({
-      resolver: zodResolver(signinSchema),
-      defaultValues: {
-         email,
-         password,
-         rememberMe,
-      },
-   });
-
    const onSubmit = async (data: z.infer<typeof signinSchema>) => {
-      setEmail(data.email);
-      setPassword(data.password);
-      setRememberMe(data.rememberMe || false);
-
-      // Sign in with Supabase
-      await signIn();
+      console.log("onSubmit", data);
+      setIsLoading(true);
+      setError(null);
+      setSuccess(null);
+      try {
+         console.log(data);
+      } catch (error) {
+         setError(error as string);
+      } finally {
+         setIsLoading(false);
+      }
    };
 
    return (
@@ -135,12 +126,12 @@ export default function SigninPage() {
                      </div>
                   )}
 
-                  <Form {...form}>
+                  <Form {...userForm}>
                      <form
-                        onSubmit={form.handleSubmit(onSubmit)}
+                        onSubmit={userForm.handleSubmit(onSubmit)}
                         className="space-y-6">
                         <FormField
-                           control={form.control}
+                           control={userForm.control}
                            name="email"
                            render={({ field }) => (
                               <FormItem className="form-field">
@@ -151,11 +142,7 @@ export default function SigninPage() {
                                        placeholder="john@example.com"
                                        className="h-12 text-base transition-all duration-200 focus:scale-[1.01]"
                                        {...field}
-                                       value={email}
-                                       onChange={(e) => {
-                                          field.onChange(e);
-                                          setEmail(e.target.value);
-                                       }}
+                                       {...userForm.register("email")}
                                     />
                                  </FormControl>
                                  <FormMessage />
@@ -164,7 +151,7 @@ export default function SigninPage() {
                         />
 
                         <FormField
-                           control={form.control}
+                           control={userForm.control}
                            name="password"
                            render={({ field }) => (
                               <FormItem className="form-field">
@@ -178,11 +165,7 @@ export default function SigninPage() {
                                           placeholder="••••••••"
                                           className="h-12 text-base transition-all duration-200 focus:scale-[1.01] pr-12"
                                           {...field}
-                                          value={password}
-                                          onChange={(e) => {
-                                             field.onChange(e);
-                                             setPassword(e.target.value);
-                                          }}
+                                          {...userForm.register("password")}
                                        />
                                        <Button
                                           type="button"
@@ -233,19 +216,14 @@ export default function SigninPage() {
 
                         <div className="flex items-center justify-between">
                            <FormField
-                              control={form.control}
+                              control={userForm.control}
                               name="rememberMe"
-                              render={({ field }) => (
+                              render={() => (
                                  <FormItem className="flex flex-row items-center space-x-2 space-y-0">
                                     <FormControl>
-                                       <input
-                                          type="checkbox"
-                                          checked={rememberMe}
-                                          onChange={(e) => {
-                                             field.onChange(e);
-                                             setRememberMe(e.target.checked);
-                                          }}
-                                          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                       <Checkbox
+                                          id="rememberMe"
+                                          {...userForm.register("rememberMe")}
                                        />
                                     </FormControl>
                                     <div className="space-y-1 leading-none">

@@ -96,8 +96,8 @@ export default function SignupPage() {
       try {
          const formData = { ...data, role: activeTab };
          console.log(formData);
-      } catch {
-         setError("An error occurred during signup. Please try again.");
+      } catch (error) {
+         setError(error as string);
       } finally {
          setIsLoading(false);
       }

@@ -1,8 +1,8 @@
 import { SIGNUP_URL } from "@/lib/constant";
-import { PatientFormData } from "@/lib/zod_schemas/auth.schema";
+import { UserFormData } from "@/lib/zod_schemas/auth.schema";
 import axios from "axios";
 
-const patientSignup = async (data: PatientFormData) => {
+const signup = async (data: UserFormData) => {
    try {
       const response = await axios.post(SIGNUP_URL, data);
       return response.data;
@@ -12,4 +12,4 @@ const patientSignup = async (data: PatientFormData) => {
    }
 };
 
-export default patientSignup;
+export default signup;
