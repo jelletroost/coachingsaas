@@ -26,6 +26,7 @@ import { animate, inView } from "motion";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import * as z from "zod";
 
 export default function SigninPage() {
@@ -79,12 +80,10 @@ export default function SigninPage() {
    const { mutate: signinMutation, isPending } = useMutation({
       mutationFn: signin,
       onSuccess: () => {
-         // toast.success("Signin successful");
-         console.log("Signin successful");
+         toast.success("Signin successful");
       },
-      onError: (error) => {
-         // toast.error(error as unknown as string);
-         console.log("Signin error", error);
+      onError: () => {
+         toast.error("Invalid credentials");
       },
    });
 
