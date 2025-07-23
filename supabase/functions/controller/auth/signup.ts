@@ -11,6 +11,11 @@ const signup = async (c: Context) => {
    const { data, error } = await supabaseClient.auth.signUp({
       email,
       password,
+      options: {
+         data: {
+            role,
+         },
+      },
    });
 
    if (error || !data?.user?.id) {
