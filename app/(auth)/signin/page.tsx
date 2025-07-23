@@ -18,7 +18,7 @@ import {
    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signinSchema } from "@/lib/zod_schemas/signin.schema";
+import { signinSchema } from "@/lib/zod_schemas/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { animate, inView } from "motion";
 import Link from "next/link";

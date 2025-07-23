@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { userSchema } from "@/lib/zod_schemas/auth.schema";
+import { signupSchema } from "@/lib/zod_schemas/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { animate, inView } from "motion";
 import Link from "next/link";
@@ -77,8 +77,8 @@ export default function SignupPage() {
       }
    }, [activeTab]);
 
-   const userForm = useForm<z.infer<typeof userSchema>>({
-      resolver: zodResolver(userSchema),
+   const userForm = useForm<z.infer<typeof signupSchema>>({
+      resolver: zodResolver(signupSchema),
       defaultValues: {
          firstName: "",
          lastName: "",
@@ -89,7 +89,7 @@ export default function SignupPage() {
       },
    });
 
-   const onSubmit = async (data: z.infer<typeof userSchema>) => {
+   const onSubmit = async (data: z.infer<typeof signupSchema>) => {
       setIsLoading(true);
       setError(null);
       setSuccess(null);
