@@ -24,7 +24,6 @@ const signup = async (c: Context) => {
       last_name: lastName,
       email,
       account_status: "active",
-      email_verified: false,
    };
 
    let insertError = null;
