@@ -1,38 +1,112 @@
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import heroImage from "@/public/female-doctor-hospital.jpg";
-import { ArrowRight, Play } from "lucide-react";
+import {
+   ArrowRight,
+   CheckCircle,
+   Clock,
+   Play,
+   Shield,
+   Star,
+   TrendingUp,
+   Users,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+const benefits = [
+   {
+      icon: Users,
+      title: "Expert Coaches",
+      description: "Certified health professionals guiding your journey",
+   },
+   {
+      icon: Shield,
+      title: "Secure & Private",
+      description: "HIPAA-compliant platform protecting your data",
+   },
+   {
+      icon: Clock,
+      title: "24/7 Support",
+      description: "Round-the-clock assistance when you need it",
+   },
+];
+
+const stats = [
+   { number: "10K+", label: "Active Users" },
+   { number: "95%", label: "Success Rate" },
+   { number: "24/7", label: "Support Available" },
+];
+
 export default function Hero() {
    return (
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary/3 via-background via-60% to-secondary/5">
-         <div className="container mx-auto px-4 py-20 lg:py-32">
+      <section className="relative overflow-hidden bg-gradient-to-br from-background via-primary/5 to-secondary/10">
+         <div className="container mx-auto px-4 py-16 lg:py-24">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
                {/* Content */}
                <div className="text-center lg:text-left">
+                  {/* Badge */}
+                  <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
+                     <Star className="w-4 h-4" />
+                     Trusted by 10,000+ healthcare professionals
+                  </div>
+
                   {/* Main Headline */}
-                  <h1 className="mb-6 text-4x font-bold tracking-tight leading-[5rem] text-foreground sm:text-5xl lg:text-6xl">
-                     A Smarter Way to Manage Your{" "}
+                  <h1 className="mb-6 text-4xl font-bold tracking-tight leading-tight text-foreground sm:text-5xl lg:text-6xl">
+                     Transform Your Health with{" "}
                      <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-                        Medication & Health Journey
+                        Personalized Coaching
                      </span>
                   </h1>
 
                   {/* Subheadline */}
-                  <p className="mb-8 text-xl text-muted-foreground sm:text-2xl">
-                     Personalized programs, professional coaching, and automated
-                     orders — all in one place.
+                  <p className="mb-8 text-lg text-muted-foreground sm:text-xl max-w-2xl lg:max-w-none">
+                     Get personalized health coaching, automated medication
+                     management, and continuous support from certified
+                     professionals. Your journey to better health starts here.
                   </p>
+
+                  {/* Benefits Cards */}
+                  <div className="grid sm:grid-cols-3 gap-4 mb-8">
+                     {benefits.map((benefit, index) => (
+                        <Card
+                           key={index}
+                           className="border-0 bg-primary/5 hover:bg-primary/10 transition-colors">
+                           <CardContent className="p-4 text-center">
+                              <benefit.icon className="w-6 h-6 text-primary mx-auto mb-2" />
+                              <h3 className="font-semibold text-sm text-foreground mb-1">
+                                 {benefit.title}
+                              </h3>
+                              <p className="text-xs text-muted-foreground">
+                                 {benefit.description}
+                              </p>
+                           </CardContent>
+                        </Card>
+                     ))}
+                  </div>
+
+                  {/* Stats */}
+                  <div className="flex flex-wrap justify-center lg:justify-start gap-8 mb-8">
+                     {stats.map((stat, index) => (
+                        <div key={index} className="text-center">
+                           <div className="text-2xl font-bold text-primary">
+                              {stat.number}
+                           </div>
+                           <div className="text-sm text-muted-foreground">
+                              {stat.label}
+                           </div>
+                        </div>
+                     ))}
+                  </div>
 
                   {/* CTA Buttons */}
                   <div className="flex flex-col gap-4 sm:flex-row sm:justify-center lg:justify-start">
                      <Button
                         asChild
                         size="lg"
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all">
                         <Link href="/signup">
-                           Get Started
+                           Start Your Journey
                            <ArrowRight className="ml-2 h-4 w-4" />
                         </Link>
                      </Button>
@@ -40,30 +114,88 @@ export default function Hero() {
                         asChild
                         variant="outline"
                         size="lg"
-                        className="border-2">
+                        className="border-2 hover:bg-primary/5">
                         <Link href="#how-it-works">
                            <Play className="mr-2 h-4 w-4" />
                            See How It Works
                         </Link>
                      </Button>
                   </div>
+
+                  {/* Trust Indicators */}
+                  <div className="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-sm text-muted-foreground">
+                     <div className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                        Free 14-day trial
+                     </div>
+                     <div className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                        No credit card required
+                     </div>
+                     <div className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                        Cancel anytime
+                     </div>
+                  </div>
                </div>
 
-               {/* Image */}
+               {/* Image Section */}
                <div className="relative">
+                  {/* Main Image */}
                   <div className="relative w-full h-[400px] lg:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
                      <Image
                         src={heroImage}
-                        alt="Health management platform interface"
+                        alt="Healthcare professional providing personalized coaching"
                         width={1000}
                         height={1000}
                         priority
+                        className="object-cover"
                      />
+
+                     {/* Overlay with stats */}
+                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+
+                     {/* Floating stats card */}
+                     <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg p-4 shadow-lg">
+                        <div className="flex items-center gap-3">
+                           <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                              <TrendingUp className="w-6 h-6 text-primary" />
+                           </div>
+                           <div>
+                              <div className="text-lg font-bold text-foreground">
+                                 95%
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                 Success Rate
+                              </div>
+                           </div>
+                        </div>
+                     </div>
                   </div>
 
                   {/* Floating elements for visual interest */}
-                  <div className="absolute -top-4 -right-4 w-20 h-20 bg-secondary/20 rounded-full blur-xl"></div>
-                  <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-primary/20 rounded-full blur-xl"></div>
+                  <div className="absolute -top-4 -right-4 w-20 h-20 bg-primary/20 rounded-full blur-xl"></div>
+                  <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-secondary/20 rounded-full blur-xl"></div>
+
+                  {/* Testimonial card */}
+                  <div className="absolute -bottom-8 -right-8 bg-white rounded-lg p-4 shadow-lg max-w-xs">
+                     <div className="flex items-center gap-2 mb-2">
+                        {[...Array(5)].map((_, i) => (
+                           <Star
+                              key={i}
+                              className="w-4 h-4 text-yellow-400 fill-current"
+                           />
+                        ))}
+                     </div>
+                     <p className="text-sm text-muted-foreground mb-2">
+                        &ldquo;This platform completely transformed my health
+                        journey. The personalized coaching made all the
+                        difference.&rdquo;
+                     </p>
+                     <div className="text-xs font-medium text-foreground">
+                        - Sarah M., Patient
+                     </div>
+                  </div>
                </div>
             </div>
          </div>
