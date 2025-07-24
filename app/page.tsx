@@ -3,6 +3,7 @@ import Hero from "@/components/home/hero";
 import HowWork from "@/components/home/howWrok";
 import Pricing from "@/components/home/pricing";
 import Services from "@/components/home/services";
+import Testimonial from "@/components/home/testimonial";
 
 export default function HomePage() {
    return (
@@ -11,6 +12,7 @@ export default function HomePage() {
          <HowWork />
          <Pricing />
          <Services />
+         <Testimonial />
          <CTA />
       </div>
    );
