@@ -168,7 +168,7 @@ export default function HowWork() {
                         asChild
                         variant="outline"
                         size="lg"
-                        className="border-white text-white hover:bg-white hover:text-primary">
+                        className="border-white text-primary hover:bg-white hover:text-primary">
                         <Link href="/signin">Sign In</Link>
                      </Button>
                   </div>
