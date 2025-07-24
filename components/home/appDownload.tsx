@@ -55,7 +55,7 @@ export default function AppDownload() {
                      </div>
 
                      {/* Download Button */}
-                     <button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-4 px-6 rounded-2xl transition-all duration-200 flex items-center justify-center space-x-3 group">
+                     <button className="w-full cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-4 px-6 rounded-2xl transition-all duration-200 flex items-center justify-center space-x-3 group">
                         <Download className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
                         <span>Download for iOS</span>
                      </button>
@@ -98,7 +98,7 @@ export default function AppDownload() {
                      </div>
 
                      {/* Download Button */}
-                     <button className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold py-4 px-6 rounded-2xl transition-all duration-200 flex items-center justify-center space-x-3 group">
+                     <button className="w-full cursor-pointer bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold py-4 px-6 rounded-2xl transition-all duration-200 flex items-center justify-center space-x-3 group">
                         <Download className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
                         <span>Download for Android</span>
                      </button>

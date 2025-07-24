@@ -94,7 +94,7 @@ export default function Footer() {
                            asChild
                            variant="outline"
                            size="icon"
-                           className="w-9 h-9 border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white">
+                           className="w-9 h-9 border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-800 hover:text-white">
                            <a href={social.href} aria-label={social.label}>
                               <social.icon className="w-4 h-4" />
                            </a>
