@@ -1,4 +1,5 @@
 import CTA from "@/components/home/CTA";
+import FAQ from "@/components/home/faq";
 import Hero from "@/components/home/hero";
 import HowWork from "@/components/home/howWrok";
 import Pricing from "@/components/home/pricing";
@@ -13,6 +14,7 @@ export default function HomePage() {
          <Pricing />
          <Services />
          <Testimonial />
+         <FAQ />
          <CTA />
       </div>
    );
