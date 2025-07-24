@@ -1,5 +1,3 @@
-"use client";
-
 import { Apple, Download, Play } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 

@@ -72,110 +72,57 @@ export default function FAQ() {
             </div>
 
             {/* FAQ Accordion */}
-            <div className="max-w-7xl mx-auto">
-               <div className="flex flex-col md:flex-row gap-6">
-                  <div className="flex-1 space-y-4">
-                     {faqs.slice(0, 3).map((faq) => (
-                        <Card
-                           key={faq.id}
-                           className={`border-2 transition-all duration-300 ${
-                              openId === faq.id
-                                 ? "border-primary shadow-lg"
-                                 : "border-border hover:border-primary/50"
-                           }`}>
-                           <CardContent className="p-0">
-                              <Button
-                                 variant="ghost"
-                                 className="w-full p-6 text-left hover:bg-transparent focus:bg-transparent"
-                                 onClick={() => toggleFAQ(faq.id)}>
-                                 <div className="flex items-start justify-between w-full">
-                                    <div className="flex items-start gap-4">
-                                       <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                                          <HelpCircle className="w-4 h-4 text-primary" />
-                                       </div>
-                                       <div className="flex-1">
-                                          <h3 className="text-lg font-semibold text-foreground text-left">
-                                             {faq.question}
-                                          </h3>
-                                       </div>
+            <div className="max-w-4xl mx-auto">
+               <div className="space-y-4">
+                  {faqs.map((faq) => (
+                     <Card
+                        key={faq.id}
+                        className={`border-2 transition-all duration-300 ${
+                           openId === faq.id
+                              ? "border-primary shadow-lg"
+                              : "border-border hover:border-primary/50"
+                        }`}>
+                        <CardContent className="p-0">
+                           <Button
+                              variant="ghost"
+                              className="w-full p-4 sm:p-6 text-left hover:bg-transparent focus:bg-transparent"
+                              onClick={() => toggleFAQ(faq.id)}>
+                              <div className="flex items-start justify-between w-full">
+                                 <div className="flex items-start gap-3 sm:gap-4">
+                                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                       <HelpCircle className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
                                     </div>
-                                    <ChevronDown
-                                       className={`w-5 h-5 text-muted-foreground transition-transform duration-300 flex-shrink-0 ml-4 ${
-                                          openId === faq.id ? "rotate-180" : ""
-                                       }`}
-                                    />
+                                    <div className="flex-1 min-w-0">
+                                       <h3 className="text-base sm:text-lg font-semibold text-foreground text-left leading-tight">
+                                          {faq.question}
+                                       </h3>
+                                    </div>
                                  </div>
-                              </Button>
+                                 <ChevronDown
+                                    className={`w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground transition-transform duration-300 flex-shrink-0 ml-2 sm:ml-4 ${
+                                       openId === faq.id ? "rotate-180" : ""
+                                    }`}
+                                 />
+                              </div>
+                           </Button>
 
-                              <div
-                                 className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                                    openId === faq.id
-                                       ? "max-h-96 opacity-100"
-                                       : "max-h-0 opacity-0"
-                                 }`}>
-                                 <div className="px-6 pb-6 ml-12">
-                                    <div className="border-l-2 border-primary/20 pl-4">
-                                       <p className="text-muted-foreground leading-relaxed">
-                                          {faq.answer}
-                                       </p>
-                                    </div>
+                           <div
+                              className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                                 openId === faq.id
+                                    ? "max-h-96 opacity-100"
+                                    : "max-h-0 opacity-0"
+                              }`}>
+                              <div className="px-4 sm:px-6 pb-4 sm:pb-6 ml-6 sm:ml-12">
+                                 <div className="border-l-2 border-primary/20 pl-3 sm:pl-4">
+                                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                                       {faq.answer}
+                                    </p>
                                  </div>
                               </div>
-                           </CardContent>
-                        </Card>
-                     ))}
-                  </div>
-                  <div className="flex-1 space-y-4">
-                     {faqs.slice(3).map((faq) => (
-                        <Card
-                           key={faq.id}
-                           className={`border-2 transition-all duration-300 ${
-                              openId === faq.id
-                                 ? "border-primary shadow-lg"
-                                 : "border-border hover:border-primary/50"
-                           }`}>
-                           <CardContent className="p-0">
-                              <Button
-                                 variant="ghost"
-                                 className="w-full p-6 text-left hover:bg-transparent focus:bg-transparent"
-                                 onClick={() => toggleFAQ(faq.id)}>
-                                 <div className="flex items-start justify-between w-full">
-                                    <div className="flex items-start gap-4">
-                                       <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                                          <HelpCircle className="w-4 h-4 text-primary" />
-                                       </div>
-                                       <div className="flex-1">
-                                          <h3 className="text-lg font-semibold text-foreground text-left">
-                                             {faq.question}
-                                          </h3>
-                                       </div>
-                                    </div>
-                                    <ChevronDown
-                                       className={`w-5 h-5 text-muted-foreground transition-transform duration-300 flex-shrink-0 ml-4 ${
-                                          openId === faq.id ? "rotate-180" : ""
-                                       }`}
-                                    />
-                                 </div>
-                              </Button>
-
-                              <div
-                                 className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                                    openId === faq.id
-                                       ? "max-h-96 opacity-100"
-                                       : "max-h-0 opacity-0"
-                                 }`}>
-                                 <div className="px-6 pb-6 ml-12">
-                                    <div className="border-l-2 border-primary/20 pl-4">
-                                       <p className="text-muted-foreground leading-relaxed">
-                                          {faq.answer}
-                                       </p>
-                                    </div>
-                                 </div>
-                              </div>
-                           </CardContent>
-                        </Card>
-                     ))}
-                  </div>
+                           </div>
+                        </CardContent>
+                     </Card>
+                  ))}
                </div>
             </div>
          </div>
