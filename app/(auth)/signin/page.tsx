@@ -1,5 +1,6 @@
 "use client";
 
+import { redirectTo } from "@/app/actions/actions";
 import { Button } from "@/components/ui/button";
 import {
    Card,
@@ -81,7 +82,7 @@ export default function SigninPage() {
       mutationFn: signin,
       onSuccess: () => {
          toast.success("Signin successful");
-         // redirectTo("/");
+         redirectTo("/");
       },
       onError: () => {
          toast.error("Invalid credentials");
