@@ -1,36 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import heroImage from "@/public/female-doctor-hospital.jpg";
-import {
-   ArrowRight,
-   CheckCircle,
-   Clock,
-   Play,
-   Shield,
-   Star,
-   TrendingUp,
-   Users,
-} from "lucide-react";
+import { ArrowRight, CheckCircle, Play, Star, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-
-const benefits = [
-   {
-      icon: Users,
-      title: "Expert Coaches",
-      description: "Certified health professionals guiding your journey",
-   },
-   {
-      icon: Shield,
-      title: "Secure & Private",
-      description: "HIPAA-compliant platform protecting your data",
-   },
-   {
-      icon: Clock,
-      title: "24/7 Support",
-      description: "Round-the-clock assistance when you need it",
-   },
-];
 
 const stats = [
    { number: "10K+", label: "Active Users" },
@@ -65,25 +37,6 @@ export default function Hero() {
                      management, and continuous support from certified
                      professionals. Your journey to better health starts here.
                   </p>
-
-                  {/* Benefits Cards */}
-                  <div className="grid sm:grid-cols-3 gap-4 mb-8">
-                     {benefits.map((benefit, index) => (
-                        <Card
-                           key={index}
-                           className="border-0 bg-primary/5 hover:bg-primary/10 transition-colors">
-                           <CardContent className="p-4 text-center">
-                              <benefit.icon className="w-6 h-6 text-primary mx-auto mb-2" />
-                              <h3 className="font-semibold text-sm text-foreground mb-1">
-                                 {benefit.title}
-                              </h3>
-                              <p className="text-xs text-muted-foreground">
-                                 {benefit.description}
-                              </p>
-                           </CardContent>
-                        </Card>
-                     ))}
-                  </div>
 
                   {/* Stats */}
                   <div className="flex flex-wrap justify-center lg:justify-start gap-8 mb-8">
