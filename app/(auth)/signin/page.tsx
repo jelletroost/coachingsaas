@@ -83,8 +83,8 @@ export default function SigninPage() {
          toast.success("Signin successful");
          // redirectTo("/");
       },
-      onError: (error) => {
-         toast.error(error.message);
+      onError: () => {
+         toast.error("Invalid credentials");
       },
    });
 
