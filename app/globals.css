@@ -47,9 +47,9 @@
    --radius: 0.625rem;
 
    /* Global Brand Colors - Easy to change */
-   --brand-primary: #004e4e;
-   --brand-accent: #004e4e;
-   --brand-secondary: #f9d67b;
+   --brand-primary: #2563eb; /* Blue-600 */
+   --brand-accent: #3b82f6; /* Blue-500 */
+   --brand-secondary: #f59e0b; /* Amber-500 */
 
    /* Background and Foreground */
    --background: oklch(1 0 0);
@@ -72,7 +72,7 @@
    --muted-foreground: oklch(0.556 0 0);
 
    /* Accent: Low opacity version of primary for hover states */
-   --accent: oklch(0.85 0.15 180 / 0.1);
+   --accent: oklch(0.85 0.15 220 / 0.1);
    --accent-foreground: var(--brand-primary);
 
    /* Destructive: Healthcare-appropriate red */
@@ -85,10 +85,10 @@
 
    /* Chart colors - using brand colors */
    --chart-1: var(--brand-primary);
-   --chart-2: oklch(0.85 0.12 85); /* Secondary (warm gold) */
-   --chart-3: oklch(0.398 0.07 227.392);
-   --chart-4: oklch(0.828 0.189 84.429);
-   --chart-5: oklch(0.769 0.188 70.08);
+   --chart-2: var(--brand-secondary); /* Secondary (amber) */
+   --chart-3: oklch(0.65 0.15 220); /* Blue variant */
+   --chart-4: oklch(0.75 0.12 85); /* Warm accent */
+   --chart-5: oklch(0.55 0.18 280); /* Purple accent */
 
    /* Sidebar */
    --sidebar: oklch(0.985 0 0);
@@ -111,7 +111,7 @@
    --popover-foreground: oklch(0.985 0 0);
 
    /* Primary: Brighter version for dark mode */
-   --primary: oklch(0.65 0.15 180); /* Brighter version of brand primary */
+   --primary: oklch(0.65 0.15 220); /* Brighter version of brand primary */
    --primary-foreground: oklch(0.145 0 0);
 
    /* Secondary: Previous accent color (warm gold) for dark mode */
@@ -123,7 +123,7 @@
    --muted-foreground: oklch(0.708 0 0);
 
    /* Accent: Low opacity version of primary for dark mode hover states */
-   --accent: oklch(0.65 0.15 180 / 0.15);
+   --accent: oklch(0.65 0.15 220 / 0.15);
    --accent-foreground: oklch(0.985 0 0);
 
    /* Destructive: Brighter for dark mode */
@@ -132,24 +132,24 @@
    /* Borders and inputs */
    --border: oklch(1 0 0 / 10%);
    --input: oklch(1 0 0 / 15%);
-   --ring: oklch(0.65 0.15 180);
+   --ring: oklch(0.65 0.15 220);
 
    /* Chart colors - brighter versions for dark mode */
-   --chart-1: oklch(0.65 0.15 180); /* Brighter primary */
-   --chart-2: oklch(0.75 0.12 85); /* Secondary (warm gold) */
-   --chart-3: oklch(0.769 0.188 70.08);
-   --chart-4: oklch(0.627 0.265 303.9);
-   --chart-5: oklch(0.645 0.246 16.439);
+   --chart-1: oklch(0.65 0.15 220); /* Brighter primary */
+   --chart-2: oklch(0.75 0.12 85); /* Secondary (amber) */
+   --chart-3: oklch(0.75 0.18 280); /* Purple accent */
+   --chart-4: oklch(0.65 0.15 220); /* Blue variant */
+   --chart-5: oklch(0.75 0.12 85); /* Warm accent */
 
    /* Sidebar */
    --sidebar: oklch(0.205 0 0);
    --sidebar-foreground: oklch(0.985 0 0);
-   --sidebar-primary: oklch(0.65 0.15 180);
+   --sidebar-primary: oklch(0.65 0.15 220);
    --sidebar-primary-foreground: oklch(0.145 0 0);
    --sidebar-accent: oklch(0.269 0 0);
    --sidebar-accent-foreground: oklch(0.985 0 0);
    --sidebar-border: oklch(1 0 0 / 10%);
-   --sidebar-ring: oklch(0.65 0.15 180);
+   --sidebar-ring: oklch(0.65 0.15 220);
 }
 
 @layer base {
@@ -236,22 +236,4 @@
    --error-bg: var(--background);
    --error-text: var(--foreground);
    --error-border: var(--destructive);
-}
-
-/* Custom icon colors for success toasts */
-[data-sonner-toaster] [data-sonner-toast][data-type="success"] svg {
-   color: var(--primary) !important;
-}
-
-/* Custom icon colors for error toasts */
-[data-sonner-toaster] [data-sonner-toast][data-type="error"] svg {
-   color: var(--destructive) !important;
-}
-
-/* Position toasts at top center */
-[data-sonner-toaster] {
-   top: 1rem !important;
-   left: 50% !important;
-   transform: translateX(-50%) !important;
-   right: auto !important;
 }
