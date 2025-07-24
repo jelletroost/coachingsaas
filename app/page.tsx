@@ -1,3 +1,4 @@
+import AppDownload from "@/components/home/appDownload";
 import CTA from "@/components/home/CTA";
 import FAQ from "@/components/home/faq";
 import Hero from "@/components/home/hero";
@@ -15,6 +16,7 @@ export default function HomePage() {
          <Services />
          <Testimonial />
          <FAQ />
+         <AppDownload />
          <CTA />
       </div>
    );
