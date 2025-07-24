@@ -93,7 +93,7 @@ export default function Testimonials() {
    return (
       <section
          id="testimonials"
-         className="py-20 lg:py-32 bg-gradient-to-br from-background via-primary/5 to-secondary/10">
+         className="py-20 lg:py-20 bg-gradient-to-br from-background via-secondary/5 to-primary/5">
          <div className="container mx-auto px-4">
             {/* Header */}
             <div className="text-center mb-16">

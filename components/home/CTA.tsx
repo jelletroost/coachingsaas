@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function CTA() {
    return (
-      <section className="py-20 lg:py-32 bg-gradient-to-br from-background via-secondary/5 to-primary/5">
+      <section className="py-20 lg:py-20 bg-gradient-to-br from-background via-secondary/5 to-primary/5">
          <div className="container mx-auto px-4">
             <div className="text-center">
                <div className="bg-gradient-to-r from-primary to-primary/80 rounded-2xl p-8 lg:p-12 text-primary-foreground">

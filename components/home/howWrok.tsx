@@ -82,7 +82,7 @@ export default function HowWork() {
    return (
       <section
          id="how-it-works"
-         className="relative py-20 lg:py-32 bg-gradient-to-br from-background via-secondary/5 to-primary/5">
+         className="relative py-20 lg:py-20 bg-gradient-to-br from-background via-secondary/5 to-primary/5">
          <div className="container mx-auto px-4">
             {/* Header */}
             <div className="text-center mb-16">
@@ -100,7 +100,7 @@ export default function HowWork() {
             </div>
 
             {/* Steps Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                {steps.map((step, index) => (
                   <div key={index}>
                      <Card className="h-full border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg group">
