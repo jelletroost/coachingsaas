@@ -75,7 +75,7 @@ function getDashboardByRole(role?: string): string {
       case "coach":
          return "/coach/dashboard";
       case "patient":
-         return "/patient/dashboard";
+         return "/dashboard";
       default:
          return "/auth/signin";
    }
