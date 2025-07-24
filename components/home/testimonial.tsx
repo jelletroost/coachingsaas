@@ -1,5 +1,12 @@
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
-import { Quote, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, Quote, Star } from "lucide-react";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 const testimonials = [
    {
@@ -103,94 +110,175 @@ export default function Testimonials() {
                </p>
             </div>
 
-            {/* Testimonials Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-               {testimonials.map((testimonial, index) => (
-                  <Card
-                     key={index}
-                     className="group h-full border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
-                     <CardContent className="p-6">
-                        {/* Quote Icon */}
-                        <div className="flex justify-between items-start mb-4">
-                           <Quote className="w-8 h-8 text-primary/30" />
-                           <div className="flex">
-                              {[...Array(testimonial.rating)].map((_, i) => (
-                                 <Star
-                                    key={i}
-                                    className="w-4 h-4 text-yellow-400 fill-current"
-                                 />
-                              ))}
-                           </div>
-                        </div>
+            {/* Testimonials Carousel */}
+            <div className="relative">
+               {/* Custom Navigation Buttons */}
+               <div className="hidden lg:block">
+                  <button className="swiper-button-prev-custom absolute left-4 top-1/2 transform -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-primary hover:text-white transition-colors cursor-pointer">
+                     <ChevronLeft className="w-6 h-6" />
+                  </button>
+                  <button className="swiper-button-next-custom absolute right-4 top-1/2 transform -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-primary hover:text-white transition-colors cursor-pointer">
+                     <ChevronRight className="w-6 h-6" />
+                  </button>
+               </div>
 
-                        {/* Testimonial Text */}
-                        <blockquote className="text-muted-foreground mb-6 leading-relaxed">
-                           &ldquo;{testimonial.testimonial}&rdquo;
-                        </blockquote>
+               <Swiper
+                  modules={[Navigation, Pagination, Autoplay]}
+                  spaceBetween={24}
+                  slidesPerView={1}
+                  breakpoints={{
+                     640: {
+                        slidesPerView: 2,
+                        spaceBetween: 24,
+                     },
+                     1024: {
+                        slidesPerView: 3,
+                        spaceBetween: 32,
+                     },
+                  }}
+                  navigation={{
+                     nextEl: ".swiper-button-next-custom",
+                     prevEl: ".swiper-button-prev-custom",
+                  }}
+                  pagination={{
+                     clickable: true,
+                     el: ".swiper-pagination-custom",
+                  }}
+                  autoplay={{
+                     delay: 5000,
+                     disableOnInteraction: false,
+                  }}
+                  loop={true}
+                  className="testimonials-swiper">
+                  {testimonials.map((testimonial, index) => (
+                     <SwiperSlide key={index}>
+                        <Card className="h-full border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
+                           <CardContent className="p-6">
+                              {/* Quote Icon */}
+                              <div className="flex justify-between items-start mb-4">
+                                 <Quote className="w-8 h-8 text-primary/30" />
+                                 <div className="flex">
+                                    {[...Array(testimonial.rating)].map(
+                                       (_, i) => (
+                                          <Star
+                                             key={i}
+                                             className="w-4 h-4 text-yellow-400 fill-current"
+                                          />
+                                       )
+                                    )}
+                                 </div>
+                              </div>
 
-                        {/* Improvement Highlight */}
-                        <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-6">
-                           <div className="text-sm font-semibold text-green-800 mb-1">
-                              Key Improvement:
-                           </div>
-                           <div className="text-sm text-green-700">
-                              {testimonial.improvement}
-                           </div>
-                        </div>
+                              {/* Testimonial Text */}
+                              <blockquote className="text-muted-foreground mb-6 leading-relaxed">
+                                 &ldquo;{testimonial.testimonial}&rdquo;
+                              </blockquote>
 
-                        {/* Customer Info */}
-                        <div className="flex items-center justify-between">
-                           <div className="flex items-center gap-3">
-                              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                                 <span className="text-sm font-semibold text-primary">
-                                    {testimonial.avatar}
+                              {/* Improvement Highlight */}
+                              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-6">
+                                 <div className="text-sm font-semibold text-green-800 mb-1">
+                                    Key Improvement:
+                                 </div>
+                                 <div className="text-sm text-green-700">
+                                    {testimonial.improvement}
+                                 </div>
+                              </div>
+
+                              {/* Customer Info */}
+                              <div className="flex items-center justify-between">
+                                 <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                                       <span className="text-sm font-semibold text-primary">
+                                          {testimonial.avatar}
+                                       </span>
+                                    </div>
+                                    <div>
+                                       <div className="font-semibold text-foreground">
+                                          {testimonial.name}
+                                       </div>
+                                       <div className="text-sm text-muted-foreground">
+                                          {testimonial.role} • {testimonial.age}{" "}
+                                          years old
+                                       </div>
+                                       <div className="text-xs text-muted-foreground">
+                                          {testimonial.condition}
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <div className="text-right">
+                                    <div className="text-sm font-medium text-foreground">
+                                       {testimonial.duration}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                       on platform
+                                    </div>
+                                 </div>
+                              </div>
+
+                              {/* Category Badge */}
+                              <div className="mt-4">
+                                 <span
+                                    className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                                       testimonial.category === "success"
+                                          ? "bg-green-100 text-green-800"
+                                          : testimonial.category === "coach"
+                                          ? "bg-blue-100 text-blue-800"
+                                          : "bg-purple-100 text-purple-800"
+                                    }`}>
+                                    {testimonial.category === "success"
+                                       ? "Health Success"
+                                       : testimonial.category === "coach"
+                                       ? "Coach Experience"
+                                       : "Family Care"}
                                  </span>
                               </div>
-                              <div>
-                                 <div className="font-semibold text-foreground">
-                                    {testimonial.name}
-                                 </div>
-                                 <div className="text-sm text-muted-foreground">
-                                    {testimonial.role} • {testimonial.age} years
-                                    old
-                                 </div>
-                                 <div className="text-xs text-muted-foreground">
-                                    {testimonial.condition}
-                                 </div>
-                              </div>
-                           </div>
-                           <div className="text-right">
-                              <div className="text-sm font-medium text-foreground">
-                                 {testimonial.duration}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                 on platform
-                              </div>
-                           </div>
-                        </div>
+                           </CardContent>
+                        </Card>
+                     </SwiperSlide>
+                  ))}
+               </Swiper>
 
-                        {/* Category Badge */}
-                        <div className="mt-4">
-                           <span
-                              className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                                 testimonial.category === "success"
-                                    ? "bg-green-100 text-green-800"
-                                    : testimonial.category === "coach"
-                                    ? "bg-blue-100 text-blue-800"
-                                    : "bg-purple-100 text-purple-800"
-                              }`}>
-                              {testimonial.category === "success"
-                                 ? "Health Success"
-                                 : testimonial.category === "coach"
-                                 ? "Coach Experience"
-                                 : "Family Care"}
-                           </span>
-                        </div>
-                     </CardContent>
-                  </Card>
-               ))}
+               {/* Custom Pagination */}
+               <div className="swiper-pagination-custom flex justify-center mt-8"></div>
             </div>
          </div>
+
+         <style
+            dangerouslySetInnerHTML={{
+               __html: `
+               .testimonials-swiper .swiper-slide {
+                  height: auto;
+               }
+                  .swiper-button-prev-custom:hover,
+                  .swiper-button-next-custom:hover {
+                     transform: none !important;
+                  }
+               
+               .swiper-pagination-custom .swiper-pagination-bullet {
+                  width: 12px;
+                  height: 12px;
+                  background: #e5e7eb;
+                  opacity: 1;
+                  margin: 0 4px;
+               }
+               
+               .swiper-pagination-custom .swiper-pagination-bullet-active {
+                  background: #2563eb;
+                  transform: scale(1.2);
+               }
+               
+               .swiper-button-prev-custom,
+               .swiper-button-next-custom {
+                  transition: all 0.3s ease;
+               }
+               
+               .swiper-button-prev-custom:hover,
+               .swiper-button-next-custom:hover {
+                  transform: translateY(-50%) scale(1.1);
+               }
+            `,
+            }}
+         />
       </section>
    );
 }
