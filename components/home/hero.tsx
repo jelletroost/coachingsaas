@@ -31,7 +31,7 @@ export default function Hero() {
                      </span>
                   </h1>
 
-                  {/* Subheadline */}
+                  {/* Subheading */}
                   <p className="mb-8 text-lg text-muted-foreground sm:text-xl max-w-2xl lg:max-w-none">
                      Get personalized health coaching, automated medication
                      management, and continuous support from certified
