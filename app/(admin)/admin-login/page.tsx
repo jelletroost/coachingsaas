@@ -100,7 +100,7 @@ export default function AdminLoginPage() {
             setTimeout(() => {
                setIsLocked(false);
                setLoginAttempts(0);
-            }, 300000); // 5 minutes lockout
+            }, 300000);
          } else {
             toast.error(
                `Invalid credentials. ${3 - newAttempts} attempts remaining.`
