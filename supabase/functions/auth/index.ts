@@ -7,7 +7,7 @@ const functionName = "auth";
 const app = new Hono().basePath(`/${functionName}`);
 
 // Routes
-app.post("/signup", signup);
-app.post("/signin", signin);
+app.post("/auth/signup", signup);
+app.post("/auth/signin", signin);
 
 Deno.serve(withCors(app));

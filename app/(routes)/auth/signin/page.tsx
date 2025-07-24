@@ -226,7 +226,7 @@ export default function SigninPage() {
                               )}
                            />
                            <Link
-                              href="/forgot-password"
+                              href="/auth/reset-password"
                               className="text-sm text-primary hover:underline cursor-pointer">
                               Forgot password?
                            </Link>
@@ -308,7 +308,7 @@ export default function SigninPage() {
                      <p className="text-sm text-muted-foreground">
                         Don&apos;t have an account?{" "}
                         <Link
-                           href="/signup"
+                           href="/auth/signup"
                            className="text-primary hover:underline cursor-pointer">
                            Sign up
                         </Link>

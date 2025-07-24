@@ -21,7 +21,7 @@ export default function CTA() {
                         asChild
                         size="lg"
                         className="bg-white text-primary hover:bg-white/90">
-                        <Link href="/signup">
+                        <Link href="/auth/signup">
                            Get Started Today
                            <ArrowRight className="ml-2 h-4 w-4" />
                         </Link>
@@ -31,7 +31,7 @@ export default function CTA() {
                         variant="outline"
                         size="lg"
                         className="border-white text-primary hover:bg-white hover:text-primary">
-                        <Link href="/signin">Sign In</Link>
+                        <Link href="/auth/signin">Sign In</Link>
                      </Button>
                   </div>
                </div>

@@ -139,7 +139,7 @@ export default function Header() {
                      />
                   ) : (
                      <>
-                        <Link href="/signin">
+                        <Link href="/auth/signin">
                            <Button
                               className="cursor-pointer"
                               variant="ghost"
@@ -147,7 +147,7 @@ export default function Header() {
                               Sign In
                            </Button>
                         </Link>
-                        <Link href="/signup">
+                        <Link href="/auth/signup">
                            <Button className="cursor-pointer" size="sm">
                               Get Started
                            </Button>

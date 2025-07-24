@@ -63,7 +63,7 @@ export default function MobileMenu({
                         </>
                      ) : (
                         <>
-                           <Link href="/signin" onClick={closeMobileMenu}>
+                           <Link href="/auth/signin" onClick={closeMobileMenu}>
                               <Button
                                  variant="ghost"
                                  className="w-full cursor-pointer"
@@ -71,7 +71,7 @@ export default function MobileMenu({
                                  Sign In
                               </Button>
                            </Link>
-                           <Link href="/signup" onClick={closeMobileMenu}>
+                           <Link href="/auth/signup" onClick={closeMobileMenu}>
                               <Button
                                  className="w-full cursor-pointer"
                                  size="sm">

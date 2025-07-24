@@ -95,7 +95,7 @@ export default function SignupPage() {
       mutationFn: signup,
       onSuccess: () => {
          toast.success("Signup successful");
-         redirectTo("/signin");
+         redirectTo("/auth/signin");
       },
       onError: () => {
          toast.error("Something went wrong");
@@ -426,7 +426,7 @@ export default function SignupPage() {
                      <p className="text-sm text-muted-foreground">
                         Already have an account?{" "}
                         <Link
-                           href="/signin"
+                           href="/auth/signin"
                            className="text-primary hover:underline cursor-pointer">
                            Sign in
                         </Link>

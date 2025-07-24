@@ -126,7 +126,7 @@ export default function ResetPasswordPage() {
          mutationFn: submitNewPassword,
          onSuccess: () => {
             toast.success("Password updated successfully!");
-            redirectTo("/signin");
+            redirectTo("/auth/signin");
          },
          onError: () => {
             toast.error("Failed to update password. Please try again.");
@@ -340,7 +340,7 @@ export default function ResetPasswordPage() {
                   {/* Back to Sign In */}
                   <div className="text-center pt-4">
                      <Link
-                        href="/signin"
+                        href="/auth/signin"
                         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
                         <ArrowLeft className="w-4 h-4" />
                         Back to Sign In

@@ -58,7 +58,7 @@ export default function Hero() {
                         asChild
                         size="lg"
                         className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all">
-                        <Link href="/signup">
+                        <Link href="/auth/signup">
                            Start Your Journey
                            <ArrowRight className="ml-2 h-4 w-4" />
                         </Link>
