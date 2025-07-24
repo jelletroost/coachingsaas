@@ -1,3 +1,4 @@
+import Footer from "@/components/layout/footer";
 import { QueryProvider } from "@/lib/providers/queryProviders";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -31,6 +32,7 @@ export default function RootLayout({
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
             <QueryProvider>
                {children}
+               <Footer />
                <Toaster position="top-center" />
             </QueryProvider>
          </body>
