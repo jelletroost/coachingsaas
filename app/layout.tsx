@@ -1,5 +1,9 @@
+import Footer from "@/components/layout/footer";
+import Header from "@/components/layout/header/header";
+import { QueryProvider } from "@/lib/providers/queryProviders";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,7 +31,12 @@ export default function RootLayout({
       <html lang="en">
          <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-            {children}
+            <QueryProvider>
+               <Header />
+               {children}
+               <Footer />
+               <Toaster position="top-center" />
+            </QueryProvider>
          </body>
       </html>
    );
