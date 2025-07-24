@@ -1,98 +1,113 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Apple, Play, Smartphone } from "lucide-react";
+import { Apple, Download, Play } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
 export default function AppDownload() {
    return (
-      <section className="py-16 bg-gradient-to-br from-primary/5 to-secondary/5">
+      <section className="py-20 lg:py-32 bg-gradient-to-br from-background via-secondary/5 to-primary/5">
          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-               <Card className="border-0 shadow-lg bg-background/80 backdrop-blur-sm">
-                  <CardContent className="p-8 lg:p-12">
-                     <div className="grid lg:grid-cols-2 gap-8 items-center">
-                        {/* Content Side */}
-                        <div className="space-y-6">
-                           <div className="flex items-center gap-2">
-                              <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
-                                 <Smartphone className="w-4 h-4 text-primary" />
-                              </div>
-                              <span className="text-sm font-medium text-primary">
-                                 Mobile App
-                              </span>
-                           </div>
+            {/* Header */}
+            <div className="text-center mb-16">
+               <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl mb-6">
+                  Download Our{" "}
+                  <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                     Mobile App
+                  </span>
+               </h2>
+               <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                  Get the full experience on your mobile device. Download our
+                  app for iOS and Android to access all features on the go.
+               </p>
+            </div>
 
-                           <div>
-                              <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-3">
-                                 Download Our App
-                              </h2>
-                              <p className="text-muted-foreground leading-relaxed">
-                                 Get instant access to your health coach,
-                                 medication reminders, and progress tracking on
-                                 your mobile device.
-                              </p>
-                           </div>
-
-                           {/* Download Buttons */}
-                           <div className="flex flex-col sm:flex-row gap-3">
-                              <Button
-                                 asChild
-                                 size="lg"
-                                 className="bg-black hover:bg-black/90 text-white">
-                                 <a
-                                    href="#"
-                                    className="flex items-center gap-2">
-                                    <Apple className="w-4 h-4" />
-                                    <span>App Store</span>
-                                 </a>
-                              </Button>
-
-                              <Button asChild size="lg" variant="outline">
-                                 <a
-                                    href="#"
-                                    className="flex items-center gap-2">
-                                    <Play className="w-4 h-4" />
-                                    <span>Google Play</span>
-                                 </a>
-                              </Button>
-                           </div>
-
-                           {/* Trust Indicators */}
-                           <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                              <span>⭐ 4.9/5</span>
-                              <span>•</span>
-                              <span>10K+ downloads</span>
-                              <span>•</span>
-                              <span>Free</span>
-                           </div>
-                        </div>
-
-                        {/* QR Code Side */}
-                        <div className="flex justify-center lg:justify-end">
-                           <div className="text-center space-y-4">
-                              <div className="inline-block p-4 bg-white rounded-2xl shadow-lg">
-                                 <QRCodeSVG
-                                    value="https://apps.apple.com/app/coach-saas"
-                                    size={160}
-                                    level="M"
-                                    includeMargin={true}
-                                 />
-                              </div>
-                              <div className="space-y-2">
-                                 <p className="text-sm font-medium text-foreground">
-                                    Scan to download
-                                 </p>
-                                 <p className="text-xs text-muted-foreground">
-                                    Works on iOS and Android
-                                 </p>
-                              </div>
-                           </div>
-                        </div>
+            {/* Download Cards */}
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+               {/* iOS Card */}
+               <div className="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="text-center">
+                     <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-2xl mb-6">
+                        <Apple className="w-9 h-9 text-primary-foreground" />
                      </div>
-                  </CardContent>
-               </Card>
+                     <h3 className="text-2xl font-bold text-foreground mb-2">
+                        iOS App
+                     </h3>
+                     <p className="text-muted-foreground mb-8">
+                        Available on the App Store
+                     </p>
+
+                     {/* QR Code */}
+                     <div className="mb-8">
+                        <div className="inline-block p-4 bg-muted rounded-2xl">
+                           <div className="w-32 h-32 bg-white rounded-xl border-2 border-border flex items-center justify-center">
+                              <QRCodeSVG
+                                 value="https://apps.apple.com/app/coach-saas"
+                                 size={120}
+                                 level="M"
+                                 includeMargin={false}
+                                 className="rounded-lg"
+                              />
+                           </div>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-3">
+                           Scan to download for iOS
+                        </p>
+                     </div>
+
+                     {/* Download Button */}
+                     <button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-4 px-6 rounded-2xl transition-all duration-200 flex items-center justify-center space-x-3 group">
+                        <Download className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
+                        <span>Download for iOS</span>
+                     </button>
+
+                     <p className="text-xs text-muted-foreground mt-4">
+                        iOS 12.0 or later required
+                     </p>
+                  </div>
+               </div>
+
+               {/* Android Card */}
+               <div className="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="text-center">
+                     <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary rounded-2xl mb-6">
+                        <Play className="w-8 h-8 text-secondary-foreground ml-1" />
+                     </div>
+                     <h3 className="text-2xl font-bold text-foreground mb-2">
+                        Android App
+                     </h3>
+                     <p className="text-muted-foreground mb-8">
+                        Get it on Google Play
+                     </p>
+
+                     {/* QR Code */}
+                     <div className="mb-8">
+                        <div className="inline-block p-4 bg-muted rounded-2xl">
+                           <div className="w-32 h-32 bg-white rounded-xl border-2 border-border flex items-center justify-center">
+                              <QRCodeSVG
+                                 value="https://play.google.com/store/apps/details?id=com.coachsaas.app"
+                                 size={120}
+                                 level="M"
+                                 includeMargin={false}
+                                 className="rounded-lg"
+                              />
+                           </div>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-3">
+                           Scan to download for Android
+                        </p>
+                     </div>
+
+                     {/* Download Button */}
+                     <button className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold py-4 px-6 rounded-2xl transition-all duration-200 flex items-center justify-center space-x-3 group">
+                        <Download className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
+                        <span>Download for Android</span>
+                     </button>
+
+                     <p className="text-xs text-muted-foreground mt-4">
+                        Android 6.0 or later required
+                     </p>
+                  </div>
+               </div>
             </div>
          </div>
       </section>
