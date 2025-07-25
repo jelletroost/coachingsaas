@@ -79,9 +79,10 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
          return [
             {
                label: "Dashboard",
-               href: "/patient/dashboard",
+               href: "/dashboard",
                icon: "HomeIcon",
             },
+            { label: "Settings", href: "/settings", icon: "Settings" },
          ];
       default:
          return [];

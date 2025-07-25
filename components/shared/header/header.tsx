@@ -76,6 +76,10 @@ const navigation = [
       label: "FAQ",
       href: "/#faq",
    },
+   {
+      label: "Admin Dashboard",
+      href: "/admin/overview",
+   },
 ];
 
 export default function Header() {
