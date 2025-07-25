@@ -23,7 +23,7 @@ export function DashboardSidebar() {
          <SidebarHeader>
             <Logo />
          </SidebarHeader>
-         <SidebarContent>
+         <SidebarContent className="p-4">
             <SidebarMenu>
                {menuItems.map((item) => (
                   <SidebarMenuItem key={item.label}>
@@ -34,7 +34,7 @@ export function DashboardSidebar() {
                               : ""
                         }`}
                         asChild>
-                        <Link href={item.href}>
+                        <Link className="py-6" href={item.href}>
                            {item.icon && <item.icon />}
                            <span>{item.label}</span>
                         </Link>
