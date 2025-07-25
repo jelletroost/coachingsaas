@@ -14,6 +14,14 @@ interface UserData {
    email: string;
    avatar: string;
 }
+const userRole: string = "patient";
+const profileUrl: string =
+   userRole === "admin"
+      ? "/admin/profile"
+      : userRole === "coach"
+      ? "/coach/profile"
+      : "/dashboard/profile";
+
 const NavUser = ({ user }: { user: UserData }) => {
    const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
    return (
@@ -56,7 +64,7 @@ const NavUser = ({ user }: { user: UserData }) => {
                   Back to Home
                </Link>
                <Link
-                  href="/profile"
+                  href={profileUrl}
                   onClick={() => setIsUserDropdownOpen(false)}
                   className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-accent hover:text-accent-foreground transition-colors">
                   <User2Icon className="mr-2 h-4 w-4" />
