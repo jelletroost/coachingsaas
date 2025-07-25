@@ -33,8 +33,8 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
       case "admin":
          return [
             {
-               label: "Dashboard",
-               href: "/admin/dashboard",
+               label: "Overview",
+               href: "/admin/overview",
                icon: getIconComponent("HomeIcon"),
             },
             {
