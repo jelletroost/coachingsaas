@@ -3,7 +3,7 @@ import DashboardHeader from "../ui/dashboard-header";
 import { DashboardSidebar } from "../ui/dashboard-sidebar";
 import { SidebarInset, SidebarProvider } from "../ui/sidebar";
 
-const AdminDashboard = ({ children }: { children: React.ReactNode }) => {
+const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
    return (
       <SidebarProvider>
          <DashboardSidebar />
@@ -21,4 +21,4 @@ const AdminDashboard = ({ children }: { children: React.ReactNode }) => {
    );
 };
 
-export default AdminDashboard;
+export default DashboardLayout;
