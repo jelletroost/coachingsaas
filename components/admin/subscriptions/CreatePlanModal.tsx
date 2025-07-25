@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 "use client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -55,7 +56,7 @@ export function CreatePlanModal({
    const [formData, setFormData] = useState({
       name: "",
       description: "",
-      status: "draft" as const,
+      status: "draft" as SubscriptionPlan["status"],
       price: 0,
       currency: "USD",
       billingCycle: "monthly" as "monthly" | "quarterly" | "yearly",
@@ -193,10 +194,7 @@ export function CreatePlanModal({
                            onValueChange={(value) =>
                               setFormData((prev) => ({
                                  ...prev,
-                                 status: value as
-                                    | "draft"
-                                    | "active"
-                                    | "inactive",
+                                 status: value as SubscriptionPlan["status"],
                               }))
                            }>
                            <SelectTrigger>

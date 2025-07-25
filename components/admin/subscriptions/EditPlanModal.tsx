@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 "use client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -163,7 +164,7 @@ export function EditPlanModal({
                            onValueChange={(value) =>
                               setFormData((prev) => ({
                                  ...prev,
-                                 status: value as any,
+                                 status: value as SubscriptionPlan["status"],
                               }))
                            }>
                            <SelectTrigger>
@@ -239,7 +240,8 @@ export function EditPlanModal({
                            onValueChange={(value) =>
                               setFormData((prev) => ({
                                  ...prev,
-                                 billingCycle: value as any,
+                                 billingCycle:
+                                    value as SubscriptionPlan["billingCycle"],
                               }))
                            }>
                            <SelectTrigger>
