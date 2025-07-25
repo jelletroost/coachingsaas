@@ -1,5 +1,6 @@
 import {
    Calendar,
+   CreditCard,
    HomeIcon,
    MessageSquare,
    Settings,
@@ -24,6 +25,7 @@ export const getIconComponent = (iconName: string) => {
       Calendar,
       MessageSquare,
       Settings,
+      CreditCard,
    };
    return iconMap[iconName];
 };
@@ -46,6 +48,11 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
                label: "Orders",
                href: "/admin/orders",
                icon: getIconComponent("ShoppingCart"),
+            },
+            {
+               label: "Subscriptions",
+               href: "/admin/subscriptions",
+               icon: getIconComponent("CreditCard"),
             },
          ];
       case "coach":
