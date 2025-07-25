@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { UserProfile } from "@/lib/types/database";
 import Link from "next/link";
 import { useState } from "react";
+import Logo from "../logo";
 import MobileMenu from "./mobileMenu";
 import UserDropdown from "./userDropdown";
 
@@ -40,15 +41,6 @@ const CloseIcon = () => (
    </svg>
 );
 
-const Logo = () => (
-   <div className="flex items-center gap-2">
-      <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-         <span className="text-primary-foreground font-bold text-sm">HC</span>
-      </div>
-      <span className="font-bold text-xl text-foreground">HealthCoach Pro</span>
-   </div>
-);
-
 // Mock user data - replace with actual user data from your auth store
 const mockUser: UserProfile = {
    id: "1",
@@ -83,6 +75,10 @@ const navigation = [
    {
       label: "FAQ",
       href: "/#faq",
+   },
+   {
+      label: "Admin Dashboard",
+      href: "/admin/overview",
    },
 ];
 
