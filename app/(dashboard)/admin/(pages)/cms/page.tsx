@@ -1,7 +1,7 @@
 export default function AdminCMSPage() {
    return (
       <div>
-         <h1>Admin CMS Page</h1>
+         <h1>Coming Soon</h1>
       </div>
    );
 }

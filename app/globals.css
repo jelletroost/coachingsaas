@@ -72,7 +72,7 @@
    --muted-foreground: oklch(0.556 0 0);
 
    /* Accent: Low opacity version of primary for hover states */
-   --accent: oklch(0.85 0.15 220 / 0.1);
+   --accent: #e7eefc;
    --accent-foreground: var(--brand-primary);
 
    /* Destructive: Healthcare-appropriate red */
@@ -95,8 +95,8 @@
    --sidebar-foreground: oklch(0.145 0 0);
    --sidebar-primary: var(--brand-primary);
    --sidebar-primary-foreground: oklch(0.985 0 0);
-   --sidebar-accent: oklch(0.97 0 0);
-   --sidebar-accent-foreground: oklch(0.205 0 0);
+   --sidebar-accent: var(--accent);
+   --sidebar-accent-foreground: var(--brand-primary);
    --sidebar-border: oklch(0.922 0 0);
    --sidebar-ring: var(--brand-primary);
 }
