@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 "use client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -87,7 +88,7 @@ export function SubscriptionDetailsModal({
                   </div>
                </DialogTitle>
                <DialogDescription>
-                  Detailed information about {subscription.userName}'s
+                  Detailed information about {subscription.userName}&apos;s
                   subscription
                </DialogDescription>
             </DialogHeader>
