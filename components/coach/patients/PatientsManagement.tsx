@@ -38,16 +38,6 @@ export function PatientsManagement() {
       setIsProfileModalOpen(true);
    };
 
-   const handleSendMessage = (patient: Patient) => {
-      // TODO: Implement message functionality
-      console.log("Send message to:", patient.name);
-   };
-
-   const handleScheduleAppointment = (patient: Patient) => {
-      // TODO: Implement appointment scheduling
-      console.log("Schedule appointment for:", patient.name);
-   };
-
    const handlePrescribe = (patient: Patient) => {
       setSelectedPatient(patient);
       setIsPrescriptionModalOpen(true);
@@ -155,8 +145,6 @@ export function PatientsManagement() {
          <PatientTable
             patients={filteredPatients}
             onViewProfile={handleViewProfile}
-            onSendMessage={handleSendMessage}
-            onScheduleAppointment={handleScheduleAppointment}
             onPrescribe={handlePrescribe}
          />
 

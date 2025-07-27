@@ -2,28 +2,13 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-   DropdownMenu,
-   DropdownMenuContent,
-   DropdownMenuItem,
-   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
-import {
-   Calendar,
-   MessageSquare,
-   MoreHorizontal,
-   Package,
-   Star,
-   User,
-} from "lucide-react";
+import { Calendar, MessageSquare, Package, Star, User } from "lucide-react";
 import { type Patient } from "./mockData";
 
 interface PatientTableProps {
    patients: Patient[];
    onViewProfile: (patient: Patient) => void;
-   onSendMessage: (patient: Patient) => void;
-   onScheduleAppointment: (patient: Patient) => void;
    onPrescribe: (patient: Patient) => void;
 }
 
@@ -43,8 +28,6 @@ const getStatusColor = (status: Patient["status"]) => {
 export function PatientTable({
    patients,
    onViewProfile,
-   onSendMessage,
-   onScheduleAppointment,
    onPrescribe,
 }: PatientTableProps) {
    return (
@@ -161,39 +144,16 @@ export function PatientTable({
                               variant="outline"
                               size="sm"
                               onClick={() => onViewProfile(patient)}>
+                              <User className="h-4 w-4 mr-1" />
                               View
                            </Button>
-                           <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                 <Button variant="ghost" size="sm">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                 </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                 <DropdownMenuItem
-                                    onClick={() => onViewProfile(patient)}>
-                                    <User className="mr-2 h-4 w-4" />
-                                    View Profile
-                                 </DropdownMenuItem>
-                                 <DropdownMenuItem
-                                    onClick={() => onSendMessage(patient)}>
-                                    <MessageSquare className="mr-2 h-4 w-4" />
-                                    Send Message
-                                 </DropdownMenuItem>
-                                 <DropdownMenuItem
-                                    onClick={() =>
-                                       onScheduleAppointment(patient)
-                                    }>
-                                    <Calendar className="mr-2 h-4 w-4" />
-                                    Schedule Appointment
-                                 </DropdownMenuItem>
-                                 <DropdownMenuItem
-                                    onClick={() => onPrescribe(patient)}>
-                                    <Package className="mr-2 h-4 w-4" />
-                                    Prescribe Product
-                                 </DropdownMenuItem>
-                              </DropdownMenuContent>
-                           </DropdownMenu>
+                           <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => onPrescribe(patient)}>
+                              <Package className="h-4 w-4 mr-1" />
+                              Prescribe
+                           </Button>
                         </div>
                      </div>
                   ))
