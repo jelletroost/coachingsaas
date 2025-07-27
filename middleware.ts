@@ -36,9 +36,9 @@ export default async function middleware(req: NextRequest) {
 
       // Define role-based access patterns
       const roleAccessPatterns = {
-         admin: ["/admin", "/coach", "/dashboard"], // Admin can access all areas
-         coach: ["/coach", "/dashboard"], // Coach can access coach and dashboard areas
-         patient: ["/dashboard"], // Patient can only access dashboard
+         admin: ["/admin", "/coach", "/dashboard"],
+         coach: ["/coach", "/dashboard"],
+         patient: ["/dashboard"],
       };
 
       // Check if user has access to the requested path
