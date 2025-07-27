@@ -1,7 +1,5 @@
+import { ComingSoon } from "@/components/admin/cms/ComingSoon";
+
 export default function AdminCMSPage() {
-   return (
-      <div>
-         <h1>Coming Soon</h1>
-      </div>
-   );
+   return <ComingSoon />;
 }

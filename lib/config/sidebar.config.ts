@@ -1,6 +1,7 @@
 import {
    Calendar,
    CreditCard,
+   FileText,
    HomeIcon,
    MessageSquare,
    NotepadText,
@@ -28,6 +29,7 @@ export const getIconComponent = (iconName: string) => {
       ShoppingCart,
       UserCheck,
       User,
+      FileText,
       Calendar,
       MessageSquare,
       Settings,
@@ -74,6 +76,11 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
                label: "Settings",
                href: "/admin/settings",
                icon: getIconComponent("Settings"),
+            },
+            {
+               label: "CMS",
+               href: "/admin/cms",
+               icon: getIconComponent("FileText"),
             },
          ];
       case "coach":
