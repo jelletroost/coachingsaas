@@ -97,6 +97,11 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
                href: "/coach/patients",
                icon: getIconComponent("UserCheck"),
             },
+            {
+               label: "Products",
+               href: "/coach/products",
+               icon: getIconComponent("Package"),
+            },
             // {
             //    label: "Orders",
             //    href: "/coach/orders",
