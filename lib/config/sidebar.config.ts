@@ -87,26 +87,26 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
          ];
       case "coach":
          return [
-            {
-               label: "Overview",
-               href: "/coach/overview",
-               icon: getIconComponent("HomeIcon"),
-            },
+            // {
+            //    label: "Overview",
+            //    href: "/coach/overview",
+            //    icon: getIconComponent("HomeIcon"),
+            // },
             {
                label: "Patients",
                href: "/coach/patients",
                icon: getIconComponent("UserCheck"),
             },
-            {
-               label: "Orders",
-               href: "/coach/orders",
-               icon: getIconComponent("ShoppingCart"),
-            },
-            {
-               label: "Intakes",
-               href: "/coach/intakes",
-               icon: getIconComponent("NotepadText"),
-            },
+            // {
+            //    label: "Orders",
+            //    href: "/coach/orders",
+            //    icon: getIconComponent("ShoppingCart"),
+            // },
+            // {
+            //    label: "Intakes",
+            //    href: "/coach/intakes",
+            //    icon: getIconComponent("NotepadText"),
+            // },
             {
                label: "Messages",
                href: "/coach/messages",
@@ -115,31 +115,32 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
          ];
       case "patient":
          return [
+            // {
+            //    label: "Dashboard",
+            //    href: "/dashboard",
+            //    icon: getIconComponent("HomeIcon"),
+            // },
             {
-               label: "Dashboard",
-               href: "/dashboard",
-               icon: getIconComponent("HomeIcon"),
+               label: "Intake History",
+               href: "/dashboard/intake-history",
+               icon: getIconComponent("NotepadText"),
             },
+
             {
-               label: "My Program",
-               href: "/dashboard/program",
-               icon: getIconComponent("Target"),
-            },
-            {
-               label: "Messages",
-               href: "/dashboard/messages",
+               label: "Coach Contact",
+               href: "/dashboard/coach-contact",
                icon: getIconComponent("MessageSquare"),
             },
-            {
-               label: "Orders",
-               href: "/dashboard/orders",
-               icon: getIconComponent("ShoppingCart"),
-            },
-            {
-               label: "Subscriptions",
-               href: "/dashboard/subscriptions",
-               icon: getIconComponent("CreditCard"),
-            },
+            // {
+            //    label: "Orders",
+            //    href: "/dashboard/orders",
+            //    icon: getIconComponent("ShoppingCart"),
+            // },
+            // {
+            //    label: "Subscriptions",
+            //    href: "/dashboard/subscriptions",
+            //    icon: getIconComponent("CreditCard"),
+            // },
             {
                label: "Profile",
                href: "/dashboard/profile",
