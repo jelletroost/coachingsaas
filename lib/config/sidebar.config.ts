@@ -59,31 +59,31 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
                href: "/admin/products",
                icon: getIconComponent("Package"),
             },
-            {
-               label: "Orders",
-               href: "/admin/orders",
-               icon: getIconComponent("ShoppingCart"),
-            },
+            // {
+            //    label: "Orders",
+            //    href: "/admin/orders",
+            //    icon: getIconComponent("ShoppingCart"),
+            // },
             {
                label: "Subscriptions",
                href: "/admin/subscriptions",
                icon: getIconComponent("CreditCard"),
             },
-            {
-               label: "Intake Management",
-               href: "/admin/intake-management",
-               icon: getIconComponent("NotepadText"),
-            },
+            // {
+            //    label: "Intake Management",
+            //    href: "/admin/intake-management",
+            //    icon: getIconComponent("NotepadText"),
+            // },
             {
                label: "Settings",
                href: "/admin/settings",
                icon: getIconComponent("Settings"),
             },
-            {
-               label: "CMS",
-               href: "/admin/cms",
-               icon: getIconComponent("FileText"),
-            },
+            // {
+            //    label: "CMS",
+            //    href: "/admin/cms",
+            //    icon: getIconComponent("FileText"),
+            // },
          ];
       case "coach":
          return [
