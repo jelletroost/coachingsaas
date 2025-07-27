@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import supabaseServerClient from "./lib/supabaseServer";
+import { currentUserSSR } from "./lib/supabase/supabaseServer";
 
 export default async function middleware(req: NextRequest) {
    const PUBLIC_ROUTES = [
@@ -16,23 +16,14 @@ export default async function middleware(req: NextRequest) {
    }
 
    try {
-      const supabase = await supabaseServerClient();
-      const {
-         data: { session },
-         error,
-      } = await supabase.auth.getSession();
-
-      if (error) {
-         console.error("Auth error in middleware:", error);
-         return NextResponse.redirect(new URL("/auth/signin", req.url));
-      }
+      const userData = await currentUserSSR();
 
       // Redirect to signin if no session
-      if (!session) {
+      if (!userData) {
          return NextResponse.redirect(new URL("/auth/signin", req.url));
       }
 
-      const userRole = session?.user.user_metadata.role;
+      const userRole = userData?.user_metadata?.role;
 
       // Define role-based access patterns
       const roleAccessPatterns = {
