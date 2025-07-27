@@ -8,6 +8,7 @@ import {
    Package,
    Settings,
    ShoppingCart,
+   Target,
    User,
    UserCheck,
    Users,
@@ -34,6 +35,7 @@ export const getIconComponent = (iconName: string) => {
       MessageSquare,
       Settings,
       CreditCard,
+      Target,
    };
    return iconMap[iconName];
 };
@@ -116,9 +118,33 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
             {
                label: "Dashboard",
                href: "/dashboard",
-               icon: "HomeIcon",
+               icon: getIconComponent("HomeIcon"),
             },
-            { label: "Settings", href: "/settings", icon: "Settings" },
+            {
+               label: "My Program",
+               href: "/dashboard/program",
+               icon: getIconComponent("Target"),
+            },
+            {
+               label: "Messages",
+               href: "/dashboard/messages",
+               icon: getIconComponent("MessageSquare"),
+            },
+            {
+               label: "Orders",
+               href: "/dashboard/orders",
+               icon: getIconComponent("ShoppingCart"),
+            },
+            {
+               label: "Subscriptions",
+               href: "/dashboard/subscriptions",
+               icon: getIconComponent("CreditCard"),
+            },
+            {
+               label: "Profile",
+               href: "/dashboard/profile",
+               icon: getIconComponent("User"),
+            },
          ];
       default:
          return [];
