@@ -8,17 +8,14 @@ import {
    SidebarMenuButton,
    SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { useRole } from "@/hooks/useRole";
 import getSidebarItemsByRole from "@/lib/config/sidebar.config";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "../shared/logo";
 
 export function DashboardSidebar() {
-   const { userRole } = useRole();
-   console.log(userRole);
    const pathname = usePathname();
-   const menuItems = getSidebarItemsByRole(userRole || "patient");
+   const menuItems = getSidebarItemsByRole("coach");
    return (
       <Sidebar>
          <SidebarHeader>
