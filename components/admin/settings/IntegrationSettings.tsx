@@ -27,7 +27,10 @@ export function IntegrationSettings({
    settings,
    onSettingsChange,
 }: IntegrationSettingsProps) {
-   const handleChange = (key: keyof IntegrationSettingsType, value: any) => {
+   const handleChange = (
+      key: keyof IntegrationSettingsType,
+      value: string | boolean
+   ) => {
       onSettingsChange({ ...settings, [key]: value });
    };
 

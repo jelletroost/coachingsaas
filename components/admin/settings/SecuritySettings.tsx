@@ -16,7 +16,10 @@ export function SecuritySettings({
    settings,
    onSettingsChange,
 }: SecuritySettingsProps) {
-   const handleChange = (key: keyof SecuritySettingsType, value: any) => {
+   const handleChange = (
+      key: keyof SecuritySettingsType,
+      value: string | boolean | number | string[]
+   ) => {
       onSettingsChange({ ...settings, [key]: value });
    };
 

@@ -28,7 +28,10 @@ export function SystemSettings({
    settings,
    onSettingsChange,
 }: SystemSettingsProps) {
-   const handleChange = (key: keyof SystemSettingsType, value: any) => {
+   const handleChange = (
+      key: keyof SystemSettingsType,
+      value: string | boolean | number
+   ) => {
       onSettingsChange({ ...settings, [key]: value });
    };
 

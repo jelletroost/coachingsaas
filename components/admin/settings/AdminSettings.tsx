@@ -40,7 +40,7 @@ export function AdminSettings() {
          await new Promise((resolve) => setTimeout(resolve, 1000));
 
          toast.success("All settings have been saved successfully!");
-      } catch (error) {
+      } catch {
          toast.error("Failed to save settings. Please try again.");
       } finally {
          setIsSaving(false);
