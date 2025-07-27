@@ -5,12 +5,28 @@ import { useState } from "react";
 import { PatientFilters } from "./PatientFilters";
 import { PatientProfileModal } from "./PatientProfileModal";
 import { PatientTable } from "./PatientTable";
+import { PrescriptionModal } from "./PrescriptionModal";
 import { patientStats, patientsData, type Patient } from "./mockData";
+
+interface PrescriptionData {
+   patientId: string;
+   patientName: string;
+   productId: string;
+   productName: string;
+   dosage: string;
+   frequency: string;
+   duration: string;
+   instructions: string;
+   notes: string;
+   prescribedAt: string;
+}
 
 export function PatientsManagement() {
    const [patients] = useState<Patient[]>(patientsData);
    const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+   const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] =
+      useState(false);
    const [filters, setFilters] = useState({
       status: "all",
       progress: "all",
@@ -30,6 +46,17 @@ export function PatientsManagement() {
    const handleScheduleAppointment = (patient: Patient) => {
       // TODO: Implement appointment scheduling
       console.log("Schedule appointment for:", patient.name);
+   };
+
+   const handlePrescribe = (patient: Patient) => {
+      setSelectedPatient(patient);
+      setIsPrescriptionModalOpen(true);
+   };
+
+   const handlePrescriptionSubmit = (prescription: PrescriptionData) => {
+      // TODO: Implement prescription submission
+      console.log("Prescription submitted:", prescription);
+      // Here you would typically save to database and notify the patient
    };
 
    const filteredPatients = patients.filter((patient) => {
@@ -130,6 +157,7 @@ export function PatientsManagement() {
             onViewProfile={handleViewProfile}
             onSendMessage={handleSendMessage}
             onScheduleAppointment={handleScheduleAppointment}
+            onPrescribe={handlePrescribe}
          />
 
          {/* Patient Profile Modal */}
@@ -140,6 +168,14 @@ export function PatientsManagement() {
                onClose={() => setIsProfileModalOpen(false)}
             />
          )}
+
+         {/* Prescription Modal */}
+         <PrescriptionModal
+            patient={selectedPatient}
+            isOpen={isPrescriptionModalOpen}
+            onClose={() => setIsPrescriptionModalOpen(false)}
+            onPrescribe={handlePrescriptionSubmit}
+         />
       </div>
    );
 }

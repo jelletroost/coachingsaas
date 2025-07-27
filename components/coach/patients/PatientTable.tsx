@@ -13,6 +13,7 @@ import {
    Calendar,
    MessageSquare,
    MoreHorizontal,
+   Package,
    Star,
    User,
 } from "lucide-react";
@@ -23,6 +24,7 @@ interface PatientTableProps {
    onViewProfile: (patient: Patient) => void;
    onSendMessage: (patient: Patient) => void;
    onScheduleAppointment: (patient: Patient) => void;
+   onPrescribe: (patient: Patient) => void;
 }
 
 const getStatusColor = (status: Patient["status"]) => {
@@ -38,17 +40,12 @@ const getStatusColor = (status: Patient["status"]) => {
    }
 };
 
-const getProgressColor = (progress: number) => {
-   if (progress >= 80) return "bg-green-500";
-   if (progress >= 50) return "bg-yellow-500";
-   return "bg-red-500";
-};
-
 export function PatientTable({
    patients,
    onViewProfile,
    onSendMessage,
    onScheduleAppointment,
+   onPrescribe,
 }: PatientTableProps) {
    return (
       <Card>
@@ -189,6 +186,11 @@ export function PatientTable({
                                     }>
                                     <Calendar className="mr-2 h-4 w-4" />
                                     Schedule Appointment
+                                 </DropdownMenuItem>
+                                 <DropdownMenuItem
+                                    onClick={() => onPrescribe(patient)}>
+                                    <Package className="mr-2 h-4 w-4" />
+                                    Prescribe Product
                                  </DropdownMenuItem>
                               </DropdownMenuContent>
                            </DropdownMenu>

@@ -8,17 +8,10 @@ import {
    DialogHeader,
    DialogTitle,
 } from "@/components/ui/dialog";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-   Calendar,
-   Clock,
-   MessageSquare,
-   Star,
-   Target,
-   TrendingUp,
-} from "lucide-react";
+import { MessageSquare, Target } from "lucide-react";
 import { type Patient } from "./mockData";
+import { PrescriptionHistory } from "./PrescriptionHistory";
 
 interface PatientProfileModalProps {
    patient: Patient;
@@ -38,6 +31,39 @@ const getStatusColor = (status: Patient["status"]) => {
          return "bg-gray-100 text-gray-800";
    }
 };
+
+// Mock prescription data - in a real app, this would come from the database
+const mockPrescriptions = [
+   {
+      id: "1",
+      patientId: "1",
+      patientName: "John Doe",
+      productId: "1",
+      productName: "Metformin 500mg",
+      dosage: "500mg",
+      frequency: "twice_daily",
+      duration: "30_days",
+      instructions: "Take with meals to reduce stomach upset",
+      notes: "Monitor blood sugar levels regularly",
+      status: "active" as const,
+      prescribedAt: "2024-01-15T10:30:00Z",
+   },
+   {
+      id: "2",
+      patientId: "1",
+      patientName: "John Doe",
+      productId: "2",
+      productName: "Omega-3 Fish Oil Supplement",
+      dosage: "1000mg",
+      frequency: "once_daily",
+      duration: "90_days",
+      instructions: "Take 1 softgel daily with meals",
+      notes: "Good for heart health",
+      status: "completed" as const,
+      prescribedAt: "2024-01-10T09:15:00Z",
+      completedAt: "2024-04-10T09:15:00Z",
+   },
+];
 
 export function PatientProfileModal({
    patient,
@@ -67,84 +93,14 @@ export function PatientProfileModal({
             </DialogHeader>
 
             <div className="space-y-6">
-               {/* Quick Stats */}
-               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Card>
-                     <CardContent className="p-4">
-                        <div className="flex items-center space-x-2">
-                           <TrendingUp className="w-4 h-4 text-blue-500" />
-                           <span className="text-sm font-medium">Progress</span>
-                        </div>
-                        <div className="text-2xl font-bold mt-1">
-                           {patient.progress}%
-                        </div>
-                        <Progress value={patient.progress} className="mt-2" />
-                     </CardContent>
-                  </Card>
-
-                  <Card>
-                     <CardContent className="p-4">
-                        <div className="flex items-center space-x-2">
-                           <Star className="w-4 h-4 text-yellow-500" />
-                           <span className="text-sm font-medium">
-                              Satisfaction
-                           </span>
-                        </div>
-                        <div className="text-2xl font-bold mt-1">
-                           {patient.satisfaction}/5
-                        </div>
-                        <div className="flex space-x-1 mt-2">
-                           {[1, 2, 3, 4, 5].map((star) => (
-                              <Star
-                                 key={star}
-                                 className={`w-3 h-3 ${
-                                    star <= patient.satisfaction
-                                       ? "text-yellow-500 fill-current"
-                                       : "text-gray-300"
-                                 }`}
-                              />
-                           ))}
-                        </div>
-                     </CardContent>
-                  </Card>
-
-                  <Card>
-                     <CardContent className="p-4">
-                        <div className="flex items-center space-x-2">
-                           <Calendar className="w-4 h-4 text-green-500" />
-                           <span className="text-sm font-medium">Sessions</span>
-                        </div>
-                        <div className="text-2xl font-bold mt-1">
-                           {patient.totalSessions}
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                           Total completed
-                        </p>
-                     </CardContent>
-                  </Card>
-
-                  <Card>
-                     <CardContent className="p-4">
-                        <div className="flex items-center space-x-2">
-                           <MessageSquare className="w-4 h-4 text-blue-500" />
-                           <span className="text-sm font-medium">Messages</span>
-                        </div>
-                        <div className="text-2xl font-bold mt-1">
-                           {patient.unreadMessages}
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                           Unread
-                        </p>
-                     </CardContent>
-                  </Card>
-               </div>
-
                <Tabs defaultValue="overview" className="w-full">
                   <TabsList className="grid w-full grid-cols-4">
                      <TabsTrigger value="overview">Overview</TabsTrigger>
                      <TabsTrigger value="health">Health</TabsTrigger>
                      <TabsTrigger value="goals">Goals</TabsTrigger>
-                     <TabsTrigger value="activity">Activity</TabsTrigger>
+                     <TabsTrigger value="prescriptions">
+                        Prescriptions
+                     </TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="overview" className="space-y-4">
@@ -197,31 +153,6 @@ export function PatientProfileModal({
                                  <p className="mt-1">{patient.assignedCoach}</p>
                               </div>
                            </div>
-
-                           {patient.nextAppointment && (
-                              <div className="border rounded-lg p-4 bg-muted/50">
-                                 <h4 className="font-medium mb-2">
-                                    Next Appointment
-                                 </h4>
-                                 <div className="flex items-center space-x-4">
-                                    <div className="flex items-center space-x-2">
-                                       <Calendar className="w-4 h-4 text-blue-500" />
-                                       <span>
-                                          {patient.nextAppointment.date}
-                                       </span>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                       <Clock className="w-4 h-4 text-green-500" />
-                                       <span>
-                                          {patient.nextAppointment.time}
-                                       </span>
-                                    </div>
-                                    <Badge variant="outline">
-                                       {patient.nextAppointment.type}
-                                    </Badge>
-                                 </div>
-                              </div>
-                           )}
 
                            {patient.notes && (
                               <div>
@@ -312,51 +243,11 @@ export function PatientProfileModal({
                      </Card>
                   </TabsContent>
 
-                  <TabsContent value="activity" className="space-y-4">
-                     <Card>
-                        <CardHeader>
-                           <CardTitle className="text-lg">
-                              Recent Activity
-                           </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                           <div className="space-y-3">
-                              <div className="flex items-center space-x-3 p-3 border rounded-lg">
-                                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                 <div className="flex-1">
-                                    <p className="text-sm font-medium">
-                                       Weekly Assessment Completed
-                                    </p>
-                                    <p className="text-xs text-muted-foreground">
-                                       2 hours ago
-                                    </p>
-                                 </div>
-                              </div>
-                              <div className="flex items-center space-x-3 p-3 border rounded-lg">
-                                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                 <div className="flex-1">
-                                    <p className="text-sm font-medium">
-                                       Message Sent
-                                    </p>
-                                    <p className="text-xs text-muted-foreground">
-                                       1 day ago
-                                    </p>
-                                 </div>
-                              </div>
-                              <div className="flex items-center space-x-3 p-3 border rounded-lg">
-                                 <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                                 <div className="flex-1">
-                                    <p className="text-sm font-medium">
-                                       Appointment Scheduled
-                                    </p>
-                                    <p className="text-xs text-muted-foreground">
-                                       2 days ago
-                                    </p>
-                                 </div>
-                              </div>
-                           </div>
-                        </CardContent>
-                     </Card>
+                  <TabsContent value="prescriptions" className="space-y-4">
+                     <PrescriptionHistory
+                        prescriptions={mockPrescriptions}
+                        patientName={patient.name}
+                     />
                   </TabsContent>
                </Tabs>
 
@@ -368,10 +259,6 @@ export function PatientProfileModal({
                   <Button>
                      <MessageSquare className="w-4 h-4 mr-2" />
                      Send Message
-                  </Button>
-                  <Button>
-                     <Calendar className="w-4 h-4 mr-2" />
-                     Schedule Appointment
                   </Button>
                </div>
             </div>
