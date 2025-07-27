@@ -14,7 +14,7 @@ import { usePathname } from "next/navigation";
 import Logo from "../shared/logo";
 
 // Menu items.
-const menuItems = getSidebarItemsByRole("coach");
+const menuItems = getSidebarItemsByRole("patient");
 
 export function DashboardSidebar() {
    const pathname = usePathname();
