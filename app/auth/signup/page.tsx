@@ -86,7 +86,7 @@ export default function SignupPage() {
          email: "",
          password: "",
          confirmPassword: "",
-         role: "patient",
+         role: activeTab,
       },
    });
 
@@ -103,7 +103,7 @@ export default function SignupPage() {
    });
 
    const onSubmit = async (data: z.infer<typeof signupSchema>) => {
-      signupMutation(data);
+      signupMutation({ ...data, role: activeTab });
    };
 
    return (
