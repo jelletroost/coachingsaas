@@ -3,9 +3,11 @@ import {
    CreditCard,
    HomeIcon,
    MessageSquare,
+   NotepadText,
    Package,
    Settings,
    ShoppingCart,
+   User,
    UserCheck,
    Users,
 } from "lucide-react";
@@ -22,8 +24,10 @@ export const getIconComponent = (iconName: string) => {
       HomeIcon,
       Users,
       Package,
+      NotepadText,
       ShoppingCart,
       UserCheck,
+      User,
       Calendar,
       MessageSquare,
       Settings,
@@ -64,7 +68,12 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
             {
                label: "Intake Management",
                href: "/admin/intake-management",
-               icon: getIconComponent("MessageSquare"),
+               icon: getIconComponent("NotepadText"),
+            },
+            {
+               label: "Settings",
+               href: "/admin/settings",
+               icon: getIconComponent("Settings"),
             },
          ];
       case "coach":
