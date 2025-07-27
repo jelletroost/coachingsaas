@@ -13,11 +13,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "../shared/logo";
 
-// Menu items.
-const menuItems = getSidebarItemsByRole("admin");
-
 export function DashboardSidebar() {
    const pathname = usePathname();
+   const menuItems = getSidebarItemsByRole("coach");
    return (
       <Sidebar>
          <SidebarHeader>

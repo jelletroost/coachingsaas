@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 
 // Supabase Server Client
 const supabaseServerClient = async () => {
+   console.log("supabaseServerClient");
    const cookieStore = await cookies();
    return createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,

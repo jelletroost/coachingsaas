@@ -1,7 +1,9 @@
+import { MessagesManagement } from "@/components/coach/messages";
+
 export default function CoachMessagesPage() {
    return (
-      <div>
-         <h1>Messages Page</h1>
+      <div className="p-6">
+         <MessagesManagement />
       </div>
    );
 }
