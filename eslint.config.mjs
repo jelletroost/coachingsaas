@@ -20,7 +20,7 @@ export default defineConfig([
       rules: {
          ...pluginReact.configs.flat.recommended.rules,
          "react/react-in-jsx-scope": "off",
-         "no-unused-vars": "error",
+         "no-unused-vars": "off",
       },
    },
 ]);

@@ -61,6 +61,11 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
                href: "/admin/subscriptions",
                icon: getIconComponent("CreditCard"),
             },
+            {
+               label: "Intake Management",
+               href: "/admin/intake-management",
+               icon: getIconComponent("MessageSquare"),
+            },
          ];
       case "coach":
          return [
