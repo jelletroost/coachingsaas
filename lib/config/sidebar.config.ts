@@ -110,11 +110,6 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
                href: "/coach/messages",
                icon: getIconComponent("MessageSquare"),
             },
-            {
-               label: "Settings",
-               href: "/coach/settings",
-               icon: getIconComponent("Settings"),
-            },
          ];
       case "patient":
          return [
