@@ -88,25 +88,33 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
             {
                label: "Overview",
                href: "/coach/overview",
-               icon: "HomeIcon",
+               icon: getIconComponent("HomeIcon"),
             },
-            { label: "Patients", href: "/coach/patients", icon: "UserCheck" },
+            {
+               label: "Patients",
+               href: "/coach/patients",
+               icon: getIconComponent("UserCheck"),
+            },
             {
                label: "Orders",
                href: "/coach/orders",
-               icon: "ShoppingCart",
+               icon: getIconComponent("ShoppingCart"),
             },
             {
                label: "Intakes",
                href: "/coach/intakes",
-               icon: "NotepadText",
+               icon: getIconComponent("NotepadText"),
             },
             {
                label: "Messages",
                href: "/coach/messages",
-               icon: "MessageSquare",
+               icon: getIconComponent("MessageSquare"),
             },
-            { label: "Settings", href: "/coach/settings", icon: "Settings" },
+            {
+               label: "Settings",
+               href: "/coach/settings",
+               icon: getIconComponent("Settings"),
+            },
          ];
       case "patient":
          return [
