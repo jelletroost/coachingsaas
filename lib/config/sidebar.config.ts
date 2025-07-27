@@ -3,6 +3,7 @@ import {
    CreditCard,
    HomeIcon,
    MessageSquare,
+   Package,
    Settings,
    ShoppingCart,
    UserCheck,
@@ -20,6 +21,7 @@ export const getIconComponent = (iconName: string) => {
    const iconMap: Record<string, React.ComponentType> = {
       HomeIcon,
       Users,
+      Package,
       ShoppingCart,
       UserCheck,
       Calendar,
@@ -43,6 +45,11 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
                label: "Users",
                href: "/admin/users",
                icon: getIconComponent("Users"),
+            },
+            {
+               label: "Products",
+               href: "/admin/products",
+               icon: getIconComponent("Package"),
             },
             {
                label: "Orders",
