@@ -1,7 +1,5 @@
+import { CoachOrdersManagement } from "@/components/coach/orders";
+
 export default function CoachOrdersPage() {
-   return (
-      <div>
-         <h1>Coach Orders Page</h1>
-      </div>
-   );
+   return <CoachOrdersManagement />;
 }

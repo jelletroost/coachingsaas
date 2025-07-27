@@ -2,99 +2,70 @@ import { NextRequest, NextResponse } from "next/server";
 import supabaseServerClient from "./lib/supabaseServer";
 
 export default async function middleware(req: NextRequest) {
+   const PUBLIC_ROUTES = [
+      "/auth/signin",
+      "/auth/signup",
+      "/auth/reset-password",
+      "/",
+   ];
    const { pathname } = req.nextUrl;
 
-   // Define route patterns
-   const isAdminRoute = pathname.startsWith("/admin");
-   const isCoachRoute = pathname.startsWith("/coach");
-   const isDashboardRoute = pathname.startsWith("/dashboard");
-
-   const isPublicPath =
-      pathname === "/" ||
-      pathname.startsWith("/auth/signin") ||
-      pathname.startsWith("/auth/signup") ||
-      pathname.startsWith("/admin/login");
-
-   // If public, allow access
-   if (isPublicPath) return NextResponse.next();
+   // Allow public routes
+   if (PUBLIC_ROUTES.includes(pathname)) {
+      return NextResponse.next();
+   }
 
    try {
       const supabase = await supabaseServerClient();
       const {
          data: { session },
+         error,
       } = await supabase.auth.getSession();
 
-      // If not logged in
-      if (!session) {
-         if (isAdminRoute) {
-            return NextResponse.redirect(new URL("/admin/login", req.url));
-         }
+      if (error) {
+         console.error("Auth error in middleware:", error);
          return NextResponse.redirect(new URL("/auth/signin", req.url));
       }
 
-      // Get role from session
-      const role = session.user.user_metadata?.role;
-
-      // Admin Area
-      if (isAdminRoute) {
-         if (role !== "admin") {
-            return NextResponse.redirect(
-               new URL(getDashboardByRole(role), req.url)
-            );
-         }
-         return NextResponse.next();
+      // Redirect to signin if no session
+      if (!session) {
+         return NextResponse.redirect(new URL("/auth/signin", req.url));
       }
 
-      // Coach Area
-      if (isCoachRoute) {
-         if (role !== "coach") {
-            return NextResponse.redirect(
-               new URL(getDashboardByRole(role), req.url)
-            );
-         }
-         return NextResponse.next();
+      const userRole = session?.user.user_metadata.role;
+
+      // Define role-based access patterns
+      const roleAccessPatterns = {
+         admin: ["/admin", "/coach", "/dashboard"],
+         coach: ["/coach", "/dashboard"],
+         patient: ["/dashboard"],
+      };
+
+      // Check if user has access to the requested path
+      const allowedPaths =
+         roleAccessPatterns[userRole as keyof typeof roleAccessPatterns];
+
+      if (!allowedPaths) {
+         console.warn(`Unknown role: ${userRole}`);
+         return NextResponse.redirect(new URL("/auth/signin", req.url));
       }
 
-      // Dashboard Area (for patients)
-      if (isDashboardRoute) {
-         if (role !== "patient") {
-            return NextResponse.redirect(
-               new URL(getDashboardByRole(role), req.url)
-            );
-         }
-         return NextResponse.next();
+      const hasAccess = allowedPaths.some((path) => pathname.startsWith(path));
+
+      if (!hasAccess) {
+         // Redirect to appropriate dashboard based on role
+         const defaultPath = allowedPaths[0];
+         return NextResponse.redirect(new URL(defaultPath, req.url));
       }
 
-      // Default fallback: redirect unknown protected routes
-      return NextResponse.redirect(new URL(getDashboardByRole(role), req.url));
+      return NextResponse.next();
    } catch (error) {
       console.error("Middleware error:", error);
-      // On error, redirect to signin for safety
       return NextResponse.redirect(new URL("/auth/signin", req.url));
    }
 }
 
-// Helper: Dashboard routes by role
-function getDashboardByRole(role?: string): string {
-   switch (role) {
-      case "admin":
-         return "/admin/dashboard";
-      case "coach":
-         return "/coach/dashboard";
-      case "patient":
-         return "/dashboard";
-      default:
-         return "/auth/signin";
-   }
-}
-
-// Apply middleware to all pages
+// Apply middleware to all protected routes
 export const config = {
-   matcher: [
-      "/admin/:path*",
-      "/coach/:path*",
-      "/dashboard/:path*",
-      "/auth/signin",
-      "/auth/signup",
-   ],
+   matcher: ["/admin/:path*", "/coach/:path*", "/dashboard/:path*"],
 };
