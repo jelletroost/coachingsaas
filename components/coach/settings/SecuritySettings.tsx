@@ -50,8 +50,8 @@ export function SecuritySettings({
                {settings.twoFactorAuth && (
                   <div className="p-4 bg-muted rounded-lg">
                      <p className="text-sm text-muted-foreground">
-                        Two-factor authentication is enabled. You'll need to
-                        enter a code from your authenticator app when signing
+                        Two-factor authentication is enabled. You&apos;ll need
+                        to enter a code from your authenticator app when signing
                         in.
                      </p>
                   </div>

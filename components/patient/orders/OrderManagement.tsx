@@ -4,15 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-   Download,
-   Eye,
-   Package,
-   Search,
-   ShoppingCart,
-   Truck,
-   User,
-} from "lucide-react";
+import { Download, Eye, Package, Search, Truck } from "lucide-react";
 import { useState } from "react";
 import { ordersData, orderStatsData } from "./mockData";
 
@@ -48,21 +40,6 @@ export function OrderManagement() {
             return "bg-red-100 text-red-800";
          default:
             return "bg-gray-100 text-gray-800";
-      }
-   };
-
-   const getStatusIcon = (status: string) => {
-      switch (status) {
-         case "delivered":
-            return Package;
-         case "shipped":
-            return Truck;
-         case "processing":
-            return ShoppingCart;
-         case "cancelled":
-            return User;
-         default:
-            return Package;
       }
    };
 
@@ -149,7 +126,7 @@ export function OrderManagement() {
                ) : (
                   <div className="space-y-4">
                      {filteredOrders.map((order) => {
-                        const StatusIcon = getStatusIcon(order.status);
+                        // const StatusIcon = getStatusIcon(order.status);
                         return (
                            <Card key={order.id}>
                               <CardContent className="pt-6">
