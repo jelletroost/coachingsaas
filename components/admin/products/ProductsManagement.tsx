@@ -5,14 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Package, TrendingUp, Users } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { AddProductDialog } from "./AddProductDialog";
+import { mockProducts, productStats, type Product } from "./mockData";
 import { ProductDetailsModal } from "./ProductDetailsModal";
 import { ProductTable } from "./ProductTable";
-import { mockProducts, productStats, type Product } from "./mockData";
 
 export function ProductsManagement() {
    const [products, setProducts] = useState<Product[]>(mockProducts);
    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+   const [isAddProductDialogOpen, setIsAddProductDialogOpen] = useState(false);
 
    const handleViewDetails = (product: Product) => {
       setSelectedProduct(product);
@@ -24,7 +26,7 @@ export function ProductsManagement() {
    };
 
    const handleAddProduct = () => {
-      toast.success("Add product functionality coming soon!");
+      setIsAddProductDialogOpen(true);
    };
 
    const handleUpdateStatus = (
@@ -47,6 +49,63 @@ export function ProductsManagement() {
 
    const handleExportProducts = () => {
       toast.success("Export functionality coming soon!");
+   };
+
+   const handleAddNewProduct = (productData: {
+      name: string;
+      type: "medicine" | "supplement" | "service";
+      price: number;
+      currency: string;
+      stock_quantity: number;
+      status: "active" | "inactive";
+      prescription_required: boolean;
+   }) => {
+      // Create a new product with mock data structure
+      const newProduct: Product = {
+         id: Date.now().toString(), // Simple ID generation
+         name: productData.name,
+         description: `New ${productData.type} product`,
+         category:
+            productData.type === "medicine"
+               ? "medication"
+               : productData.type === "supplement"
+               ? "supplement"
+               : "consultation",
+         sku: `NEW-${productData.type.toUpperCase()}-${Date.now()}`,
+         price: productData.price,
+         currency: productData.currency,
+         cost: productData.price * 0.3, // Mock cost calculation
+         profitMargin: 70, // Mock profit margin
+         status: productData.status === "active" ? "active" : "inactive",
+         inventory: {
+            inStock: productData.stock_quantity,
+            lowStockThreshold: 10,
+            reorderPoint: 15,
+            supplier: "New Supplier",
+            leadTime: 7,
+         },
+         prescription: {
+            required: productData.prescription_required,
+            type: productData.prescription_required ? "non-controlled" : "otc",
+         },
+         specifications: {
+            form: productData.type === "service" ? "service" : "tablet",
+            quantity: 1,
+            unit: productData.type === "service" ? "session" : "unit",
+         },
+         images: [],
+         tags: [productData.type],
+         rating: 0,
+         reviewCount: 0,
+         popularity: 999,
+         createdAt: new Date().toISOString(),
+         updatedAt: new Date().toISOString(),
+         createdBy: "admin",
+         lastModifiedBy: "admin",
+      };
+
+      setProducts((prev) => [newProduct, ...prev]);
+      toast.success(`Product "${productData.name}" added successfully!`);
    };
 
    return (
@@ -161,6 +220,13 @@ export function ProductsManagement() {
             isOpen={isDetailsModalOpen}
             onClose={() => setIsDetailsModalOpen(false)}
             onEdit={handleEditProduct}
+         />
+
+         {/* Add Product Dialog */}
+         <AddProductDialog
+            open={isAddProductDialogOpen}
+            onOpenChange={setIsAddProductDialogOpen}
+            onAddProduct={handleAddNewProduct}
          />
       </div>
    );
