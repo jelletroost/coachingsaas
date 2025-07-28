@@ -98,8 +98,6 @@ export default function SignupPage() {
          redirectTo("/auth/signin");
       },
       onError: (error) => {
-         console.log("Error", error.message);
-
          toast.error(error.message);
       },
    });
