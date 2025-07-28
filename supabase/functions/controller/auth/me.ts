@@ -1,10 +1,10 @@
 import { Context } from "jsr:@hono/hono";
-import edgeClient from "../../_shared/supabaseClient.ts";
+import edgeAdminClient from "../../_shared/supabaseAdmin.ts";
 
 const me = async (c: Context) => {
    const userId = c.req.query("id");
 
-   const { data, error } = await edgeClient
+   const { data, error } = await edgeAdminClient
       .from("users")
       .select("first_name, last_name, email, role")
       .eq("id", userId);
