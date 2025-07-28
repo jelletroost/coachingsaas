@@ -2,7 +2,6 @@ import { Context } from "jsr:@hono/hono";
 import edgeAdminClient from "../../_shared/supabaseAdmin.ts";
 
 const createProduct = async (c: Context) => {
-   console.log("createProduct");
    const productData = await c.req.json();
    const { error } = await edgeAdminClient.from("products").insert(productData);
 

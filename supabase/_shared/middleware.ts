@@ -3,27 +3,35 @@ import edgeAdminClient from "./supabaseAdmin.ts";
 
 export const checkRole = (allowedRole: string) => {
    return async (c: Context, next: Next) => {
-      // get userId from header
-      const userId = c.req.header("x-user-id");
+      const authHeader = c.req.header("Authorization");
+      const token = authHeader?.replace("Bearer ", "");
 
-      if (!userId) {
+      if (!token) {
          return c.json({ message: "Unauthorized" }, 401);
       }
 
-      const { data, error } = await edgeAdminClient
+      // Verify the JWT token with Supabase
+      const {
+         data: { user },
+         error,
+      } = await edgeAdminClient.auth.getUser(token);
+
+      if (error || !user) {
+         return c.json({ message: "Unauthorized" }, 401);
+      }
+
+      const { data, error: roleError } = await edgeAdminClient
          .from("users")
          .select("role")
-         .eq("id", userId)
+         .eq("id", user.id)
          .single();
 
-      if (error) {
+      if (roleError || data?.role !== allowedRole) {
          return c.json({ message: "Unauthorized" }, 401);
       }
 
-      if (data?.role !== allowedRole) {
-         return c.json({ message: "Unauthorized" }, 401);
-      }
-
+      // Store user in context for use in route handlers
+      c.set("user", user);
       await next();
    };
 };

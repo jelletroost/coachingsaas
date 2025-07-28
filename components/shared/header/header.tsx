@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthStore } from "@/store/useAuthStore";
 import Link from "next/link";
 import { useState } from "react";
 import Logo from "../logo";
@@ -69,8 +69,8 @@ const navigation = [
 ];
 
 export default function Header() {
-   const { user } = useAuth();
-   const isAuthenticated = user?.is_authenticated;
+   const user = useAuthStore((state) => state.user);
+   const isAuthenticated = user?.aud === "authenticated" ? true : false;
    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
    const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
 
