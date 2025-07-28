@@ -28,11 +28,13 @@ import toast from "react-hot-toast";
 interface AddProductDialogProps {
    open: boolean;
    onOpenChange: (open: boolean) => void;
+   onProductAdded?: () => void;
 }
 
 export function AddProductDialog({
    open,
    onOpenChange,
+   onProductAdded,
 }: AddProductDialogProps) {
    const {
       register,
@@ -45,6 +47,7 @@ export function AddProductDialog({
       defaultValues: {
          name: "",
          type: "supplement",
+         description: "",
          price: 0,
          currency: "USD",
          stock_quantity: 0,
@@ -56,9 +59,11 @@ export function AddProductDialog({
    const { mutate: createProductMutation, isPending } = useMutation({
       mutationFn: createProduct,
       onSuccess: () => {
-         toast.success("Product created");
+         toast.success("Product created successfully!");
          reset();
          onOpenChange(false);
+         // Trigger refetch to show the new product in real-time
+         onProductAdded?.();
       },
       onError: (error) => {
          toast.error(error.message);
@@ -94,6 +99,23 @@ export function AddProductDialog({
                   {errors.name && (
                      <p className="text-sm text-red-500">
                         {errors.name.message}
+                     </p>
+                  )}
+               </div>
+
+               <div className="space-y-2">
+                  <Label htmlFor="description">Description *</Label>
+                  <Input
+                     id="description"
+                     {...register("description", {
+                        required: "Description is required",
+                     })}
+                     placeholder="Enter product description"
+                     className={errors.description ? "border-red-500" : ""}
+                  />
+                  {errors.description && (
+                     <p className="text-sm text-red-500">
+                        {errors.description.message}
                      </p>
                   )}
                </div>

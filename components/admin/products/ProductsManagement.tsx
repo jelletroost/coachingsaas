@@ -20,7 +20,13 @@ import { ProductDetailsModal } from "./ProductDetailsModal";
 import { ProductTable } from "./ProductTable";
 
 export function ProductsManagement() {
-   const { data: products = [], isLoading, error, refetch } = useProducts();
+   const {
+      data: products = [],
+      isLoading,
+      error,
+      refetch,
+      isRefetching,
+   } = useProducts();
    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
    const [isAddProductDialogOpen, setIsAddProductDialogOpen] = useState(false);
@@ -46,7 +52,7 @@ export function ProductsManagement() {
       toast.success(`Product "${product.name}" status updated to ${newStatus}`);
       // TODO: Implement API call to update product status
       // After successful update, refetch the products
-      // refetch();
+      refetch();
    };
 
    const handleExportProducts = () => {
@@ -211,6 +217,22 @@ export function ProductsManagement() {
             onExportProducts={handleExportProducts}
          />
 
+         {/* Refresh Button */}
+         <div className="flex justify-center">
+            <Button
+               variant="outline"
+               onClick={() => refetch()}
+               disabled={isLoading || isRefetching}
+               className="flex items-center gap-2">
+               <RefreshCw
+                  className={`h-4 w-4 ${
+                     isLoading || isRefetching ? "animate-spin" : ""
+                  }`}
+               />
+               {isRefetching ? "Refreshing..." : "Refresh Products"}
+            </Button>
+         </div>
+
          {/* Product Details Modal */}
          <ProductDetailsModal
             product={selectedProduct}
@@ -223,6 +245,7 @@ export function ProductsManagement() {
          <AddProductDialog
             open={isAddProductDialogOpen}
             onOpenChange={setIsAddProductDialogOpen}
+            onProductAdded={refetch}
          />
       </div>
    );
