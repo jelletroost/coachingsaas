@@ -19,20 +19,22 @@ import {
    SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+interface ProductFormData {
+   name: string;
+   type: "medicine" | "supplement" | "service";
+   price: number;
+   currency: string;
+   stock_quantity: number;
+   status: "active" | "inactive";
+   prescription_required: boolean;
+}
 
 interface AddProductDialogProps {
    open: boolean;
    onOpenChange: (open: boolean) => void;
-   onAddProduct: (product: {
-      name: string;
-      type: "medicine" | "supplement" | "service";
-      price: number;
-      currency: string;
-      stock_quantity: number;
-      status: "active" | "inactive";
-      prescription_required: boolean;
-   }) => void;
+   onAddProduct: (product: ProductFormData) => void;
 }
 
 export function AddProductDialog({
@@ -40,91 +42,30 @@ export function AddProductDialog({
    onOpenChange,
    onAddProduct,
 }: AddProductDialogProps) {
-   const [formData, setFormData] = useState({
-      name: "",
-      type: "supplement" as "medicine" | "supplement" | "service",
-      price: "",
-      currency: "USD",
-      stock_quantity: "",
-      status: "active" as "active" | "inactive",
-      prescription_required: false,
-   });
-
-   const [errors, setErrors] = useState<Record<string, string>>({});
-
-   const validateForm = () => {
-      const newErrors: Record<string, string> = {};
-
-      if (!formData.name.trim()) {
-         newErrors.name = "Product name is required";
-      }
-
-      if (!formData.price || parseFloat(formData.price) <= 0) {
-         newErrors.price = "Price must be greater than 0";
-      }
-
-      if (!formData.stock_quantity || parseInt(formData.stock_quantity) < 0) {
-         newErrors.stock_quantity = "Stock quantity must be 0 or greater";
-      }
-
-      setErrors(newErrors);
-      return Object.keys(newErrors).length === 0;
-   };
-
-   const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
-
-      if (!validateForm()) {
-         return;
-      }
-
-      onAddProduct({
-         name: formData.name.trim(),
-         type: formData.type,
-         price: parseFloat(formData.price),
-         currency: formData.currency,
-         stock_quantity: parseInt(formData.stock_quantity),
-         status: formData.status,
-         prescription_required: formData.prescription_required,
-      });
-
-      // Reset form
-      setFormData({
+   const {
+      register,
+      handleSubmit,
+      formState: { errors },
+      reset,
+      setValue,
+      watch,
+   } = useForm<ProductFormData>({
+      defaultValues: {
          name: "",
          type: "supplement",
-         price: "",
+         price: 0,
          currency: "USD",
-         stock_quantity: "",
+         stock_quantity: 0,
          status: "active",
          prescription_required: false,
-      });
-      setErrors({});
+      },
+   });
+
+   const onSubmit = (data: ProductFormData) => {
+      console.log("Form Data:", data);
+      onAddProduct(data);
+      reset();
       onOpenChange(false);
-   };
-
-   const handleInputChange = (
-      field: string,
-      value:
-         | string
-         | boolean
-         | "medicine"
-         | "supplement"
-         | "service"
-         | "active"
-         | "inactive"
-   ) => {
-      setFormData((prev) => ({
-         ...prev,
-         [field]: value,
-      }));
-
-      // Clear error when user starts typing
-      if (errors[field]) {
-         setErrors((prev) => ({
-            ...prev,
-            [field]: "",
-         }));
-      }
    };
 
    return (
@@ -138,28 +79,31 @@ export function AddProductDialog({
                </DialogDescription>
             </DialogHeader>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                <div className="space-y-2">
                   <Label htmlFor="name">Product Name *</Label>
                   <Input
                      id="name"
-                     value={formData.name}
-                     onChange={(e) => handleInputChange("name", e.target.value)}
+                     {...register("name", {
+                        required: "Product name is required",
+                     })}
                      placeholder="Enter product name"
                      className={errors.name ? "border-red-500" : ""}
                   />
                   {errors.name && (
-                     <p className="text-sm text-red-500">{errors.name}</p>
+                     <p className="text-sm text-red-500">
+                        {errors.name.message}
+                     </p>
                   )}
                </div>
 
                <div className="space-y-2">
                   <Label htmlFor="type">Product Type *</Label>
                   <Select
-                     value={formData.type}
+                     value={watch("type")}
                      onValueChange={(
                         value: "medicine" | "supplement" | "service"
-                     ) => handleInputChange("type", value)}>
+                     ) => setValue("type", value)}>
                      <SelectTrigger>
                         <SelectValue placeholder="Select product type" />
                      </SelectTrigger>
@@ -179,25 +123,28 @@ export function AddProductDialog({
                         type="number"
                         step="0.01"
                         min="0"
-                        value={formData.price}
-                        onChange={(e) =>
-                           handleInputChange("price", e.target.value)
-                        }
+                        {...register("price", {
+                           required: "Price is required",
+                           min: {
+                              value: 0.01,
+                              message: "Price must be greater than 0",
+                           },
+                        })}
                         placeholder="0.00"
                         className={errors.price ? "border-red-500" : ""}
                      />
                      {errors.price && (
-                        <p className="text-sm text-red-500">{errors.price}</p>
+                        <p className="text-sm text-red-500">
+                           {errors.price.message}
+                        </p>
                      )}
                   </div>
 
                   <div className="space-y-2">
                      <Label htmlFor="currency">Currency</Label>
                      <Select
-                        value={formData.currency}
-                        onValueChange={(value) =>
-                           handleInputChange("currency", value)
-                        }>
+                        value={watch("currency")}
+                        onValueChange={(value) => setValue("currency", value)}>
                         <SelectTrigger>
                            <SelectValue />
                         </SelectTrigger>
@@ -217,16 +164,19 @@ export function AddProductDialog({
                      id="stock_quantity"
                      type="number"
                      min="0"
-                     value={formData.stock_quantity}
-                     onChange={(e) =>
-                        handleInputChange("stock_quantity", e.target.value)
-                     }
+                     {...register("stock_quantity", {
+                        required: "Stock quantity is required",
+                        min: {
+                           value: 0,
+                           message: "Stock quantity must be 0 or greater",
+                        },
+                     })}
                      placeholder="0"
                      className={errors.stock_quantity ? "border-red-500" : ""}
                   />
                   {errors.stock_quantity && (
                      <p className="text-sm text-red-500">
-                        {errors.stock_quantity}
+                        {errors.stock_quantity.message}
                      </p>
                   )}
                </div>
@@ -234,9 +184,9 @@ export function AddProductDialog({
                <div className="space-y-2">
                   <Label htmlFor="status">Status</Label>
                   <Select
-                     value={formData.status}
+                     value={watch("status")}
                      onValueChange={(value: "active" | "inactive") =>
-                        handleInputChange("status", value)
+                        setValue("status", value)
                      }>
                      <SelectTrigger>
                         <SelectValue />
@@ -251,9 +201,9 @@ export function AddProductDialog({
                <div className="flex items-center space-x-2">
                   <Switch
                      id="prescription_required"
-                     checked={formData.prescription_required}
+                     checked={watch("prescription_required")}
                      onCheckedChange={(checked) =>
-                        handleInputChange("prescription_required", checked)
+                        setValue("prescription_required", checked)
                      }
                   />
                   <Label htmlFor="prescription_required">
