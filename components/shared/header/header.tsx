@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { UserProfile } from "@/lib/types/database";
+import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
 import { useState } from "react";
 import Logo from "../logo";
@@ -41,20 +41,6 @@ const CloseIcon = () => (
    </svg>
 );
 
-// Mock user data - replace with actual user data from your auth store
-const mockUser: UserProfile = {
-   id: "1",
-   user_id: "user-1",
-   role: "patient",
-   first_name: "John",
-   last_name: "Doe",
-   email: "john.doe@example.com",
-   account_status: "active",
-   email_verified: true,
-   created_at: "2024-01-01",
-   updated_at: "2024-01-01",
-};
-
 const navigation = [
    {
       label: "Home",
@@ -83,7 +69,8 @@ const navigation = [
 ];
 
 export default function Header() {
-   const isAuthenticated = true;
+   const { user } = useAuth();
+   const isAuthenticated = user?.is_authenticated;
    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
    const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
 
@@ -130,7 +117,7 @@ export default function Header() {
                      <UserDropdown
                         isUserDropdownOpen={isUserDropdownOpen}
                         setIsUserDropdownOpen={setIsUserDropdownOpen}
-                        mockUser={mockUser}
+                        user={user}
                         handleSignOut={handleSignOut}
                      />
                   ) : (

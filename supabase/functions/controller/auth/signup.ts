@@ -13,6 +13,8 @@ const signup = async (c: Context) => {
       password,
       options: {
          data: {
+            first_name,
+            last_name,
             role,
          },
       },
