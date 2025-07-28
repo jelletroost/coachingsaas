@@ -1,7 +1,7 @@
-import { Context } from "jsr:@hono/hono";
 import edgeClient from "../../_shared/supabaseClient.ts";
 
 const signin = async (c: Context) => {
+   console.log("Signin request received");
    const { email, password } = await c.req.json();
 
    if (!email || !password) {
