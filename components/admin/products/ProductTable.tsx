@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -44,6 +43,7 @@ interface ProductTableProps {
    onExportProducts: () => void;
 }
 
+// Status
 const getStatusIcon = (status: Product["status"]) => {
    switch (status) {
       case "active":
@@ -59,6 +59,7 @@ const getStatusIcon = (status: Product["status"]) => {
    }
 };
 
+// Status Badge Variant
 const getStatusBadgeVariant = (status: Product["status"]) => {
    switch (status) {
       case "active":
@@ -74,6 +75,7 @@ const getStatusBadgeVariant = (status: Product["status"]) => {
    }
 };
 
+// Category Badge Variant
 const getCategoryBadgeVariant = (category: Product["category"]) => {
    switch (category) {
       case "medication":
@@ -91,6 +93,7 @@ const getCategoryBadgeVariant = (category: Product["category"]) => {
    }
 };
 
+// Stock Status Badge Variant
 const getStockStatusBadgeVariant = (
    inStock: number,
    lowStockThreshold: number
@@ -100,12 +103,14 @@ const getStockStatusBadgeVariant = (
    return "default";
 };
 
+// Stock Status Text
 const getStockStatusText = (inStock: number, lowStockThreshold: number) => {
    if (inStock === 0) return "Out of Stock";
    if (inStock <= lowStockThreshold) return "Low Stock";
    return "In Stock";
 };
 
+// Product Table
 export function ProductTable({
    products,
    onViewDetails,
@@ -114,12 +119,14 @@ export function ProductTable({
    onUpdateStatus,
    onExportProducts,
 }: ProductTableProps) {
+   // Search Term
    const [searchTerm, setSearchTerm] = useState("");
    const [categoryFilter, setCategoryFilter] = useState<string>("all");
    const [statusFilter, setStatusFilter] = useState<string>("all");
    const [currentPage, setCurrentPage] = useState(1);
    const [itemsPerPage, setItemsPerPage] = useState(10);
 
+   // Filtered Products
    const filteredProducts = products.filter((product) => {
       const matchesSearch =
          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -137,6 +144,7 @@ export function ProductTable({
       return matchesSearch && matchesCategory && matchesStatus;
    });
 
+   // Total Pages
    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
    const startIndex = (currentPage - 1) * itemsPerPage;
    const endIndex = startIndex + itemsPerPage;
