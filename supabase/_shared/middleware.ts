@@ -1,7 +1,7 @@
 import { Context, Next } from "jsr:@hono/hono";
 import edgeAdminClient from "./supabaseAdmin.ts";
 
-export const checkRole = (allowedRole: string) => {
+export const checkRole = (allowedRoles: string[]) => {
    return async (c: Context, next: Next) => {
       const authHeader = c.req.header("Authorization");
       const token = authHeader?.replace("Bearer ", "");
@@ -26,7 +26,7 @@ export const checkRole = (allowedRole: string) => {
          .eq("id", user.id)
          .single();
 
-      if (roleError || data?.role !== allowedRole) {
+      if (roleError || !allowedRoles.includes(data?.role)) {
          return c.json({ message: "Unauthorized" }, 401);
       }
 
