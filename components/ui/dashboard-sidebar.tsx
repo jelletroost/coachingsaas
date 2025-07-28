@@ -15,8 +15,7 @@ import { usePathname } from "next/navigation";
 import Logo from "../shared/logo";
 
 export function DashboardSidebar() {
-   const { userRole, user } = useAuth();
-   console.log(user);
+   const { userRole } = useAuth();
    const pathname = usePathname();
    const menuItems = getSidebarItemsByRole(userRole || "patient");
    return (
