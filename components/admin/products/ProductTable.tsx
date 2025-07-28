@@ -18,6 +18,7 @@ import {
    SelectTrigger,
    SelectValue,
 } from "@/components/ui/select";
+import { Product } from "@/lib/types/database";
 import {
    CheckCircle,
    Edit,
@@ -30,7 +31,6 @@ import {
    XCircle,
 } from "lucide-react";
 import { useState } from "react";
-import { Product } from "./mockData";
 
 interface ProductTableProps {
    products: Product[];
@@ -65,19 +65,15 @@ const getStatusBadgeVariant = (status: Product["status"]) => {
    }
 };
 
-// Category Badge Variant
-const getCategoryBadgeVariant = (category: Product["category"]) => {
-   switch (category) {
-      case "medication":
+// Type Badge Variant
+const getTypeBadgeVariant = (type: Product["type"]) => {
+   switch (type) {
+      case "medicine":
          return "destructive";
       case "supplement":
          return "default";
-      case "consultation":
+      case "service":
          return "secondary";
-      case "program":
-         return "default";
-      case "equipment":
-         return "outline";
       default:
          return "secondary";
    }
@@ -120,14 +116,10 @@ export function ProductTable({
    const filteredProducts = products.filter((product) => {
       const matchesSearch =
          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         product.tags.some((tag) =>
-            tag.toLowerCase().includes(searchTerm.toLowerCase())
-         );
+         product.description.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesCategory =
-         categoryFilter === "all" || product.category === categoryFilter;
+         categoryFilter === "all" || product.type === categoryFilter;
       const matchesStatus =
          statusFilter === "all" || product.status === statusFilter;
 
@@ -184,11 +176,9 @@ export function ProductTable({
                   </SelectTrigger>
                   <SelectContent>
                      <SelectItem value="all">All Types</SelectItem>
-                     <SelectItem value="medication">Medication</SelectItem>
+                     <SelectItem value="medicine">Medicine</SelectItem>
                      <SelectItem value="supplement">Supplement</SelectItem>
-                     <SelectItem value="consultation">Consultation</SelectItem>
-                     <SelectItem value="program">Program</SelectItem>
-                     <SelectItem value="equipment">Equipment</SelectItem>
+                     <SelectItem value="service">Service</SelectItem>
                   </SelectContent>
                </Select>
                <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -243,10 +233,8 @@ export function ProductTable({
                            </td>
                            <td className="px-4 py-3">
                               <Badge
-                                 variant={getCategoryBadgeVariant(
-                                    product.category
-                                 )}>
-                                 {product.category}
+                                 variant={getTypeBadgeVariant(product.type)}>
+                                 {product.type}
                               </Badge>
                            </td>
                            <td className="px-4 py-3">
@@ -270,17 +258,17 @@ export function ProductTable({
                            </td>
                            <td className="px-4 py-3">
                               <div className="font-medium">
-                                 {product.inventory.inStock}
+                                 {product.stock_quantity}
                               </div>
                               <Badge
                                  variant={getStockStatusBadgeVariant(
-                                    product.inventory.inStock,
-                                    product.inventory.lowStockThreshold
+                                    product.stock_quantity,
+                                    10
                                  )}
                                  className="text-xs">
                                  {getStockStatusText(
-                                    product.inventory.inStock,
-                                    product.inventory.lowStockThreshold
+                                    product.stock_quantity,
+                                    10
                                  )}
                               </Badge>
                            </td>
