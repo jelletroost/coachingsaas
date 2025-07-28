@@ -19,28 +19,20 @@ import {
    SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Product } from "@/lib/types/database";
+import createProduct from "@/services/product_service";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-
-interface ProductFormData {
-   name: string;
-   type: "medicine" | "supplement" | "service";
-   price: number;
-   currency: string;
-   stock_quantity: number;
-   status: "active" | "inactive";
-   prescription_required: boolean;
-}
+import toast from "react-hot-toast";
 
 interface AddProductDialogProps {
    open: boolean;
    onOpenChange: (open: boolean) => void;
-   onAddProduct: (product: ProductFormData) => void;
 }
 
 export function AddProductDialog({
    open,
    onOpenChange,
-   onAddProduct,
 }: AddProductDialogProps) {
    const {
       register,
@@ -49,7 +41,7 @@ export function AddProductDialog({
       reset,
       setValue,
       watch,
-   } = useForm<ProductFormData>({
+   } = useForm<Product>({
       defaultValues: {
          name: "",
          type: "supplement",
@@ -61,11 +53,20 @@ export function AddProductDialog({
       },
    });
 
-   const onSubmit = (data: ProductFormData) => {
-      console.log("Form Data:", data);
-      onAddProduct(data);
-      reset();
-      onOpenChange(false);
+   const { mutate: createProductMutation, isPending } = useMutation({
+      mutationFn: createProduct,
+      onSuccess: () => {
+         toast.success("Product created");
+         reset();
+         onOpenChange(false);
+      },
+      onError: (error) => {
+         toast.error(error.message);
+      },
+   });
+
+   const onSubmit = (data: Product) => {
+      createProductMutation(data);
    };
 
    return (
@@ -218,7 +219,16 @@ export function AddProductDialog({
                      onClick={() => onOpenChange(false)}>
                      Cancel
                   </Button>
-                  <Button type="submit">Add Product</Button>
+                  <Button type="submit" disabled={isPending}>
+                     {isPending ? (
+                        <div className="flex items-center gap-2">
+                           <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                           <span className="animate-pulse">Requesting...</span>
+                        </div>
+                     ) : (
+                        "Submit"
+                     )}
+                  </Button>
                </DialogFooter>
             </form>
          </DialogContent>

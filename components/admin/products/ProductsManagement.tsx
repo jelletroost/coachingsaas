@@ -51,63 +51,6 @@ export function ProductsManagement() {
       toast.success("Export functionality coming soon!");
    };
 
-   const handleAddNewProduct = (productData: {
-      name: string;
-      type: "medicine" | "supplement" | "service";
-      price: number;
-      currency: string;
-      stock_quantity: number;
-      status: "active" | "inactive";
-      prescription_required: boolean;
-   }) => {
-      // Create a new product with mock data structure
-      const newProduct: Product = {
-         id: Date.now().toString(), // Simple ID generation
-         name: productData.name,
-         description: `New ${productData.type} product`,
-         category:
-            productData.type === "medicine"
-               ? "medication"
-               : productData.type === "supplement"
-               ? "supplement"
-               : "consultation",
-         sku: `NEW-${productData.type.toUpperCase()}-${Date.now()}`,
-         price: productData.price,
-         currency: productData.currency,
-         cost: productData.price * 0.3, // Mock cost calculation
-         profitMargin: 70, // Mock profit margin
-         status: productData.status === "active" ? "active" : "inactive",
-         inventory: {
-            inStock: productData.stock_quantity,
-            lowStockThreshold: 10,
-            reorderPoint: 15,
-            supplier: "New Supplier",
-            leadTime: 7,
-         },
-         prescription: {
-            required: productData.prescription_required,
-            type: productData.prescription_required ? "non-controlled" : "otc",
-         },
-         specifications: {
-            form: productData.type === "service" ? "service" : "tablet",
-            quantity: 1,
-            unit: productData.type === "service" ? "session" : "unit",
-         },
-         images: [],
-         tags: [productData.type],
-         rating: 0,
-         reviewCount: 0,
-         popularity: 999,
-         createdAt: new Date().toISOString(),
-         updatedAt: new Date().toISOString(),
-         createdBy: "admin",
-         lastModifiedBy: "admin",
-      };
-
-      setProducts((prev) => [newProduct, ...prev]);
-      toast.success(`Product "${productData.name}" added successfully!`);
-   };
-
    return (
       <div className="space-y-6">
          {/* Statistics Cards */}
@@ -226,7 +169,6 @@ export function ProductsManagement() {
          <AddProductDialog
             open={isAddProductDialogOpen}
             onOpenChange={setIsAddProductDialogOpen}
-            onAddProduct={handleAddNewProduct}
          />
       </div>
    );
