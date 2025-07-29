@@ -87,11 +87,11 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
          ];
       case "coach":
          return [
-            // {
-            //    label: "Overview",
-            //    href: "/coach/overview",
-            //    icon: getIconComponent("HomeIcon"),
-            // },
+            {
+               label: "Overview",
+               href: "/coach/overview",
+               icon: getIconComponent("HomeIcon"),
+            },
             {
                label: "Patients",
                href: "/coach/patients",

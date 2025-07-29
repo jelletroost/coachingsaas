@@ -11,9 +11,9 @@ import {
    SelectTrigger,
    SelectValue,
 } from "@/components/ui/select";
-import { CheckCircle, Eye, Package, Search, Star, XCircle } from "lucide-react";
+import { Product } from "@/lib/types/database";
+import { CheckCircle, Eye, Package, Search, XCircle } from "lucide-react";
 import { useState } from "react";
-import { Product, productCategories } from "./mockData";
 
 interface CoachProductTableProps {
    products: Product[];
@@ -26,10 +26,6 @@ const getStatusIcon = (status: Product["status"]) => {
          return <CheckCircle className="h-4 w-4 text-green-500" />;
       case "inactive":
          return <XCircle className="h-4 w-4 text-gray-500" />;
-      case "draft":
-         return <Package className="h-4 w-4 text-yellow-500" />;
-      case "discontinued":
-         return <XCircle className="h-4 w-4 text-red-500" />;
       default:
          return <Package className="h-4 w-4 text-gray-500" />;
    }
@@ -41,38 +37,36 @@ const getStatusBadgeVariant = (status: Product["status"]) => {
          return "default";
       case "inactive":
          return "secondary";
-      case "draft":
-         return "outline";
-      case "discontinued":
-         return "destructive";
       default:
          return "secondary";
    }
 };
 
-const getCategoryBadgeVariant = (category: Product["category"]) => {
-   switch (category) {
-      case "medication":
+const getTypeBadgeVariant = (type: Product["type"]) => {
+   switch (type) {
+      case "medicine":
          return "destructive";
       case "supplement":
          return "default";
-      case "consultation":
+      case "service":
          return "secondary";
-      case "program":
-         return "default";
-      case "equipment":
-         return "outline";
       default:
          return "secondary";
    }
 };
+
+const productTypes = [
+   { id: "medicine", name: "Medicine" },
+   { id: "supplement", name: "Supplement" },
+   { id: "service", name: "Service" },
+];
 
 export function CoachProductTable({
    products,
    onViewDetails,
 }: CoachProductTableProps) {
    const [searchTerm, setSearchTerm] = useState("");
-   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+   const [typeFilter, setTypeFilter] = useState<string>("all");
    const [statusFilter, setStatusFilter] = useState<string>("all");
    const [currentPage, setCurrentPage] = useState(1);
    const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -80,18 +74,14 @@ export function CoachProductTable({
    const filteredProducts = products.filter((product) => {
       const matchesSearch =
          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         product.tags.some((tag) =>
-            tag.toLowerCase().includes(searchTerm.toLowerCase())
-         );
+         product.description.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesCategory =
-         categoryFilter === "all" || product.category === categoryFilter;
+      const matchesType =
+         typeFilter === "all" || product.type === typeFilter;
       const matchesStatus =
          statusFilter === "all" || product.status === statusFilter;
 
-      return matchesSearch && matchesCategory && matchesStatus;
+      return matchesSearch && matchesType && matchesStatus;
    });
 
    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
@@ -126,15 +116,15 @@ export function CoachProductTable({
                      className="pl-10"
                   />
                </div>
-               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+               <Select value={typeFilter} onValueChange={setTypeFilter}>
                   <SelectTrigger>
-                     <SelectValue placeholder="Filter by category" />
+                     <SelectValue placeholder="Filter by type" />
                   </SelectTrigger>
                   <SelectContent>
-                     <SelectItem value="all">All Categories</SelectItem>
-                     {productCategories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                           {category.name}
+                     <SelectItem value="all">All Types</SelectItem>
+                     {productTypes.map((type) => (
+                        <SelectItem key={type.id} value={type.id}>
+                           {type.name}
                         </SelectItem>
                      ))}
                   </SelectContent>
@@ -147,8 +137,6 @@ export function CoachProductTable({
                      <SelectItem value="all">All Statuses</SelectItem>
                      <SelectItem value="active">Active</SelectItem>
                      <SelectItem value="inactive">Inactive</SelectItem>
-                     <SelectItem value="draft">Draft</SelectItem>
-                     <SelectItem value="discontinued">Discontinued</SelectItem>
                   </SelectContent>
                </Select>
             </div>
@@ -162,7 +150,7 @@ export function CoachProductTable({
                            Product
                         </th>
                         <th className="px-4 py-3 text-left text-sm font-medium">
-                           Category
+                           Type
                         </th>
                         <th className="px-4 py-3 text-left text-sm font-medium">
                            Status
@@ -171,7 +159,7 @@ export function CoachProductTable({
                            Price
                         </th>
                         <th className="px-4 py-3 text-left text-sm font-medium">
-                           Rating
+                           Stock
                         </th>
                         <th className="px-4 py-3 text-left text-sm font-medium">
                            Actions
@@ -186,9 +174,6 @@ export function CoachProductTable({
                                  <div className="font-medium">
                                     {product.name}
                                  </div>
-                                 <div className="text-sm text-muted-foreground">
-                                    SKU: {product.sku}
-                                 </div>
                                  <div className="text-sm text-muted-foreground line-clamp-2">
                                     {product.description}
                                  </div>
@@ -196,16 +181,9 @@ export function CoachProductTable({
                            </td>
                            <td className="px-4 py-3">
                               <Badge
-                                 variant={getCategoryBadgeVariant(
-                                    product.category
-                                 )}>
-                                 {product.category}
+                                 variant={getTypeBadgeVariant(product.type)}>
+                                 {product.type}
                               </Badge>
-                              {product.subcategory && (
-                                 <div className="text-xs text-muted-foreground mt-1">
-                                    {product.subcategory}
-                                 </div>
-                              )}
                            </td>
                            <td className="px-4 py-3">
                               <div className="flex items-center space-x-2">
@@ -225,21 +203,18 @@ export function CoachProductTable({
                               <div className="text-sm text-muted-foreground">
                                  {product.currency}
                               </div>
-                              {product.prescription.required && (
+                              {product.prescription_required && (
                                  <div className="text-xs text-orange-600">
                                     Prescription Required
                                  </div>
                               )}
                            </td>
                            <td className="px-4 py-3">
-                              <div className="flex items-center space-x-1">
-                                 <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                                 <span className="font-medium">
-                                    {product.rating}
-                                 </span>
-                                 <span className="text-sm text-muted-foreground">
-                                    ({product.reviewCount})
-                                 </span>
+                              <div className="font-medium">
+                                 {product.stock_quantity}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                 in stock
                               </div>
                            </td>
                            <td className="px-4 py-3">

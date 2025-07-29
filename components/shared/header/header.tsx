@@ -118,7 +118,6 @@ export default function Header() {
                         isUserDropdownOpen={isUserDropdownOpen}
                         setIsUserDropdownOpen={setIsUserDropdownOpen}
                         user={user}
-                        handleSignOut={handleSignOut}
                      />
                   ) : (
                      <>

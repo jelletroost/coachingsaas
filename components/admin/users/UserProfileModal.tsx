@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+ 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,24 +20,7 @@ import {
    UserCheck,
    UserX,
 } from "lucide-react";
-
-interface User {
-   id: string;
-   name: string;
-   email: string;
-   role: "patient" | "coach" | "admin";
-   status: "active" | "suspended" | "pending";
-   avatar?: string;
-   phone?: string;
-   joinedDate: string;
-   lastActive: string;
-   subscription?: string;
-   coach?: string;
-   location?: string;
-   bio?: string;
-   specializations?: string[];
-   certifications?: string[];
-}
+import { User } from "./types";
 
 interface UserProfileModalProps {
    user: User | null;

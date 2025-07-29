@@ -8,8 +8,8 @@ const toCapitalize = (str: string) => {
 };
 
 const DashboardHeader = async () => {
-   const userData = await currentUserSSR();
-   const userRole = userData?.user_metadata?.role;
+   const user = await currentUserSSR();
+   const userRole = user?.user_metadata?.role;
    const title = toCapitalize(userRole || "coach");
    return (
       <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
@@ -21,13 +21,7 @@ const DashboardHeader = async () => {
             />
             <h1 className="text-base font-medium">{title} Dashboard</h1>
             <div className="ml-auto flex items-center gap-2">
-               <NavUser
-                  user={{
-                     name: userData?.user_metadata?.name || "",
-                     email: userData?.email || "",
-                     avatar: userData?.user_metadata?.avatar || "",
-                  }}
-               />
+               <NavUser/>
             </div>
          </div>
       </header>
