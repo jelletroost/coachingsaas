@@ -1,3 +1,4 @@
+export { AssignCoachModal } from "./AssignCoachModal";
 export type { User } from "./types";
 export { UserProfileModal } from "./UserProfileModal";
 export { UsersManagement } from "./UsersManagement";

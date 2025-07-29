@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { AssignCoachModal } from "./AssignCoachModal";
 import { type User as UserType } from "./types";
 import { UserProfileModal } from "./UserProfileModal";
 import { UserTable } from "./UserTable";
@@ -24,9 +25,14 @@ export function UsersManagement() {
    const { data: dbUsers, isLoading, error, refetch } = useUsers();
    const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+   const [isAssignCoachModalOpen, setIsAssignCoachModalOpen] = useState(false);
+   const [selectedPatient, setSelectedPatient] = useState<UserType | null>(null);
 
    // Transform database users to component format
-   const users: UserType[] = dbUsers ? dbUsers.map(transformUserForComponent) : [];
+   const users = dbUsers ? dbUsers.map(transformUserForComponent) as UserType[] : [];
+
+   // Get coaches for assignment
+   const coaches = users.filter((u: UserType) => u.role === "coach");
 
    // Calculate stats from real data
    const userStats = {
@@ -66,6 +72,15 @@ export function UsersManagement() {
 
    const handleExportUsers = () => {
       toast.success("Export functionality coming soon!");
+   };
+
+   const handleAssignCoach = (user: UserType) => {
+      setSelectedPatient(user);
+      setIsAssignCoachModalOpen(true);
+   };
+
+   const handleAssignCoachSuccess = () => {
+      refetch(); // Refresh data after assignment
    };
 
    if (isLoading) {
@@ -207,6 +222,7 @@ export function UsersManagement() {
                   onSuspendUser={handleSuspendUser}
                   onActivateUser={handleActivateUser}
                   onSendMessage={handleSendMessage}
+                  onAssignCoach={handleAssignCoach}
                />
             )}
          </UserTabs>
@@ -219,6 +235,13 @@ export function UsersManagement() {
             onSendMessage={handleSendMessage}
             onSuspend={handleSuspendUser}
             onActivate={handleActivateUser}
+         />
+         <AssignCoachModal
+            patient={selectedPatient}
+            coaches={coaches}
+            isOpen={isAssignCoachModalOpen}
+            onClose={() => setIsAssignCoachModalOpen(false)}
+            onSuccess={handleAssignCoachSuccess}
          />
       </div>
    );
