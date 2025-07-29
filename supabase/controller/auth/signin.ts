@@ -1,3 +1,4 @@
+import { Context } from "jsr:@hono/hono";
 import edgeClient from "../../_shared/supabaseClient.ts";
 
 const signin = async (c: Context) => {
