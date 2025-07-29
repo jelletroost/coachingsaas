@@ -86,6 +86,20 @@ export interface UserProfileWithDetails extends UserProfile {
    coach_profile?: CoachProfile;
 }
 
+export interface Product {
+   id: string;
+   name: string;
+   type: "medicine" | "supplement" | "service";
+   description: string;
+   price: number;
+   currency: string;
+   stock_quantity: number;
+   status: "active" | "inactive";
+   prescription_required: boolean;
+   created_at: string;
+   updated_at: string;
+}
+
 // Database table names
 export const TABLES = {
    USER_PROFILES: "user_profiles",

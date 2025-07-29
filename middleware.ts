@@ -24,11 +24,10 @@ export default async function middleware(req: NextRequest) {
       }
 
       const userRole = userData?.user_metadata?.role;
-      console.log("User Role", userRole);
 
       // Define role-based access patterns
       const roleAccessPatterns = {
-         admin: ["/admin/overview"],
+         admin: ["/admin/overview", "/admin/products"],
          coach: ["/coach/overview"],
          patient: ["/dashboard"],
       };

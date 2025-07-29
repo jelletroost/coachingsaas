@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -19,8 +18,8 @@ import {
    SelectTrigger,
    SelectValue,
 } from "@/components/ui/select";
+import { Product } from "@/lib/types/database";
 import {
-   AlertTriangle,
    CheckCircle,
    Edit,
    Eye,
@@ -28,12 +27,10 @@ import {
    Package,
    Plus,
    Search,
-   Star,
    TrendingUp,
    XCircle,
 } from "lucide-react";
 import { useState } from "react";
-import { Product, productCategories } from "./mockData";
 
 interface ProductTableProps {
    products: Product[];
@@ -44,53 +41,45 @@ interface ProductTableProps {
    onExportProducts: () => void;
 }
 
+// Status
 const getStatusIcon = (status: Product["status"]) => {
    switch (status) {
       case "active":
          return <CheckCircle className="h-4 w-4 text-green-500" />;
       case "inactive":
          return <XCircle className="h-4 w-4 text-gray-500" />;
-      case "draft":
-         return <Package className="h-4 w-4 text-yellow-500" />;
-      case "discontinued":
-         return <AlertTriangle className="h-4 w-4 text-red-500" />;
       default:
          return <Package className="h-4 w-4 text-gray-500" />;
    }
 };
 
+// Status Badge Variant
 const getStatusBadgeVariant = (status: Product["status"]) => {
    switch (status) {
       case "active":
          return "default";
       case "inactive":
          return "secondary";
-      case "draft":
-         return "outline";
-      case "discontinued":
-         return "destructive";
       default:
          return "secondary";
    }
 };
 
-const getCategoryBadgeVariant = (category: Product["category"]) => {
-   switch (category) {
-      case "medication":
+// Type Badge Variant
+const getTypeBadgeVariant = (type: Product["type"]) => {
+   switch (type) {
+      case "medicine":
          return "destructive";
       case "supplement":
          return "default";
-      case "consultation":
+      case "service":
          return "secondary";
-      case "program":
-         return "default";
-      case "equipment":
-         return "outline";
       default:
          return "secondary";
    }
 };
 
+// Stock Status Badge Variant
 const getStockStatusBadgeVariant = (
    inStock: number,
    lowStockThreshold: number
@@ -100,12 +89,14 @@ const getStockStatusBadgeVariant = (
    return "default";
 };
 
+// Stock Status Text
 const getStockStatusText = (inStock: number, lowStockThreshold: number) => {
    if (inStock === 0) return "Out of Stock";
    if (inStock <= lowStockThreshold) return "Low Stock";
    return "In Stock";
 };
 
+// Product Table
 export function ProductTable({
    products,
    onViewDetails,
@@ -114,29 +105,28 @@ export function ProductTable({
    onUpdateStatus,
    onExportProducts,
 }: ProductTableProps) {
+   // Search Term
    const [searchTerm, setSearchTerm] = useState("");
    const [categoryFilter, setCategoryFilter] = useState<string>("all");
    const [statusFilter, setStatusFilter] = useState<string>("all");
    const [currentPage, setCurrentPage] = useState(1);
    const [itemsPerPage, setItemsPerPage] = useState(10);
 
+   // Filtered Products
    const filteredProducts = products.filter((product) => {
       const matchesSearch =
          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         product.tags.some((tag) =>
-            tag.toLowerCase().includes(searchTerm.toLowerCase())
-         );
+         product.description.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesCategory =
-         categoryFilter === "all" || product.category === categoryFilter;
+         categoryFilter === "all" || product.type === categoryFilter;
       const matchesStatus =
          statusFilter === "all" || product.status === statusFilter;
 
       return matchesSearch && matchesCategory && matchesStatus;
    });
 
+   // Total Pages
    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
    const startIndex = (currentPage - 1) * itemsPerPage;
    const endIndex = startIndex + itemsPerPage;
@@ -170,7 +160,7 @@ export function ProductTable({
                   </Button>
                </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                <div className="relative">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -182,15 +172,13 @@ export function ProductTable({
                </div>
                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                   <SelectTrigger>
-                     <SelectValue placeholder="Filter by category" />
+                     <SelectValue placeholder="Filter by type" />
                   </SelectTrigger>
                   <SelectContent>
-                     <SelectItem value="all">All Categories</SelectItem>
-                     {productCategories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                           {category.name}
-                        </SelectItem>
-                     ))}
+                     <SelectItem value="all">All Types</SelectItem>
+                     <SelectItem value="medicine">Medicine</SelectItem>
+                     <SelectItem value="supplement">Supplement</SelectItem>
+                     <SelectItem value="service">Service</SelectItem>
                   </SelectContent>
                </Select>
                <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -201,8 +189,6 @@ export function ProductTable({
                      <SelectItem value="all">All Statuses</SelectItem>
                      <SelectItem value="active">Active</SelectItem>
                      <SelectItem value="inactive">Inactive</SelectItem>
-                     <SelectItem value="draft">Draft</SelectItem>
-                     <SelectItem value="discontinued">Discontinued</SelectItem>
                   </SelectContent>
                </Select>
             </div>
@@ -216,7 +202,7 @@ export function ProductTable({
                            Product
                         </th>
                         <th className="px-4 py-3 text-left text-sm font-medium">
-                           Category
+                           Type
                         </th>
                         <th className="px-4 py-3 text-left text-sm font-medium">
                            Status
@@ -226,9 +212,6 @@ export function ProductTable({
                         </th>
                         <th className="px-4 py-3 text-left text-sm font-medium">
                            Stock
-                        </th>
-                        <th className="px-4 py-3 text-left text-sm font-medium">
-                           Rating
                         </th>
                         <th className="px-4 py-3 text-left text-sm font-medium">
                            Actions
@@ -244,25 +227,15 @@ export function ProductTable({
                                     {product.name}
                                  </div>
                                  <div className="text-sm text-muted-foreground">
-                                    SKU: {product.sku}
-                                 </div>
-                                 <div className="text-sm text-muted-foreground line-clamp-2">
                                     {product.description}
                                  </div>
                               </div>
                            </td>
                            <td className="px-4 py-3">
                               <Badge
-                                 variant={getCategoryBadgeVariant(
-                                    product.category
-                                 )}>
-                                 {product.category}
+                                 variant={getTypeBadgeVariant(product.type)}>
+                                 {product.type}
                               </Badge>
-                              {product.subcategory && (
-                                 <div className="text-xs text-muted-foreground mt-1">
-                                    {product.subcategory}
-                                 </div>
-                              )}
                            </td>
                            <td className="px-4 py-3">
                               <div className="flex items-center space-x-2">
@@ -282,44 +255,22 @@ export function ProductTable({
                               <div className="text-sm text-muted-foreground">
                                  {product.currency}
                               </div>
-                              <div className="text-xs text-muted-foreground">
-                                 Margin: {product.profitMargin.toFixed(1)}%
-                              </div>
                            </td>
                            <td className="px-4 py-3">
+                              <div className="font-medium">
+                                 {product.stock_quantity}
+                              </div>
                               <Badge
                                  variant={getStockStatusBadgeVariant(
-                                    product.inventory.inStock,
-                                    product.inventory.lowStockThreshold
-                                 )}>
+                                    product.stock_quantity,
+                                    10
+                                 )}
+                                 className="text-xs">
                                  {getStockStatusText(
-                                    product.inventory.inStock,
-                                    product.inventory.lowStockThreshold
+                                    product.stock_quantity,
+                                    10
                                  )}
                               </Badge>
-                              <div className="text-sm text-muted-foreground mt-1">
-                                 {product.inventory.inStock} in stock
-                              </div>
-                              {product.inventory.inStock <=
-                                 product.inventory.lowStockThreshold && (
-                                 <div className="text-xs text-orange-600">
-                                    Reorder: {product.inventory.reorderPoint}
-                                 </div>
-                              )}
-                           </td>
-                           <td className="px-4 py-3">
-                              <div className="flex items-center space-x-1">
-                                 <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                                 <span className="font-medium">
-                                    {product.rating}
-                                 </span>
-                                 <span className="text-sm text-muted-foreground">
-                                    ({product.reviewCount})
-                                 </span>
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                 Popularity: #{product.popularity}
-                              </div>
                            </td>
                            <td className="px-4 py-3">
                               <DropdownMenu>
@@ -355,28 +306,6 @@ export function ProductTable({
                                           }>
                                           <CheckCircle className="mr-2 h-4 w-4" />
                                           Activate
-                                       </DropdownMenuItem>
-                                    )}
-                                    {product.status === "draft" && (
-                                       <DropdownMenuItem
-                                          onClick={() =>
-                                             onUpdateStatus(product, "active")
-                                          }>
-                                          <CheckCircle className="mr-2 h-4 w-4" />
-                                          Publish
-                                       </DropdownMenuItem>
-                                    )}
-                                    {product.status !== "discontinued" && (
-                                       <DropdownMenuItem
-                                          onClick={() =>
-                                             onUpdateStatus(
-                                                product,
-                                                "discontinued"
-                                             )
-                                          }
-                                          className="text-red-600">
-                                          <AlertTriangle className="mr-2 h-4 w-4" />
-                                          Discontinue
                                        </DropdownMenuItem>
                                     )}
                                  </DropdownMenuContent>

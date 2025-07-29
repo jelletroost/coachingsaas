@@ -82,7 +82,7 @@ export default function SigninPage() {
       mutationFn: signin,
       onSuccess: () => {
          toast.success("Signin successful");
-         redirectTo("/");
+         redirectTo("/dashboard");
       },
       onError: () => {
          toast.error("Invalid credentials");

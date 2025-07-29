@@ -5,7 +5,7 @@ const signup = async (c: Context) => {
    const { email, password, first_name, last_name, role } = await c.req.json();
 
    if (!email || !password) {
-      return c.json({ error: "Email and password are required" }, 400);
+      return c.json({ message: "Email and password are required" }, 400);
    }
 
    const { data, error } = await edgeClient.auth.signUp({
@@ -13,13 +13,18 @@ const signup = async (c: Context) => {
       password,
       options: {
          data: {
+            first_name,
+            last_name,
             role,
          },
       },
    });
 
    if (error || !data?.user?.id) {
-      return c.json({ error: error?.message ?? "Failed to create user" }, 500);
+      return c.json(
+         { message: error?.message ?? "Failed to create user" },
+         500
+      );
    }
 
    const userId = data.user?.id;
@@ -37,7 +42,7 @@ const signup = async (c: Context) => {
 
    if (insertError) {
       return c.json(
-         { error: insertError.message ?? "Failed to create user" },
+         { message: insertError.message ?? "Failed to create user" },
          500
       );
    }

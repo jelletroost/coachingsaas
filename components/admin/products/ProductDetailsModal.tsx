@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -10,16 +9,8 @@ import {
    DialogTitle,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import {
-   AlertTriangle,
-   CheckCircle,
-   Edit,
-   Package,
-   Star,
-   TrendingUp,
-   XCircle,
-} from "lucide-react";
-import { Product } from "./mockData";
+import { Product } from "@/lib/types/database";
+import { CheckCircle, Edit, Package, XCircle } from "lucide-react";
 
 interface ProductDetailsModalProps {
    product: Product | null;
@@ -34,10 +25,6 @@ const getStatusIcon = (status: Product["status"]) => {
          return <CheckCircle className="h-4 w-4 text-green-500" />;
       case "inactive":
          return <XCircle className="h-4 w-4 text-gray-500" />;
-      case "draft":
-         return <Package className="h-4 w-4 text-yellow-500" />;
-      case "discontinued":
-         return <AlertTriangle className="h-4 w-4 text-red-500" />;
       default:
          return <Package className="h-4 w-4 text-gray-500" />;
    }
@@ -49,27 +36,19 @@ const getStatusBadgeVariant = (status: Product["status"]) => {
          return "default";
       case "inactive":
          return "secondary";
-      case "draft":
-         return "outline";
-      case "discontinued":
-         return "destructive";
       default:
          return "secondary";
    }
 };
 
-const getCategoryBadgeVariant = (category: Product["category"]) => {
-   switch (category) {
-      case "medication":
+const getTypeBadgeVariant = (type: Product["type"]) => {
+   switch (type) {
+      case "medicine":
          return "destructive";
       case "supplement":
          return "default";
-      case "consultation":
+      case "service":
          return "secondary";
-      case "program":
-         return "default";
-      case "equipment":
-         return "outline";
       default:
          return "secondary";
    }
@@ -129,8 +108,8 @@ export function ProductDetailsModal({
                      </div>
                   </div>
                   <div className="text-right">
-                     <div className="text-sm text-muted-foreground">SKU</div>
-                     <div className="font-mono font-medium">{product.sku}</div>
+                     <div className="text-sm text-muted-foreground">ID</div>
+                     <div className="font-mono font-medium">{product.id}</div>
                   </div>
                </div>
 
@@ -156,32 +135,20 @@ export function ProductDetailsModal({
                            </div>
                         </div>
                         <div>
-                           <div className="text-sm font-medium">Category</div>
+                           <div className="text-sm font-medium">Type</div>
                            <div className="flex items-center space-x-2">
                               <Badge
-                                 variant={getCategoryBadgeVariant(
-                                    product.category
-                                 )}>
-                                 {product.category}
+                                 variant={getTypeBadgeVariant(product.type)}>
+                                 {product.type}
                               </Badge>
-                              {product.subcategory && (
-                                 <span className="text-sm text-muted-foreground">
-                                    - {product.subcategory}
-                                 </span>
-                              )}
                            </div>
                         </div>
                         <div>
-                           <div className="text-sm font-medium">Tags</div>
-                           <div className="flex flex-wrap gap-1 mt-1">
-                              {product.tags.map((tag) => (
-                                 <Badge
-                                    key={tag}
-                                    variant="outline"
-                                    className="text-xs">
-                                    {tag}
-                                 </Badge>
-                              ))}
+                           <div className="text-sm font-medium">
+                              Prescription Required
+                           </div>
+                           <div className="text-sm text-muted-foreground">
+                              {product.prescription_required ? "Yes" : "No"}
                            </div>
                         </div>
                      </div>
@@ -199,34 +166,28 @@ export function ProductDetailsModal({
                            </span>
                         </div>
                         <div className="flex justify-between">
-                           <span className="text-sm font-medium">Cost:</span>
-                           <span className="text-sm text-muted-foreground">
-                              ${product.cost.toFixed(2)}
-                           </span>
-                        </div>
-                        <div className="flex justify-between">
                            <span className="text-sm font-medium">
-                              Profit Margin:
+                              Currency:
                            </span>
-                           <span className="text-sm text-green-600">
-                              {product.profitMargin.toFixed(1)}%
+                           <span className="text-sm text-muted-foreground">
+                              {product.currency}
                            </span>
                         </div>
                         <Separator />
-                        <div className="flex items-center space-x-1">
-                           <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                           <span className="font-medium">{product.rating}</span>
+                        <div className="flex justify-between">
+                           <span className="text-sm font-medium">Created:</span>
                            <span className="text-sm text-muted-foreground">
-                              ({product.reviewCount} reviews)
+                              {new Date(
+                                 product.created_at
+                              ).toLocaleDateString()}
                            </span>
                         </div>
-                        <div className="flex items-center space-x-1">
-                           <TrendingUp className="h-4 w-4 text-blue-500" />
-                           <span className="text-sm font-medium">
-                              Popularity:
-                           </span>
+                        <div className="flex justify-between">
+                           <span className="text-sm font-medium">Updated:</span>
                            <span className="text-sm text-muted-foreground">
-                              #{product.popularity}
+                              {new Date(
+                                 product.updated_at
+                              ).toLocaleDateString()}
                            </span>
                         </div>
                      </div>
@@ -248,21 +209,18 @@ export function ProductDetailsModal({
                            </span>
                            <Badge
                               variant={getStockStatusBadgeVariant(
-                                 product.inventory.inStock,
-                                 product.inventory.lowStockThreshold
+                                 product.stock_quantity,
+                                 10
                               )}>
-                              {getStockStatusText(
-                                 product.inventory.inStock,
-                                 product.inventory.lowStockThreshold
-                              )}
+                              {getStockStatusText(product.stock_quantity, 10)}
                            </Badge>
                         </div>
                         <div className="flex justify-between">
                            <span className="text-sm font-medium">
-                              In Stock:
+                              Stock Quantity:
                            </span>
                            <span className="font-medium">
-                              {product.inventory.inStock}
+                              {product.stock_quantity}
                            </span>
                         </div>
                         <div className="flex justify-between">
@@ -270,59 +228,16 @@ export function ProductDetailsModal({
                               Low Stock Threshold:
                            </span>
                            <span className="text-sm text-muted-foreground">
-                              {product.inventory.lowStockThreshold}
+                              10
                            </span>
                         </div>
                         <div className="flex justify-between">
-                           <span className="text-sm font-medium">
-                              Reorder Point:
-                           </span>
+                           <span className="text-sm font-medium">Status:</span>
                            <span className="text-sm text-muted-foreground">
-                              {product.inventory.reorderPoint}
+                              {product.status}
                            </span>
                         </div>
                      </div>
-                     <div className="space-y-3">
-                        <div className="flex justify-between">
-                           <span className="text-sm font-medium">
-                              Supplier:
-                           </span>
-                           <span className="text-sm text-muted-foreground">
-                              {product.inventory.supplier}
-                           </span>
-                        </div>
-                        <div className="flex justify-between">
-                           <span className="text-sm font-medium">
-                              Lead Time:
-                           </span>
-                           <span className="text-sm text-muted-foreground">
-                              {product.inventory.leadTime} days
-                           </span>
-                        </div>
-                        {product.inventory.inStock <=
-                           product.inventory.lowStockThreshold && (
-                           <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                              <div className="text-sm font-medium text-orange-800">
-                                 Low Stock Alert
-                              </div>
-                              <div className="text-xs text-orange-600 mt-1">
-                                 Consider reordering soon. Current stock:{" "}
-                                 {product.inventory.inStock}
-                              </div>
-                           </div>
-                        )}
-                     </div>
-                  </div>
-               </div>
-
-               <Separator />
-
-               {/* Prescription Information */}
-               <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">
-                     Prescription Requirements
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                      <div className="space-y-3">
                         <div className="flex justify-between">
                            <span className="text-sm font-medium">
@@ -330,193 +245,24 @@ export function ProductDetailsModal({
                            </span>
                            <Badge
                               variant={
-                                 product.prescription.required
+                                 product.prescription_required
                                     ? "destructive"
                                     : "default"
                               }>
-                              {product.prescription.required ? "Yes" : "No"}
+                              {product.prescription_required ? "Yes" : "No"}
                            </Badge>
                         </div>
-                        {product.prescription.type && (
-                           <div className="flex justify-between">
-                              <span className="text-sm font-medium">Type:</span>
-                              <span className="text-sm text-muted-foreground">
-                                 {product.prescription.type}
-                              </span>
-                           </div>
-                        )}
-                        {product.prescription.schedule && (
-                           <div className="flex justify-between">
-                              <span className="text-sm font-medium">
-                                 Schedule:
-                              </span>
-                              <span className="text-sm text-muted-foreground">
-                                 Schedule {product.prescription.schedule}
-                              </span>
-                           </div>
-                        )}
-                     </div>
-                  </div>
-               </div>
-
-               <Separator />
-
-               {/* Specifications */}
-               <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">
-                     Product Specifications
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                     <div className="space-y-3">
-                        {product.specifications.dosage && (
-                           <div className="flex justify-between">
-                              <span className="text-sm font-medium">
-                                 Dosage:
-                              </span>
-                              <span className="text-sm text-muted-foreground">
-                                 {product.specifications.dosage}
-                              </span>
-                           </div>
-                        )}
-                        {product.specifications.strength && (
-                           <div className="flex justify-between">
-                              <span className="text-sm font-medium">
-                                 Strength:
-                              </span>
-                              <span className="text-sm text-muted-foreground">
-                                 {product.specifications.strength}
-                              </span>
-                           </div>
-                        )}
-                        {product.specifications.form && (
-                           <div className="flex justify-between">
-                              <span className="text-sm font-medium">Form:</span>
-                              <span className="text-sm text-muted-foreground">
-                                 {product.specifications.form}
-                              </span>
-                           </div>
-                        )}
-                        {product.specifications.quantity && (
-                           <div className="flex justify-between">
-                              <span className="text-sm font-medium">
-                                 Quantity:
-                              </span>
-                              <span className="text-sm text-muted-foreground">
-                                 {product.specifications.quantity}{" "}
-                                 {product.specifications.unit}
-                              </span>
-                           </div>
-                        )}
-                     </div>
-                     <div className="space-y-3">
-                        {product.specifications.expirationDays && (
-                           <div className="flex justify-between">
-                              <span className="text-sm font-medium">
-                                 Expiration:
-                              </span>
-                              <span className="text-sm text-muted-foreground">
-                                 {product.specifications.expirationDays} days
-                              </span>
-                           </div>
-                        )}
-                        {product.specifications.storage && (
-                           <div className="flex justify-between">
-                              <span className="text-sm font-medium">
-                                 Storage:
-                              </span>
-                              <span className="text-sm text-muted-foreground">
-                                 {product.specifications.storage}
-                              </span>
-                           </div>
-                        )}
-                     </div>
-                  </div>
-               </div>
-
-               {/* Additional Information */}
-               <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">
-                     Additional Information
-                  </h3>
-                  <div className="space-y-4">
-                     {product.ingredients && product.ingredients.length > 0 && (
-                        <div>
-                           <div className="text-sm font-medium mb-2">
-                              Ingredients:
-                           </div>
-                           <div className="text-sm text-muted-foreground">
-                              {product.ingredients.join(", ")}
-                           </div>
-                        </div>
-                     )}
-                     {product.contraindications &&
-                        product.contraindications.length > 0 && (
-                           <div>
-                              <div className="text-sm font-medium mb-2">
-                                 Contraindications:
+                        {product.stock_quantity <= 10 && (
+                           <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                              <div className="text-sm font-medium text-orange-800">
+                                 Low Stock Alert
                               </div>
-                              <div className="text-sm text-muted-foreground">
-                                 {product.contraindications.join(", ")}
+                              <div className="text-xs text-orange-600 mt-1">
+                                 Consider reordering soon. Current stock:{" "}
+                                 {product.stock_quantity}
                               </div>
                            </div>
                         )}
-                     {product.sideEffects && product.sideEffects.length > 0 && (
-                        <div>
-                           <div className="text-sm font-medium mb-2">
-                              Side Effects:
-                           </div>
-                           <div className="text-sm text-muted-foreground">
-                              {product.sideEffects.join(", ")}
-                           </div>
-                        </div>
-                     )}
-                     {product.instructions && (
-                        <div>
-                           <div className="text-sm font-medium mb-2">
-                              Instructions:
-                           </div>
-                           <div className="text-sm text-muted-foreground">
-                              {product.instructions}
-                           </div>
-                        </div>
-                     )}
-                  </div>
-               </div>
-
-               <Separator />
-
-               {/* Metadata */}
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                     <div className="flex justify-between">
-                        <span className="text-sm font-medium">Created:</span>
-                        <span className="text-sm text-muted-foreground">
-                           {new Date(product.createdAt).toLocaleDateString()}
-                        </span>
-                     </div>
-                     <div className="flex justify-between">
-                        <span className="text-sm font-medium">Created By:</span>
-                        <span className="text-sm text-muted-foreground">
-                           {product.createdBy}
-                        </span>
-                     </div>
-                  </div>
-                  <div className="space-y-3">
-                     <div className="flex justify-between">
-                        <span className="text-sm font-medium">
-                           Last Updated:
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                           {new Date(product.updatedAt).toLocaleDateString()}
-                        </span>
-                     </div>
-                     <div className="flex justify-between">
-                        <span className="text-sm font-medium">
-                           Modified By:
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                           {product.lastModifiedBy}
-                        </span>
                      </div>
                   </div>
                </div>

@@ -97,8 +97,8 @@ export default function SignupPage() {
          toast.success("Signup successful");
          redirectTo("/auth/signin");
       },
-      onError: () => {
-         toast.error("Something went wrong");
+      onError: (error) => {
+         toast.error(error.message);
       },
    });
 
