@@ -1,9 +1,5 @@
-import supabaseServerClient from "@/lib/supabaseServer";
+import supabaseServerClient from "@/lib/supabase/supabaseServer";
 import { NextRequest, NextResponse } from "next/server";
-
-export async function GET() {
-   return NextResponse.json({ message: "Hello, world!" });
-}
 
 export async function POST(req: NextRequest) {
    const { email, password } = await req.json();

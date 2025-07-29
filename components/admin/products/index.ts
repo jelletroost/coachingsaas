@@ -1,3 +1,4 @@
+export { AddProductDialog } from "./AddProductDialog";
 export {
    mockProducts,
    productCategories,

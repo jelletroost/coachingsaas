@@ -3,7 +3,6 @@ import { cookies } from "next/headers";
 
 // Supabase Server Client
 const supabaseServerClient = async () => {
-   console.log("supabaseServerClient");
    const cookieStore = await cookies();
    return createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -28,3 +27,16 @@ const supabaseServerClient = async () => {
 };
 
 export default supabaseServerClient;
+
+// Get current user ssr
+export const currentUserSSR = async () => {
+   const supabase = await supabaseServerClient();
+   const {
+      data: { user },
+      error,
+   } = await supabase.auth.getUser();
+
+   if (error) return null;
+
+   return user;
+};

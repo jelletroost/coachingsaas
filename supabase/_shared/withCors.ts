@@ -1,5 +1,5 @@
 import type { Hono } from "jsr:@hono/hono";
-import { corsHeaders } from "../_shared/cors.ts";
+import { corsHeaders } from "./cors.ts";
 
 export function withCors(app: Hono) {
    return (req: Request) => {

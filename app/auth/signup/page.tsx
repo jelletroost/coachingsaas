@@ -86,7 +86,7 @@ export default function SignupPage() {
          email: "",
          password: "",
          confirmPassword: "",
-         role: "patient",
+         role: activeTab,
       },
    });
 
@@ -97,13 +97,13 @@ export default function SignupPage() {
          toast.success("Signup successful");
          redirectTo("/auth/signin");
       },
-      onError: () => {
-         toast.error("Something went wrong");
+      onError: (error) => {
+         toast.error(error.message);
       },
    });
 
    const onSubmit = async (data: z.infer<typeof signupSchema>) => {
-      signupMutation(data);
+      signupMutation({ ...data, role: activeTab });
    };
 
    return (
