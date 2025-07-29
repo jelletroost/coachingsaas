@@ -31,7 +31,7 @@ export default async function middleware(req: NextRequest) {
 
       // Define role-based access patterns
       const roleAccessPatterns = {
-         admin: ["/admin/overview", "/admin/products", "/admin/cms"],
+         admin: ["/admin/overview", "/admin/products", "/admin/cms","/admin/users"],
          coach: ["/coach/overview", "/coach/patients", "/coach/products", "/coach/overview","/coach/messages","/coach/settings"],
          patient: ["/dashboard"],
       };
