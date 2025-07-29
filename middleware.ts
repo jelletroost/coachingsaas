@@ -9,10 +9,14 @@ export default async function middleware(req: NextRequest) {
       "/",
    ];
    const { pathname } = req.nextUrl;
+   const headers = new Headers(req.headers);
+   headers.set("x-current-pathname", pathname);
 
    // Allow public routes
    if (PUBLIC_ROUTES.includes(pathname)) {
-      return NextResponse.next();
+      return NextResponse.next({
+         headers,
+      });
    }
 
    try {
@@ -49,7 +53,9 @@ export default async function middleware(req: NextRequest) {
          return NextResponse.redirect(new URL(defaultPath, req.url));
       }
 
-      return NextResponse.next();
+      return NextResponse.next({
+         headers,
+      });
    } catch (error) {
       console.error("Middleware error:", error);
       return NextResponse.redirect(new URL("/auth/signin", req.url));
