@@ -1,5 +1,5 @@
 "use client";
-/* eslint-disable no-unused-vars */
+ 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,23 +20,11 @@ import {
    Search,
    Shield,
    UserCheck,
+   UserPlus,
    UserX,
 } from "lucide-react";
 import { useState } from "react";
-
-interface User {
-   id: string;
-   name: string;
-   email: string;
-   role: "patient" | "coach" | "admin";
-   status: "active" | "suspended" | "pending";
-   avatar?: string;
-   phone?: string;
-   joinedDate: string;
-   lastActive: string;
-   subscription?: string;
-   coach?: string;
-}
+import { User } from "./types";
 
 interface UserTableProps {
    users: User[];
@@ -44,6 +32,7 @@ interface UserTableProps {
    onSuspendUser: (user: User) => void;
    onActivateUser: (user: User) => void;
    onSendMessage: (user: User) => void;
+   onAssignCoach: (user: User) => void;
 }
 
 const getRoleBadge = (role: User["role"]) => {
@@ -80,6 +69,7 @@ export function UserTable({
    onSuspendUser,
    onActivateUser,
    onSendMessage,
+   onAssignCoach,
 }: UserTableProps) {
    const [searchTerm, setSearchTerm] = useState("");
 
@@ -190,6 +180,13 @@ export function UserTable({
                                        <Mail className="h-4 w-4 mr-2" />
                                        Send Message
                                     </DropdownMenuItem>
+                                    {user.role === "patient" && (
+                                       <DropdownMenuItem
+                                          onClick={() => onAssignCoach(user)}>
+                                          <UserPlus className="h-4 w-4 mr-2" />
+                                          Assign Coach
+                                       </DropdownMenuItem>
+                                    )}
                                     {user.status === "active" ? (
                                        <DropdownMenuItem
                                           onClick={() => onSuspendUser(user)}

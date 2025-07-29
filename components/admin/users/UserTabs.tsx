@@ -1,21 +1,7 @@
-/* eslint-disable no-unused-vars */
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, User, UserCheck, Users } from "lucide-react";
-
-interface User {
-   id: string;
-   name: string;
-   email: string;
-   role: "patient" | "coach" | "admin";
-   status: "active" | "suspended" | "pending";
-   avatar?: string;
-   phone?: string;
-   joinedDate: string;
-   lastActive: string;
-   subscription?: string;
-   coach?: string;
-}
+import { Shield, UserCheck, User as UserIcon, Users } from "lucide-react";
+import { User } from "./types";
 
 interface UserTabsProps {
    users: User[];
@@ -40,7 +26,7 @@ export function UserTabs({ users, children }: UserTabsProps) {
             <TabsTrigger
                value="patients"
                className="flex items-center space-x-2">
-               <User className="h-4 w-4" />
+               <UserIcon className="h-4 w-4" />
                <span>Patients</span>
                <Badge variant="secondary" className="ml-1">
                   {patients.length}

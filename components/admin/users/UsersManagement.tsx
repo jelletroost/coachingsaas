@@ -2,9 +2,11 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { transformUserForComponent, useUsers } from "@/hooks/useUsers";
 import {
    Download,
    Filter,
+   Loader2,
    Shield,
    User,
    UserCheck,
@@ -13,15 +15,35 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { AssignCoachModal } from "./AssignCoachModal";
+import { type User as UserType } from "./types";
 import { UserProfileModal } from "./UserProfileModal";
 import { UserTable } from "./UserTable";
 import { UserTabs } from "./UserTabs";
-import { mockUsers, userStats, type User as UserType } from "./mockData";
 
 export function UsersManagement() {
-   const [users, setUsers] = useState<UserType[]>(mockUsers);
+   const { data: dbUsers, isLoading, error, refetch } = useUsers();
    const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+   const [isAssignCoachModalOpen, setIsAssignCoachModalOpen] = useState(false);
+   const [selectedPatient, setSelectedPatient] = useState<UserType | null>(null);
+
+   // Transform database users to component format
+   const users = dbUsers ? dbUsers.map(transformUserForComponent) as UserType[] : [];
+
+   // Get coaches for assignment
+   const coaches = users.filter((u: UserType) => u.role === "coach");
+
+   // Calculate stats from real data
+   const userStats = {
+      total: users.length,
+      patients: users.filter((u: UserType) => u.role === "patient").length,
+      coaches: users.filter((u: UserType) => u.role === "coach").length,
+      admins: users.filter((u: UserType) => u.role === "admin").length,
+      active: users.filter((u: UserType) => u.status === "active").length,
+      suspended: users.filter((u: UserType) => u.status === "suspended").length,
+      pending: users.filter((u: UserType) => u.status === "pending").length,
+   };
 
    const handleViewProfile = (user: UserType) => {
       setSelectedUser(user);
@@ -29,21 +51,15 @@ export function UsersManagement() {
    };
 
    const handleSuspendUser = (user: UserType) => {
-      setUsers((prev) =>
-         prev.map((u) =>
-            u.id === user.id ? { ...u, status: "suspended" as const } : u
-         )
-      );
+      // TODO: Implement actual API call to suspend user
       toast.success(`${user.name} has been suspended`);
+      refetch(); // Refresh data after action
    };
 
    const handleActivateUser = (user: UserType) => {
-      setUsers((prev) =>
-         prev.map((u) =>
-            u.id === user.id ? { ...u, status: "active" as const } : u
-         )
-      );
+      // TODO: Implement actual API call to activate user
       toast.success(`${user.name} has been activated`);
+      refetch(); // Refresh data after action
    };
 
    const handleSendMessage = (user: UserType) => {
@@ -57,6 +73,37 @@ export function UsersManagement() {
    const handleExportUsers = () => {
       toast.success("Export functionality coming soon!");
    };
+
+   const handleAssignCoach = (user: UserType) => {
+      setSelectedPatient(user);
+      setIsAssignCoachModalOpen(true);
+   };
+
+   const handleAssignCoachSuccess = () => {
+      refetch(); // Refresh data after assignment
+   };
+
+   if (isLoading) {
+      return (
+         <div className="flex items-center justify-center h-64">
+            <div className="flex items-center space-x-2">
+               <Loader2 className="h-6 w-6 animate-spin" />
+               <span>Loading users...</span>
+            </div>
+         </div>
+      );
+   }
+
+   if (error) {
+      return (
+         <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+               <p className="text-red-600 mb-4">Error loading users</p>
+               <Button onClick={() => refetch()}>Retry</Button>
+            </div>
+         </div>
+      );
+   }
 
    return (
       <div className="space-y-6">
@@ -175,6 +222,7 @@ export function UsersManagement() {
                   onSuspendUser={handleSuspendUser}
                   onActivateUser={handleActivateUser}
                   onSendMessage={handleSendMessage}
+                  onAssignCoach={handleAssignCoach}
                />
             )}
          </UserTabs>
@@ -187,6 +235,13 @@ export function UsersManagement() {
             onSendMessage={handleSendMessage}
             onSuspend={handleSuspendUser}
             onActivate={handleActivateUser}
+         />
+         <AssignCoachModal
+            patient={selectedPatient}
+            coaches={coaches}
+            isOpen={isAssignCoachModalOpen}
+            onClose={() => setIsAssignCoachModalOpen(false)}
+            onSuccess={handleAssignCoachSuccess}
          />
       </div>
    );

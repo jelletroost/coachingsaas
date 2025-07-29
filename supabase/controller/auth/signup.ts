@@ -27,6 +27,7 @@ const signup = async (c: Context) => {
       );
    }
 
+
    const userId = data.user?.id;
    const userData = {
       id: userId,

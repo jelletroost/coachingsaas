@@ -6,18 +6,19 @@ import {
    SidebarHeader,
    SidebarMenu,
    SidebarMenuButton,
-   SidebarMenuItem,
+   SidebarMenuItem
 } from "@/components/ui/sidebar";
-import { useAuth } from "@/hooks/useAuth";
 import getSidebarItemsByRole from "@/lib/config/sidebar.config";
+import { useAuthStore } from "@/store/useAuthStore";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "../shared/logo";
 
 export function DashboardSidebar() {
-   const { userRole } = useAuth();
+   const { user } = useAuthStore();
+   const menuItems = getSidebarItemsByRole(user?.user_metadata?.role || "patient");
+
    const pathname = usePathname();
-   const menuItems = getSidebarItemsByRole(userRole || "patient");
    return (
       <Sidebar>
          <SidebarHeader>
@@ -27,13 +28,11 @@ export function DashboardSidebar() {
             <SidebarMenu>
                {menuItems.map((item) => (
                   <SidebarMenuItem key={item.label}>
-                     <SidebarMenuButton
-                        className={`${
-                           pathname === item.href
-                              ? "bg-accent text-accent-foreground"
-                              : ""
-                        }`}
-                        asChild>
+                     <SidebarMenuButton className={`${
+                        pathname === item.href
+                           ? "bg-accent text-accent-foreground"
+                           : ""
+                     }`} asChild>
                         <Link className="py-6" href={item.href}>
                            {item.icon && <item.icon />}
                            <span>{item.label}</span>

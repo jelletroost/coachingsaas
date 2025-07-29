@@ -1,19 +1,17 @@
 "use client";
+import { signOut } from "@/app/actions/actions";
 import { Button } from "@/components/ui/button";
 import {
    Popover,
    PopoverContent,
    PopoverTrigger,
 } from "@/components/ui/popover";
+import { useAuthStore } from "@/store/useAuthStore";
 import { ChevronDownIcon, HomeIcon, User2Icon, UserIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
-interface UserData {
-   name: string;
-   email: string;
-   avatar: string;
-}
+
 const userRole: string = "patient";
 const profileUrl: string =
    userRole === "admin"
@@ -22,7 +20,8 @@ const profileUrl: string =
       ? "/coach/profile"
       : "/dashboard/profile";
 
-const NavUser = ({ user }: { user: UserData }) => {
+const NavUser = () => {
+   const { user } = useAuthStore();
    const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
    return (
       <Popover open={isUserDropdownOpen} onOpenChange={setIsUserDropdownOpen}>
@@ -32,10 +31,10 @@ const NavUser = ({ user }: { user: UserData }) => {
                className="flex cursor-pointer items-center gap-2 px-3 py-2 h-auto"
                size="sm">
                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  {user.avatar ? (
+                  {user?.user_metadata?.avatar_url ? (
                      <img
-                        src={user.avatar}
-                        alt={`${user.name}`}
+                        src={user?.user_metadata?.avatar_url}
+                        alt={`${user?.user_metadata?.first_name}`}
                         className="h-8 w-8 rounded-full object-cover"
                      />
                   ) : (
@@ -43,9 +42,11 @@ const NavUser = ({ user }: { user: UserData }) => {
                   )}
                </div>
                <div className="hidden sm:block text-left">
-                  <div className="text-sm font-medium">{user.name}</div>
+                  <div className="text-sm font-medium">
+                     {user?.user_metadata?.first_name}
+                  </div>
                   <div className="text-xs text-muted-foreground">
-                     {user.email}
+                     {user?.email}
                   </div>
                </div>
                <ChevronDownIcon />
@@ -72,7 +73,7 @@ const NavUser = ({ user }: { user: UserData }) => {
                </Link>
                <div className="border-t my-1" />
                <button
-                  // onClick={handleSignOut}
+                  onClick={signOut}
                   className="flex w-full items-center px-3 py-2 text-sm rounded-md hover:bg-accent transition-colors text-red-600 hover:text-red-700 cursor-pointer">
                   <svg
                      className="mr-2 h-4 w-4"

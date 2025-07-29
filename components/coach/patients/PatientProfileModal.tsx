@@ -9,7 +9,7 @@ import {
    DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Target } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { type Patient } from "./mockData";
 import { PrescriptionHistory } from "./PrescriptionHistory";
 
@@ -94,10 +94,10 @@ export function PatientProfileModal({
 
             <div className="space-y-6">
                <Tabs defaultValue="overview" className="w-full">
-                  <TabsList className="grid w-full grid-cols-4">
-                     <TabsTrigger value="overview">Overview</TabsTrigger>
-                     <TabsTrigger value="health">Health</TabsTrigger>
-                     <TabsTrigger value="goals">Goals</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-2">
+                     <TabsTrigger value="overview">Profile</TabsTrigger>
+                     {/* <TabsTrigger value="health">Health</TabsTrigger>
+                     <TabsTrigger value="goals">Goals</TabsTrigger> */}
                      <TabsTrigger value="prescriptions">
                         Prescriptions
                      </TabsTrigger>
@@ -153,20 +153,11 @@ export function PatientProfileModal({
                                  <p className="mt-1">{patient.assignedCoach}</p>
                               </div>
                            </div>
-
-                           {patient.notes && (
-                              <div>
-                                 <label className="text-sm font-medium text-muted-foreground">
-                                    Notes
-                                 </label>
-                                 <p className="mt-1 text-sm">{patient.notes}</p>
-                              </div>
-                           )}
                         </CardContent>
                      </Card>
                   </TabsContent>
 
-                  <TabsContent value="health" className="space-y-4">
+                  {/* <TabsContent value="health" className="space-y-4">
                      <Card>
                         <CardHeader>
                            <CardTitle className="text-lg">
@@ -218,9 +209,9 @@ export function PatientProfileModal({
                            </div>
                         </CardContent>
                      </Card>
-                  </TabsContent>
+                  </TabsContent> */}
 
-                  <TabsContent value="goals" className="space-y-4">
+                  {/* <TabsContent value="goals" className="space-y-4">
                      <Card>
                         <CardHeader>
                            <CardTitle className="text-lg">
@@ -241,7 +232,7 @@ export function PatientProfileModal({
                            </div>
                         </CardContent>
                      </Card>
-                  </TabsContent>
+                  </TabsContent> */}
 
                   <TabsContent value="prescriptions" className="space-y-4">
                      <PrescriptionHistory
