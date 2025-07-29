@@ -1,5 +1,5 @@
 "use client";
-/* eslint-disable no-unused-vars */
+ 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,20 +23,7 @@ import {
    UserX,
 } from "lucide-react";
 import { useState } from "react";
-
-interface User {
-   id: string;
-   name: string;
-   email: string;
-   role: "patient" | "coach" | "admin";
-   status: "active" | "suspended" | "pending";
-   avatar?: string;
-   phone?: string;
-   joinedDate: string;
-   lastActive: string;
-   subscription?: string;
-   coach?: string;
-}
+import { User } from "./types";
 
 interface UserTableProps {
    users: User[];
