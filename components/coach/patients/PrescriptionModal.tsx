@@ -222,12 +222,6 @@ export function PrescriptionModal({
                      </div>
                   )}
 
-                  {success && (
-                     <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                        <p className="text-green-600 text-sm">Prescription submitted successfully!</p>
-                     </div>
-                  )}
-
                   {!loading && !error && (
                      <div className="mt-4 max-h-60 overflow-y-auto space-y-2">
                         {filteredProducts.length === 0 ? (
