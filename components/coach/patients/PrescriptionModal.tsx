@@ -3,24 +3,25 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
+   Dialog,
+   DialogContent,
+   DialogHeader,
+   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+   Select,
+   SelectContent,
+   SelectItem,
+   SelectTrigger,
+   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Search, Star } from "lucide-react";
-import { useState } from "react";
-import { type Product, mockProducts } from "../products/mockData";
+import { Product as DatabaseProduct } from "@/lib/types/database";
+import { getAllProducts } from "@/services/product_service";
+import { Loader2, Search } from "lucide-react";
+import { useEffect, useState } from "react";
 import { type Patient } from "./mockData";
 
 interface PrescriptionModalProps {
@@ -30,17 +31,15 @@ interface PrescriptionModalProps {
    onPrescribe: (prescription: PrescriptionData) => void;
 }
 
-interface PrescriptionData {
-   patientId: string;
-   patientName: string;
-   productId: string;
-   productName: string;
+export type PrescriptionData ={
+   patient_id: string;
+   product_id: string;
    dosage: string;
    frequency: string;
    duration: string;
    instructions: string;
    notes: string;
-   prescribedAt: string;
+   status: string;
 }
 
 const frequencyOptions = [
@@ -70,47 +69,67 @@ export function PrescriptionModal({
    onPrescribe,
 }: PrescriptionModalProps) {
    const [searchTerm, setSearchTerm] = useState("");
-   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+   const [selectedProduct, setSelectedProduct] = useState<DatabaseProduct | null>(null);
+   const [products, setProducts] = useState<DatabaseProduct[]>([]);
+   const [loading, setLoading] = useState(false);
+   const [error, setError] = useState<string | null>(null);
    const [dosage, setDosage] = useState("");
    const [frequency, setFrequency] = useState("");
    const [duration, setDuration] = useState("");
    const [instructions, setInstructions] = useState("");
    const [notes, setNotes] = useState("");
 
-   const filteredProducts = mockProducts.filter((product) => {
+   // Fetch products from database when modal opens
+   useEffect(() => {
+      if (isOpen) {
+         fetchProducts();
+      }
+   }, [isOpen]);
+
+   const fetchProducts = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+         const response = await getAllProducts();
+         setProducts(response || []);
+      } catch{
+         setError("Failed to load products. Please try again.");
+      } finally {
+         setLoading(false);
+      }
+   };
+
+   const filteredProducts = products.filter((product) => {
+      if (!product.status || product.status !== "active") return false;
+      
       const matchesSearch =
          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
          product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         product.category.toLowerCase().includes(searchTerm.toLowerCase());
+         product.type.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesSearch;
    });
 
-   const handleProductSelect = (product: Product) => {
+   const handleProductSelect = (product: DatabaseProduct) => {
       setSelectedProduct(product);
-      // Pre-fill dosage if available
-      if (product.specifications.dosage) {
-         setDosage(product.specifications.dosage);
-      }
-      // Pre-fill instructions if available
-      if (product.instructions) {
-         setInstructions(product.instructions);
-      }
+      setDosage("");
+      setFrequency("");
+      setDuration("");
+      setInstructions("");
+      setNotes("");
    };
 
    const handlePrescribe = () => {
       if (!patient || !selectedProduct) return;
 
       const prescription: PrescriptionData = {
-         patientId: patient.id,
-         patientName: `${patient.user.first_name} ${patient.user.last_name}`,
-         productId: selectedProduct.id,
-         productName: selectedProduct.name,
+         patient_id: patient.id,
+         product_id: selectedProduct.id,
          dosage,
          frequency,
          duration,
          instructions,
          notes,
-         prescribedAt: new Date().toISOString(),
+         status:'active'
       };
 
       onPrescribe(prescription);
@@ -125,6 +144,7 @@ export function PrescriptionModal({
       setDuration("");
       setInstructions("");
       setNotes("");
+      setError(null);
       onClose();
    };
 
@@ -150,47 +170,78 @@ export function PrescriptionModal({
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-10"
+                        disabled={loading}
                      />
                   </div>
 
-                  <div className="mt-4 max-h-60 overflow-y-auto space-y-2">
-                     {filteredProducts.map((product) => (
-                        <div
-                           key={product.id}
-                           className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                              selectedProduct?.id === product.id
-                                 ? "border-blue-500 bg-blue-50"
-                                 : "border-border hover:bg-muted/50"
-                           }`}
-                           onClick={() => handleProductSelect(product)}>
-                           <div className="flex items-center justify-between">
-                              <div className="flex-1">
-                                 <div className="font-medium">
-                                    {product.name}
-                                 </div>
-                                 <div className="text-sm text-muted-foreground">
-                                    {product.description}
-                                 </div>
-                                 <div className="flex items-center space-x-2 mt-1">
-                                    <Badge variant="outline">
-                                       {product.category}
-                                    </Badge>
-                                    <div className="flex items-center space-x-1">
-                                       <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                                       <span className="text-xs">
-                                          {product.rating} (
-                                          {product.reviewCount})
-                                       </span>
+                  {loading && (
+                     <div className="mt-4 flex items-center justify-center py-8">
+                        <Loader2 className="h-6 w-6 animate-spin" />
+                        <span className="ml-2">Loading products from database...</span>
+                     </div>
+                  )}
+
+                  {error && (
+                     <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <p className="text-red-600 text-sm">{error}</p>
+                        <Button 
+                           variant="outline" 
+                           size="sm" 
+                           onClick={fetchProducts}
+                           className="mt-2"
+                        >
+                           Retry
+                        </Button>
+                     </div>
+                  )}
+
+                  {!loading && !error && (
+                     <div className="mt-4 max-h-60 overflow-y-auto space-y-2">
+                        {filteredProducts.length === 0 ? (
+                           <div className="text-center py-8 text-muted-foreground">
+                              {searchTerm ? "No products found matching your search." : "No products available in database."}
+                           </div>
+                        ) : (
+                           filteredProducts.map((product) => (
+                              <div
+                                 key={product.id}
+                                 className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                                    selectedProduct?.id === product.id
+                                       ? "border-blue-500 bg-blue-50"
+                                       : "border-border hover:bg-muted/50"
+                                 }`}
+                                 onClick={() => handleProductSelect(product)}>
+                                 <div className="flex items-center justify-between">
+                                    <div className="flex-1">
+                                       <div className="font-medium">
+                                          {product.name}
+                                       </div>
+                                       <div className="text-sm text-muted-foreground">
+                                          {product.description}
+                                       </div>
+                                       <div className="flex items-center space-x-2 mt-1">
+                                          <Badge variant="outline">
+                                             {product.type}
+                                          </Badge>
+                                          <span className="text-sm font-medium">
+                                             ${product.price} {product.currency}
+                                          </span>
+                                          {product.prescription_required && (
+                                             <Badge variant="destructive">
+                                                Prescription Required
+                                             </Badge>
+                                          )}
+                                          <span className="text-xs text-muted-foreground">
+                                             Stock: {product.stock_quantity}
+                                          </span>
+                                       </div>
                                     </div>
-                                    <span className="text-sm font-medium">
-                                       ${product.price}
-                                    </span>
                                  </div>
                               </div>
-                           </div>
-                        </div>
-                     ))}
-                  </div>
+                           ))
+                        )}
+                     </div>
+                  )}
                </div>
 
                {selectedProduct && (
@@ -278,7 +329,7 @@ export function PrescriptionModal({
                      {/* Selected Product Summary */}
                      <div className="p-4 bg-muted/50 rounded-lg">
                         <Label className="text-sm font-medium text-muted-foreground">
-                           Selected Product
+                           Selected Product (From Database)
                         </Label>
                         <div className="mt-2">
                            <div className="font-medium">
@@ -289,16 +340,19 @@ export function PrescriptionModal({
                            </div>
                            <div className="flex items-center space-x-2 mt-1">
                               <Badge variant="outline">
-                                 {selectedProduct.category}
+                                 {selectedProduct.type}
                               </Badge>
                               <span className="text-sm">
-                                 ${selectedProduct.price}
+                                 ${selectedProduct.price} {selectedProduct.currency}
                               </span>
-                              {selectedProduct.prescription.required && (
+                              {selectedProduct.prescription_required && (
                                  <Badge variant="destructive">
                                     Prescription Required
                                  </Badge>
                               )}
+                              <span className="text-xs text-muted-foreground">
+                                 Stock: {selectedProduct.stock_quantity}
+                              </span>
                            </div>
                         </div>
                      </div>

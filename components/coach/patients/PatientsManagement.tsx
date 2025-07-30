@@ -6,21 +6,8 @@ import { useState } from "react";
 import { PatientFilters } from "./PatientFilters";
 import { PatientProfileModal } from "./PatientProfileModal";
 import { PatientTable } from "./PatientTable";
-import { PrescriptionModal } from "./PrescriptionModal";
+import { PrescriptionData, PrescriptionModal } from "./PrescriptionModal";
 import { type Patient } from "./mockData";
-
-interface PrescriptionData {
-   patientId: string;
-   patientName: string;
-   productId: string;
-   productName: string;
-   dosage: string;
-   frequency: string;
-   duration: string;
-   instructions: string;
-   notes: string;
-   prescribedAt: string;
-}
 
 export function PatientsManagement() {
    const { data: patients = [], isLoading, error } = usePatientsByCoach();
@@ -45,9 +32,8 @@ export function PatientsManagement() {
    };
 
    const handlePrescriptionSubmit = (prescription: PrescriptionData) => {
-      // TODO: Implement prescription submission
       console.log("Prescription submitted:", prescription);
-      // Here you would typically save to database and notify the patient
+      // prescribeByCoach(prescription);
    };
 
    const filteredPatients = typedPatients.filter((patient) => {
