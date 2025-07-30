@@ -10,9 +10,14 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import usePrescriptions from "@/hooks/usePrescriptions";
-import { MessageSquare } from "lucide-react";
+import { PrescriptionData } from "@/lib/zod_schemas/prescription.schema";
+
+import { MessageSquare, Package } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 import { type Patient } from "./mockData";
 import { PrescriptionHistory } from "./PrescriptionHistory";
+import { PrescriptionModal } from "./PrescriptionModal";
 
 interface PatientProfileModalProps {
    patient: Patient;
@@ -39,11 +44,58 @@ export function PatientProfileModal({
    onClose,
 }: PatientProfileModalProps) {
    const patientName = `${patient.user.first_name} ${patient.user.last_name}`;
+   const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
+   const [forceRefresh, setForceRefresh] = useState(0);
    
    // Fetch prescriptions for the patient
    const {
       data: prescriptions = [],
+      refetch: refetchPrescriptions,
    } = usePrescriptions(patient.id);
+
+   // Debug log to track prescriptions data
+   console.log("Current prescriptions for patient", patient.id, ":", prescriptions);
+   console.log("Force refresh count:", forceRefresh);
+
+   // Refetch prescriptions when modal opens or force refresh changes
+   useEffect(() => {
+      if (isOpen) {
+         console.log("Modal opened, refetching prescriptions");
+         refetchPrescriptions();
+      }
+   }, [isOpen, forceRefresh, refetchPrescriptions]);
+
+   const handlePrescriptionSubmit = async (prescription: Omit<PrescriptionData, "id" | "created_at" | "updated_at">) => {
+      try {
+         // Import the service function
+         const { prescribeByCoach } = await import("@/services/patients_services");
+         await prescribeByCoach(prescription);
+         
+         // Show success message
+         toast.success("Prescription submitted successfully");
+         
+         // Force refetch prescriptions after successful submission
+         console.log("Refetching prescriptions for patient:", patient.id);
+         
+         // Wait a moment for the server to process the new prescription
+         await new Promise(resolve => setTimeout(resolve, 500));
+         
+         // Force refetch the prescriptions
+         await refetchPrescriptions();
+         
+         // Force a component re-render as backup
+         setForceRefresh(prev => prev + 1);
+         
+         console.log("Prescriptions refetched successfully");
+         
+         // Close the prescription modal
+         setIsPrescriptionModalOpen(false);
+      } catch (error) {
+         console.error("Error creating prescription:", error);
+         toast.error("Failed to create prescription. Please try again.");
+         throw error;
+      }
+   };
 
 
    
@@ -145,7 +197,27 @@ export function PatientProfileModal({
                   </TabsContent>
 
                   <TabsContent value="prescriptions" className="space-y-4">
+                     <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-medium">Prescription History</h3>
+                        <div className="flex space-x-2">
+                           <Button
+                              onClick={() => refetchPrescriptions()}
+                              variant="outline"
+                              size="sm"
+                           >
+                              Refresh
+                           </Button>
+                           <Button
+                              onClick={() => setIsPrescriptionModalOpen(true)}
+                              size="sm"
+                           >
+                              <Package className="h-4 w-4 mr-2" />
+                              Prescribe New
+                           </Button>
+                        </div>
+                     </div>
                      <PrescriptionHistory
+                        key={`${patient.id}-${forceRefresh}`}
                         prescriptions={prescriptions}
                         patientName={patientName}
                      />
@@ -164,6 +236,14 @@ export function PatientProfileModal({
                </div>
             </div>
          </DialogContent>
+
+         {/* Prescription Modal */}
+         <PrescriptionModal
+            patient={patient}
+            isOpen={isPrescriptionModalOpen}
+            onClose={() => setIsPrescriptionModalOpen(false)}
+            onPrescribe={handlePrescriptionSubmit}
+         />
       </Dialog>
    );
 }

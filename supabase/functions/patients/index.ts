@@ -5,6 +5,7 @@ import assignCoach from "../../controller/patients/assignCoach.ts";
 import getPatientsByCoach from "../../controller/patients/getPatientsByCoach.ts";
 import getPrescriptions from "../../controller/patients/getPrescriptions.ts";
 import prescribeByCoach from "../../controller/patients/prescribeByCoach.ts";
+import prescriptionStatusUpdate from "../../controller/patients/prescriptionStatus.ts";
 
 const functionName = "patients";
 const app = new Hono().basePath(`/${functionName}`);
@@ -13,6 +14,7 @@ const app = new Hono().basePath(`/${functionName}`);
 app.use("/assign-coach", checkRole(["admin"]), assignCoach);
 app.use("/get-patients-by-coach",checkRole(["admin","coach"]), getPatientsByCoach);
 app.use("/prescribe-by-coach",checkRole(["coach"]), prescribeByCoach);
-app.use("/get-prescriptions",checkRole(["admin","coach"]), getPrescriptions);
+app.use("/get-prescriptions", checkRole(["admin", "coach"]), getPrescriptions);
+app.use("/prescription-status", checkRole(["admin", "coach"]), prescriptionStatusUpdate);
 
 Deno.serve(withCors(app));
