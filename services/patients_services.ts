@@ -40,7 +40,7 @@ export const prescribeByCoach = async (prescriptionData: Omit<PrescriptionData, 
 export const getPrescriptionsByPatient = async (patientId: string) => {
    try {
       const response = await apiClient.get(`/patients/get-prescriptions?patientId=${patientId}`);
-      return response.data;
+      return response.data.data; // Extract the nested data array
    } catch (error) {
       console.error(error);
       throw error;

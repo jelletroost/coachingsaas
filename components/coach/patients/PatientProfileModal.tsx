@@ -9,8 +9,10 @@ import {
    DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import usePrescriptions from "@/hooks/usePrescriptions";
 import { MessageSquare } from "lucide-react";
 import { type Patient } from "./mockData";
+import { PrescriptionHistory } from "./PrescriptionHistory";
 
 interface PatientProfileModalProps {
    patient: Patient;
@@ -37,6 +39,13 @@ export function PatientProfileModal({
    onClose,
 }: PatientProfileModalProps) {
    const patientName = `${patient.user.first_name} ${patient.user.last_name}`;
+   
+   // Fetch prescriptions for the patient
+   const {
+      data: prescriptions = [],
+   } = usePrescriptions(patient.id);
+
+
    
    return (
       <Dialog open={isOpen} onOpenChange={onClose}>
@@ -136,10 +145,10 @@ export function PatientProfileModal({
                   </TabsContent>
 
                   <TabsContent value="prescriptions" className="space-y-4">
-                     {/* <PrescriptionHistory
+                     <PrescriptionHistory
                         prescriptions={prescriptions}
                         patientName={patientName}
-                     /> */}
+                     />
                   </TabsContent>
                </Tabs>
 

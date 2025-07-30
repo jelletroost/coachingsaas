@@ -19,6 +19,7 @@ export function PatientsManagement() {
    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
    const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] =
       useState(false);
+
    const [filters, setFilters] = useState({
       status: "all",
       searchTerm: "",
@@ -33,6 +34,8 @@ export function PatientsManagement() {
       setSelectedPatient(patient);
       setIsPrescriptionModalOpen(true);
    };
+
+
 
    const handlePrescriptionSubmit = async (prescription: Omit<PrescriptionData, "id" | "created_at" | "updated_at">) => {
       try {
@@ -201,6 +204,8 @@ export function PatientsManagement() {
             onClose={() => setIsPrescriptionModalOpen(false)}
             onPrescribe={handlePrescriptionSubmit}
          />
+
+
       </div>
    );
 }

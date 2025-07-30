@@ -8,8 +8,9 @@ const usePrescriptions = (patientId: string) => {
       staleTime: 10 * 60 * 1000,
       gcTime: 30 * 60 * 1000,
       refetchOnWindowFocus: false,
-      refetchOnMount: false,
+      refetchOnMount: true, // Enable refetch on mount
       refetchOnReconnect: true,
+      enabled: !!patientId, // Only run query if patientId exists
    });
 };
 
