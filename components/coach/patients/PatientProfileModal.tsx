@@ -3,10 +3,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-   Dialog,
-   DialogContent,
-   DialogHeader,
-   DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageSquare } from "lucide-react";
@@ -19,7 +19,7 @@ interface PatientProfileModalProps {
    onClose: () => void;
 }
 
-const getStatusColor = (status: Patient["status"]) => {
+const getStatusColor = (status: Patient["account_status"]) => {
    switch (status) {
       case "active":
          return "bg-green-100 text-green-800";
@@ -70,6 +70,8 @@ export function PatientProfileModal({
    isOpen,
    onClose,
 }: PatientProfileModalProps) {
+   const patientName = `${patient.user.first_name} ${patient.user.last_name}`;
+   
    return (
       <Dialog open={isOpen} onOpenChange={onClose}>
          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -77,16 +79,16 @@ export function PatientProfileModal({
                <DialogTitle className="flex items-center space-x-3">
                   <Avatar className="w-12 h-12">
                      <AvatarFallback className="text-lg">
-                        {patient.name
+                        {patientName
                            .split(" ")
                            .map((n) => n[0])
                            .join("")}
                      </AvatarFallback>
                   </Avatar>
                   <div>
-                     <h2 className="text-xl font-semibold">{patient.name}</h2>
+                     <h2 className="text-xl font-semibold">{patientName}</h2>
                      <p className="text-sm text-muted-foreground">
-                        {patient.email}
+                        {patient.user.email}
                      </p>
                   </div>
                </DialogTitle>
@@ -96,8 +98,6 @@ export function PatientProfileModal({
                <Tabs defaultValue="overview" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
                      <TabsTrigger value="overview">Profile</TabsTrigger>
-                     {/* <TabsTrigger value="health">Health</TabsTrigger>
-                     <TabsTrigger value="goals">Goals</TabsTrigger> */}
                      <TabsTrigger value="prescriptions">
                         Prescriptions
                      </TabsTrigger>
@@ -120,9 +120,9 @@ export function PatientProfileModal({
                                     <Badge
                                        variant="secondary"
                                        className={getStatusColor(
-                                          patient.status
+                                          patient.account_status
                                        )}>
-                                       {patient.status}
+                                       {patient.account_status}
                                     </Badge>
                                  </div>
                               </div>
@@ -132,7 +132,7 @@ export function PatientProfileModal({
                                  </label>
                                  <p className="mt-1">
                                     {new Date(
-                                       patient.joinDate
+                                       patient.created_at
                                     ).toLocaleDateString()}
                                  </p>
                               </div>
@@ -142,102 +142,37 @@ export function PatientProfileModal({
                                  </label>
                                  <p className="mt-1">
                                     {new Date(
-                                       patient.lastActive
+                                       patient.updated_at
                                     ).toLocaleDateString()}
                                  </p>
                               </div>
                               <div>
                                  <label className="text-sm font-medium text-muted-foreground">
-                                    Assigned Coach
+                                    Phone
                                  </label>
-                                 <p className="mt-1">{patient.assignedCoach}</p>
+                                 <p className="mt-1">
+                                    {patient.phone || "Not provided"}
+                                 </p>
+                              </div>
+                              <div>
+                                 <label className="text-sm font-medium text-muted-foreground">
+                                    Date of Birth
+                                 </label>
+                                 <p className="mt-1">
+                                    {patient.date_of_birth 
+                                       ? new Date(patient.date_of_birth).toLocaleDateString()
+                                       : "Not provided"}
+                                 </p>
                               </div>
                            </div>
                         </CardContent>
                      </Card>
                   </TabsContent>
 
-                  {/* <TabsContent value="health" className="space-y-4">
-                     <Card>
-                        <CardHeader>
-                           <CardTitle className="text-lg">
-                              Health Metrics
-                           </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                              {patient.healthMetrics.weight && (
-                                 <div className="text-center p-4 border rounded-lg">
-                                    <div className="text-2xl font-bold">
-                                       {patient.healthMetrics.weight} kg
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">
-                                       Weight
-                                    </div>
-                                 </div>
-                              )}
-                              {patient.healthMetrics.bloodPressure && (
-                                 <div className="text-center p-4 border rounded-lg">
-                                    <div className="text-2xl font-bold">
-                                       {patient.healthMetrics.bloodPressure}
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">
-                                       Blood Pressure
-                                    </div>
-                                 </div>
-                              )}
-                              {patient.healthMetrics.heartRate && (
-                                 <div className="text-center p-4 border rounded-lg">
-                                    <div className="text-2xl font-bold">
-                                       {patient.healthMetrics.heartRate} bpm
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">
-                                       Heart Rate
-                                    </div>
-                                 </div>
-                              )}
-                              {patient.healthMetrics.sleepHours && (
-                                 <div className="text-center p-4 border rounded-lg">
-                                    <div className="text-2xl font-bold">
-                                       {patient.healthMetrics.sleepHours}h
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">
-                                       Sleep
-                                    </div>
-                                 </div>
-                              )}
-                           </div>
-                        </CardContent>
-                     </Card>
-                  </TabsContent> */}
-
-                  {/* <TabsContent value="goals" className="space-y-4">
-                     <Card>
-                        <CardHeader>
-                           <CardTitle className="text-lg">
-                              Health Goals
-                           </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                           <div className="space-y-3">
-                              {patient.goals.map((goal, index) => (
-                                 <div
-                                    key={index}
-                                    className="flex items-center space-x-3 p-3 border rounded-lg">
-                                    <Target className="w-5 h-5 text-blue-500" />
-                                    <span className="flex-1">{goal}</span>
-                                    <Badge variant="outline">In Progress</Badge>
-                                 </div>
-                              ))}
-                           </div>
-                        </CardContent>
-                     </Card>
-                  </TabsContent> */}
-
                   <TabsContent value="prescriptions" className="space-y-4">
                      <PrescriptionHistory
                         prescriptions={mockPrescriptions}
-                        patientName={patient.name}
+                        patientName={patientName}
                      />
                   </TabsContent>
                </Tabs>

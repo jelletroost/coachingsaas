@@ -12,3 +12,14 @@ export const assignCoachToPatient = async (patientId: string, coachId: string) =
       throw error;
    }
 };
+
+// get patients by coach
+export const getPatientsByCoach = async (coachId: string) => {
+   try {
+      const response = await apiClient.get(`/patients/get-patients-by-coach?coachId=${coachId}`);
+      return response.data;
+   } catch (error) {
+      console.error(error);
+      throw error;
+   }
+};

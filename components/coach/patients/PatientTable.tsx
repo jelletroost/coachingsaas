@@ -1,9 +1,7 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Calendar, MessageSquare, Package, Star, User } from "lucide-react";
+import { Calendar, Package, User } from "lucide-react";
 import { type Patient } from "./mockData";
 
 interface PatientTableProps {
@@ -11,19 +9,6 @@ interface PatientTableProps {
    onViewProfile: (patient: Patient) => void;
    onPrescribe: (patient: Patient) => void;
 }
-
-const getStatusColor = (status: Patient["status"]) => {
-   switch (status) {
-      case "active":
-         return "bg-green-100 text-green-800";
-      case "inactive":
-         return "bg-gray-100 text-gray-800";
-      case "pending":
-         return "bg-yellow-100 text-yellow-800";
-      default:
-         return "bg-gray-100 text-gray-800";
-   }
-};
 
 export function PatientTable({
    patients,
@@ -55,7 +40,7 @@ export function PatientTable({
                         <div className="flex items-center space-x-3 flex-1 min-w-0">
                            <Avatar className="w-12 h-12">
                               <AvatarFallback className="text-sm">
-                                 {patient.name
+                                 {`${patient.user.first_name} ${patient.user.last_name}`
                                     .split(" ")
                                     .map((n) => n[0])
                                     .join("")}
@@ -63,79 +48,29 @@ export function PatientTable({
                            </Avatar>
                            <div className="flex-1 min-w-0">
                               <h3 className="text-sm font-medium text-foreground truncate">
-                                 {patient.name}
+                                 {`${patient.user.first_name} ${patient.user.last_name}`}
                               </h3>
                               <p className="text-xs text-muted-foreground truncate">
-                                 {patient.email}
+                                 {patient.user.email}
                               </p>
                            </div>
                         </div>
 
-                        {/* Status */}
-                        <div className="hidden sm:block">
-                           <Badge
-                              variant="secondary"
-                              className={getStatusColor(patient.status)}>
-                              {patient.status}
-                           </Badge>
-                        </div>
-
-                        {/* Progress */}
-                        <div className="hidden md:block w-32">
-                           <div className="flex items-center space-x-2">
-                              <Progress
-                                 value={patient.progress}
-                                 className="w-16 h-2"
-                              />
-                              <span className="text-xs text-muted-foreground">
-                                 {patient.progress}%
-                              </span>
-                           </div>
-                        </div>
-
-                        {/* Satisfaction */}
-                        <div className="hidden lg:block">
-                           <div className="flex items-center space-x-1">
-                              <Star className="w-3 h-3 text-yellow-500 fill-current" />
-                              <span className="text-xs">
-                                 {patient.satisfaction}
-                              </span>
-                           </div>
-                        </div>
-
-                        {/* Next Appointment */}
-                        <div className="hidden xl:block">
-                           {patient.nextAppointment ? (
-                              <div className="text-xs text-muted-foreground">
-                                 <div className="flex items-center space-x-1">
-                                    <Calendar className="w-3 h-3" />
-                                    <span>{patient.nextAppointment.date}</span>
-                                 </div>
-                                 <div>{patient.nextAppointment.time}</div>
-                              </div>
-                           ) : (
-                              <span className="text-xs text-muted-foreground">
-                                 No upcoming
-                              </span>
-                           )}
-                        </div>
-
-                        {/* Unread Messages */}
-                        <div className="hidden lg:block">
-                           {patient.unreadMessages > 0 ? (
+                        {/* Join Date */}
+                        <div className="hidden md:block">
+                           <div className="text-xs text-muted-foreground">
                               <div className="flex items-center space-x-1">
-                                 <MessageSquare className="w-4 h-4 text-blue-500" />
-                                 <Badge
-                                    variant="destructive"
-                                    className="text-xs">
-                                    {patient.unreadMessages}
-                                 </Badge>
+                                 <Calendar className="w-3 h-3" />
+                                 <span>Joined {new Date(patient.created_at).toLocaleDateString()}</span>
                               </div>
-                           ) : (
-                              <span className="text-xs text-muted-foreground">
-                                 No messages
-                              </span>
-                           )}
+                           </div>
+                        </div>
+
+                        {/* Last Active */}
+                        <div className="hidden lg:block">
+                           <div className="text-xs text-muted-foreground">
+                              Last active: {new Date(patient.updated_at).toLocaleDateString()}
+                           </div>
                         </div>
 
                         {/* Actions */}

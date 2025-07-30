@@ -3,19 +3,19 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-   Dialog,
-   DialogContent,
-   DialogHeader,
-   DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-   Select,
-   SelectContent,
-   SelectItem,
-   SelectTrigger,
-   SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Search, Star } from "lucide-react";
@@ -102,7 +102,7 @@ export function PrescriptionModal({
 
       const prescription: PrescriptionData = {
          patientId: patient.id,
-         patientName: patient.name,
+         patientName: `${patient.user.first_name} ${patient.user.last_name}`,
          productId: selectedProduct.id,
          productName: selectedProduct.name,
          dosage,
@@ -134,7 +134,7 @@ export function PrescriptionModal({
       <Dialog open={isOpen} onOpenChange={handleClose}>
          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-               <DialogTitle>Prescribe Product to {patient?.name}</DialogTitle>
+               <DialogTitle>Prescribe Product to {patient ? `${patient.user.first_name} ${patient.user.last_name}` : ''}</DialogTitle>
             </DialogHeader>
 
             <div className="space-y-6">
