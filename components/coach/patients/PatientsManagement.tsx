@@ -1,8 +1,10 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { usePatientsByCoach } from "@/hooks/usePatients";
+import { prescribeByCoach } from "@/services/patients_services";
 import { Calendar, MessageSquare, TrendingUp, Users } from "lucide-react";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 import { PatientFilters } from "./PatientFilters";
 import { PatientProfileModal } from "./PatientProfileModal";
 import { PatientTable } from "./PatientTable";
@@ -31,9 +33,16 @@ export function PatientsManagement() {
       setIsPrescriptionModalOpen(true);
    };
 
-   const handlePrescriptionSubmit = (prescription: PrescriptionData) => {
-      console.log("Prescription submitted:", prescription);
-      // prescribeByCoach(prescription);
+   const handlePrescriptionSubmit = async (prescription: PrescriptionData) => {
+      try {
+         await prescribeByCoach(prescription);
+         toast.success(`Prescription submitted`);
+         setIsPrescriptionModalOpen(false);
+      } catch (error) {
+         console.error("Error creating prescription:", error);
+         toast.error("Failed to create prescription. Please try again.");
+         throw error;
+      }
    };
 
    const filteredPatients = typedPatients.filter((patient) => {
@@ -54,9 +63,9 @@ export function PatientsManagement() {
       active: typedPatients.filter((p) => p.account_status === "active").length,
       inactive: typedPatients.filter((p) => p.account_status === "inactive").length,
       pending: typedPatients.filter((p) => p.account_status === "pending").length,
-      averageProgress: 75, // Placeholder since we don't have progress data
-      totalSessions: 45, // Placeholder since we don't have sessions data
-      unreadMessages: 12, // Placeholder since we don't have messages data
+      averageProgress: 75,
+      totalSessions: 45,
+      unreadMessages: 12,
    };
 
    if (isLoading) {

@@ -19,16 +19,19 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Product as DatabaseProduct } from "@/lib/types/database";
+import { prescriptionSchema, type PrescriptionFormData } from "@/lib/zod_schemas/prescription.schema";
 import { getAllProducts } from "@/services/product_service";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Search } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { type Patient } from "./mockData";
 
 interface PrescriptionModalProps {
    patient: Patient | null;
    isOpen: boolean;
    onClose: () => void;
-   onPrescribe: (prescription: PrescriptionData) => void;
+   onPrescribe: (prescription: PrescriptionData) => Promise<void>;
 }
 
 export type PrescriptionData ={
@@ -72,12 +75,32 @@ export function PrescriptionModal({
    const [selectedProduct, setSelectedProduct] = useState<DatabaseProduct | null>(null);
    const [products, setProducts] = useState<DatabaseProduct[]>([]);
    const [loading, setLoading] = useState(false);
+   const [submitting, setSubmitting] = useState(false);
    const [error, setError] = useState<string | null>(null);
-   const [dosage, setDosage] = useState("");
-   const [frequency, setFrequency] = useState("");
-   const [duration, setDuration] = useState("");
-   const [instructions, setInstructions] = useState("");
-   const [notes, setNotes] = useState("");
+   const [success, setSuccess] = useState(false);
+
+   // React Hook Form setup
+   const {
+      register,
+      handleSubmit,
+      setValue,
+      watch,
+      reset,
+      formState: { errors, isValid },
+   } = useForm<PrescriptionFormData>({
+      resolver: zodResolver(prescriptionSchema),
+      mode: "onChange",
+      defaultValues: {
+         product_id: "",
+         dosage: "",
+         frequency: "",
+         duration: "",
+         instructions: "",
+         notes: "",
+      },
+   });
+
+   const watchedProductId = watch("product_id");
 
    // Fetch products from database when modal opens
    useEffect(() => {
@@ -111,44 +134,48 @@ export function PrescriptionModal({
 
    const handleProductSelect = (product: DatabaseProduct) => {
       setSelectedProduct(product);
-      setDosage("");
-      setFrequency("");
-      setDuration("");
-      setInstructions("");
-      setNotes("");
+      setValue("product_id", product.id);
+      setValue("dosage", "");
+      setValue("frequency", "");
+      setValue("duration", "");
+      setValue("instructions", "");
+      setValue("notes", "");
    };
 
-   const handlePrescribe = () => {
-      if (!patient || !selectedProduct) return;
+   const onSubmit = async (data: PrescriptionFormData) => {
+      if (!patient) return;
 
-      const prescription: PrescriptionData = {
-         patient_id: patient.id,
-         product_id: selectedProduct.id,
-         dosage,
-         frequency,
-         duration,
-         instructions,
-         notes,
-         status:'active'
-      };
+      setSubmitting(true);
+      setError(null);
+      try {
+         const prescription: PrescriptionData = {
+            patient_id: patient.id,
+            product_id: data.product_id,
+            dosage: data.dosage,
+            frequency: data.frequency,
+            duration: data.duration,
+            instructions: data.instructions,
+            notes: data.notes || "",
+            status: 'active'
+         };
 
-      onPrescribe(prescription);
-      handleClose();
+         await onPrescribe(prescription);
+         setSuccess(true);
+      } catch {
+         setError("Something went wrong. Please try again.");
+      } finally {
+         setSubmitting(false);
+      }
    };
 
    const handleClose = () => {
       setSearchTerm("");
       setSelectedProduct(null);
-      setDosage("");
-      setFrequency("");
-      setDuration("");
-      setInstructions("");
-      setNotes("");
       setError(null);
+      setSuccess(false);
+      reset();
       onClose();
    };
-
-   const isFormValid = selectedProduct && dosage && frequency && duration;
 
    return (
       <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -157,7 +184,7 @@ export function PrescriptionModal({
                <DialogTitle>Prescribe Product to {patient ? `${patient.user.first_name} ${patient.user.last_name}` : ''}</DialogTitle>
             </DialogHeader>
 
-            <div className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                {/* Product Selection */}
                <div>
                   <Label className="text-base font-semibold">
@@ -195,6 +222,12 @@ export function PrescriptionModal({
                      </div>
                   )}
 
+                  {success && (
+                     <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <p className="text-green-600 text-sm">Prescription submitted successfully!</p>
+                     </div>
+                  )}
+
                   {!loading && !error && (
                      <div className="mt-4 max-h-60 overflow-y-auto space-y-2">
                         {filteredProducts.length === 0 ? (
@@ -206,7 +239,7 @@ export function PrescriptionModal({
                               <div
                                  key={product.id}
                                  className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                                    selectedProduct?.id === product.id
+                                    watchedProductId === product.id
                                        ? "border-blue-500 bg-blue-50"
                                        : "border-border hover:bg-muted/50"
                                  }`}
@@ -242,9 +275,13 @@ export function PrescriptionModal({
                         )}
                      </div>
                   )}
+                  
+                  {errors.product_id && (
+                     <p className="mt-2 text-sm text-red-600">{errors.product_id.message}</p>
+                  )}
                </div>
 
-               {selectedProduct && (
+               {watchedProductId && (
                   <>
                      {/* Prescription Details */}
                      <div className="space-y-4">
@@ -257,18 +294,21 @@ export function PrescriptionModal({
                               <Label htmlFor="dosage">Dosage</Label>
                               <Input
                                  id="dosage"
-                                 value={dosage}
-                                 onChange={(e) => setDosage(e.target.value)}
+                                 {...register("dosage")}
                                  placeholder="e.g., 500mg, 1 tablet"
+                                 className={errors.dosage ? "border-red-500" : ""}
                               />
+                              {errors.dosage && (
+                                 <p className="mt-1 text-sm text-red-600">{errors.dosage.message}</p>
+                              )}
                            </div>
 
                            <div>
                               <Label htmlFor="frequency">Frequency</Label>
                               <Select
-                                 value={frequency}
-                                 onValueChange={setFrequency}>
-                                 <SelectTrigger>
+                                 value={watch("frequency")}
+                                 onValueChange={(value) => setValue("frequency", value)}>
+                                 <SelectTrigger className={errors.frequency ? "border-red-500" : ""}>
                                     <SelectValue placeholder="Select frequency" />
                                  </SelectTrigger>
                                  <SelectContent>
@@ -281,14 +321,17 @@ export function PrescriptionModal({
                                     ))}
                                  </SelectContent>
                               </Select>
+                              {errors.frequency && (
+                                 <p className="mt-1 text-sm text-red-600">{errors.frequency.message}</p>
+                              )}
                            </div>
 
                            <div>
                               <Label htmlFor="duration">Duration</Label>
                               <Select
-                                 value={duration}
-                                 onValueChange={setDuration}>
-                                 <SelectTrigger>
+                                 value={watch("duration")}
+                                 onValueChange={(value) => setValue("duration", value)}>
+                                 <SelectTrigger className={errors.duration ? "border-red-500" : ""}>
                                     <SelectValue placeholder="Select duration" />
                                  </SelectTrigger>
                                  <SelectContent>
@@ -301,14 +344,16 @@ export function PrescriptionModal({
                                     ))}
                                  </SelectContent>
                               </Select>
+                              {errors.duration && (
+                                 <p className="mt-1 text-sm text-red-600">{errors.duration.message}</p>
+                              )}
                            </div>
 
                            <div>
                               <Label htmlFor="notes">Notes (Optional)</Label>
                               <Input
                                  id="notes"
-                                 value={notes}
-                                 onChange={(e) => setNotes(e.target.value)}
+                                 {...register("notes")}
                                  placeholder="Additional notes for the patient"
                               />
                            </div>
@@ -318,11 +363,14 @@ export function PrescriptionModal({
                            <Label htmlFor="instructions">Instructions</Label>
                            <Textarea
                               id="instructions"
-                              value={instructions}
-                              onChange={(e) => setInstructions(e.target.value)}
+                              {...register("instructions")}
                               placeholder="Detailed instructions for the patient"
                               rows={3}
+                              className={errors.instructions ? "border-red-500" : ""}
                            />
+                           {errors.instructions && (
+                              <p className="mt-1 text-sm text-red-600">{errors.instructions.message}</p>
+                           )}
                         </div>
                      </div>
 
@@ -333,41 +381,58 @@ export function PrescriptionModal({
                         </Label>
                         <div className="mt-2">
                            <div className="font-medium">
-                              {selectedProduct.name}
+                              {selectedProduct?.name}
                            </div>
                            <div className="text-sm text-muted-foreground">
-                              {selectedProduct.description}
+                              {selectedProduct?.description}
                            </div>
                            <div className="flex items-center space-x-2 mt-1">
                               <Badge variant="outline">
-                                 {selectedProduct.type}
+                                 {selectedProduct?.type}
                               </Badge>
                               <span className="text-sm">
-                                 ${selectedProduct.price} {selectedProduct.currency}
+                                 ${selectedProduct?.price} {selectedProduct?.currency}
                               </span>
-                              {selectedProduct.prescription_required && (
+                              {selectedProduct?.prescription_required && (
                                  <Badge variant="destructive">
                                     Prescription Required
                                  </Badge>
                               )}
                               <span className="text-xs text-muted-foreground">
-                                 Stock: {selectedProduct.stock_quantity}
+                                 Stock: {selectedProduct?.stock_quantity}
                               </span>
                            </div>
                         </div>
                      </div>
                   </>
                )}
-            </div>
 
-            <div className="flex justify-end space-x-2 pt-4">
-               <Button variant="outline" onClick={handleClose}>
-                  Cancel
-               </Button>
-               <Button onClick={handlePrescribe} disabled={!isFormValid}>
-                  Prescribe Product
-               </Button>
-            </div>
+               <div className="flex justify-end space-x-2 pt-4">
+                  <Button 
+                     type="button" 
+                     variant="outline" 
+                     onClick={handleClose}
+                     disabled={submitting}
+                  >
+                     Cancel
+                  </Button>
+                  <Button 
+                     type="submit" 
+                     disabled={!isValid || submitting || success}
+                  >
+                     {submitting ? (
+                        <>
+                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                           Prescribing...
+                        </>
+                     ) : success ? (
+                        "Prescription Submitted ✓"
+                     ) : (
+                        "Prescribe Product"
+                     )}
+                  </Button>
+               </div>
+            </form>
          </DialogContent>
       </Dialog>
    );

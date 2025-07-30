@@ -7,7 +7,7 @@ const prescribeByCoach = async (c: Context) => {
    if (error) {
       return c.json({ error: error.message }, 500);
    }
-   return c.json({ data }, 200);
+   return c.json({message:"Data inserted"}, 200);
 };
 
 export default prescribeByCoach;
