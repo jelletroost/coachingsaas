@@ -6,14 +6,15 @@ export const useUsers = () => {
    return useQuery({
       queryKey: ["users"],
       queryFn: getAllUsers,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
+      staleTime: 10 * 60 * 1000,
+      gcTime: 30 * 60 * 1000,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: true,
    });
 };
 
-// Transform database user to component user format
 export const transformUserForComponent = (dbUser: UserProfileWithDetails) => {
-   // Map database status to component status
    const mapStatus = (status: string) => {
       switch (status) {
          case "active":
@@ -44,10 +45,10 @@ export const transformUserForComponent = (dbUser: UserProfileWithDetails) => {
       avatar: dbUser.avatar_url,
       phone: dbUser.phone,
       joinedDate: new Date(dbUser.created_at).toLocaleDateString(),
-      lastActive: "Recently", // This would need to be calculated from session data
-      subscription: "Active", // This would need to be fetched from subscription data
-      coach: coachName, // Updated to show actual assigned coach
-      location: "N/A", // This would need to be added to the database
+      lastActive: "Recently",
+      subscription: "Active",
+      coach: coachName,
+      location: "N/A",
       bio: dbUser.coach_profile?.bio || "No bio available",
       specializations: dbUser.coach_profile?.specialization ? [dbUser.coach_profile.specialization] : [],
       certifications: dbUser.coach_profile?.certifications || [],

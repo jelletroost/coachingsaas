@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
 import { getPatientsByCoach } from "@/services/patients_services";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useQuery } from "@tanstack/react-query";
 
 export const usePatientsByCoach = () => {
    const { user } = useAuthStore();
@@ -9,7 +9,10 @@ export const usePatientsByCoach = () => {
       queryKey: ["patients", "coach", user?.id],
       queryFn: () => getPatientsByCoach(user?.id || ""),
       enabled: !!user?.id,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      cacheTime: 10 * 60 * 1000, // 10 minutes
+      staleTime: 10 * 60 * 1000,
+      gcTime: 30 * 60 * 1000,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: true,
    });
 }; 

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -18,12 +19,12 @@ import {
    SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useProducts } from "@/hooks/useProducts"; // Use the cached hook instead
 import { Product as DatabaseProduct } from "@/lib/types/database";
 import { prescriptionSchema, type PrescriptionFormData } from "@/lib/zod_schemas/prescription.schema";
-import { getAllProducts } from "@/services/product_service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { type Patient } from "./mockData";
 
@@ -73,11 +74,12 @@ export function PrescriptionModal({
 }: PrescriptionModalProps) {
    const [searchTerm, setSearchTerm] = useState("");
    const [selectedProduct, setSelectedProduct] = useState<DatabaseProduct | null>(null);
-   const [products, setProducts] = useState<DatabaseProduct[]>([]);
-   const [loading, setLoading] = useState(false);
    const [submitting, setSubmitting] = useState(false);
    const [error, setError] = useState<string | null>(null);
    const [success, setSuccess] = useState(false);
+
+   // Use the cached products hook instead of direct API call
+   const { data: products = [], isLoading: loading, error: productsError } = useProducts();
 
    // React Hook Form setup
    const {
@@ -102,27 +104,8 @@ export function PrescriptionModal({
 
    const watchedProductId = watch("product_id");
 
-   // Fetch products from database when modal opens
-   useEffect(() => {
-      if (isOpen) {
-         fetchProducts();
-      }
-   }, [isOpen]);
-
-   const fetchProducts = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-         const response = await getAllProducts();
-         setProducts(response || []);
-      } catch{
-         setError("Failed to load products. Please try again.");
-      } finally {
-         setLoading(false);
-      }
-   };
-
-   const filteredProducts = products.filter((product) => {
+   // Filter products based on search term and status
+   const filteredProducts = products.filter((product: DatabaseProduct) => {
       if (!product.status || product.status !== "active") return false;
       
       const matchesSearch =
@@ -204,17 +187,17 @@ export function PrescriptionModal({
                   {loading && (
                      <div className="mt-4 flex items-center justify-center py-8">
                         <Loader2 className="h-6 w-6 animate-spin" />
-                        <span className="ml-2">Loading products from database...</span>
+                        <span className="ml-2">Loading products from cache...</span>
                      </div>
                   )}
 
-                  {error && (
+                  {productsError && (
                      <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                        <p className="text-red-600 text-sm">{error}</p>
+                        <p className="text-red-600 text-sm">Failed to load products. Please try again.</p>
                         <Button 
                            variant="outline" 
                            size="sm" 
-                           onClick={fetchProducts}
+                           onClick={() => window.location.reload()}
                            className="mt-2"
                         >
                            Retry
@@ -222,14 +205,20 @@ export function PrescriptionModal({
                      </div>
                   )}
 
-                  {!loading && !error && (
+                  {error && (
+                     <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <p className="text-red-600 text-sm">{error}</p>
+                     </div>
+                  )}
+
+                  {!loading && !productsError && (
                      <div className="mt-4 max-h-60 overflow-y-auto space-y-2">
                         {filteredProducts.length === 0 ? (
                            <div className="text-center py-8 text-muted-foreground">
                               {searchTerm ? "No products found matching your search." : "No products available in database."}
                            </div>
                         ) : (
-                           filteredProducts.map((product) => (
+                           filteredProducts.map((product: DatabaseProduct) => (
                               <div
                                  key={product.id}
                                  className={`p-3 border rounded-lg cursor-pointer transition-colors ${
@@ -371,7 +360,7 @@ export function PrescriptionModal({
                      {/* Selected Product Summary */}
                      <div className="p-4 bg-muted/50 rounded-lg">
                         <Label className="text-sm font-medium text-muted-foreground">
-                           Selected Product (From Database)
+                           Selected Product (From Cache)
                         </Label>
                         <div className="mt-2">
                            <div className="font-medium">
