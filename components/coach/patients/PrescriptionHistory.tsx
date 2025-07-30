@@ -55,10 +55,20 @@ export function PrescriptionHistory({
          setUpdatingStatus(null);
       }
    };
-   // Sort prescriptions by created_at date (latest first)
-   const sortedPrescriptions = [...prescriptions].sort((a, b) => 
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-   );
+   // Sort prescriptions: active first, then by created_at date (latest first)
+   const sortedPrescriptions = [...prescriptions].sort((a, b) => {
+      // First, sort by status: active first, then completed, then discontinued
+      const statusOrder = { active: 0, completed: 1, discontinued: 2 };
+      const statusDiff = statusOrder[a.status] - statusOrder[b.status];
+      
+      // If status is different, sort by status
+      if (statusDiff !== 0) {
+         return statusDiff;
+      }
+      
+      // If status is the same, sort by date (latest first)
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+   });
    if (prescriptions.length === 0) {
       return (
          <Card>
