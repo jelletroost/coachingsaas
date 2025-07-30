@@ -110,6 +110,22 @@ export interface Product {
    updated_at: string;
 }
 
+export interface Prescription {
+   id: string;
+   patient_id: string;
+   product_id: string;
+   patient_name: string;
+   product_name: string;
+   dosage: string;
+   frequency: string;
+   duration: string;
+   instructions: string;
+   notes: string | null;
+   status: "active" | "completed" | "discontinued";
+   created_at: string;
+   updated_at: string;
+}
+
 // Database table names
 export const TABLES = {
    USER_PROFILES: "user_profiles",
@@ -148,6 +164,13 @@ export interface Database {
             Insert: Omit<UserSession, "id" | "created_at" | "last_activity">;
             Update: Partial<
                Omit<UserSession, "id" | "created_at" | "last_activity">
+            >;
+         };
+         prescriptions: {
+            Row: Prescription;
+            Insert: Omit<Prescription, "id" | "created_at" | "updated_at">;
+            Update: Partial<
+               Omit<Prescription, "id" | "created_at" | "updated_at">
             >;
          };
       };

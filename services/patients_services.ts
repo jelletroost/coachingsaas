@@ -1,5 +1,5 @@
-import { type PrescriptionData } from "@/components/coach/patients/PrescriptionModal";
 import apiClient from "@/lib/axios";
+import { type PrescriptionData } from "@/lib/zod_schemas/prescription.schema";
 
 export const assignCoachToPatient = async (patientId: string, coachId: string) => {
    try {
@@ -26,9 +26,20 @@ export const getPatientsByCoach = async (coachId: string) => {
 };
 
 // prescribe by coach
-export const prescribeByCoach = async (prescriptionData: PrescriptionData) => {
+export const prescribeByCoach = async (prescriptionData: Omit<PrescriptionData, "id" | "created_at" | "updated_at">) => {
    try {
       const response = await apiClient.post("/patients/prescribe-by-coach", prescriptionData);
+      return response.data;
+   } catch (error) {
+      console.error(error);
+      throw error;
+   }
+};
+
+// get prescriptions by patient
+export const getPrescriptionsByPatient = async (patientId: string) => {
+   try {
+      const response = await apiClient.get(`/patients/get-prescriptions?patientId=${patientId}`);
       return response.data;
    } catch (error) {
       console.error(error);

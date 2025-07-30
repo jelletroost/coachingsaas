@@ -1,15 +1,16 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { usePatientsByCoach } from "@/hooks/usePatients";
+import { PrescriptionData } from "@/lib/zod_schemas/prescription.schema";
 import { prescribeByCoach } from "@/services/patients_services";
 import { Calendar, MessageSquare, TrendingUp, Users } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { type Patient } from "./mockData";
 import { PatientFilters } from "./PatientFilters";
 import { PatientProfileModal } from "./PatientProfileModal";
 import { PatientTable } from "./PatientTable";
-import { PrescriptionData, PrescriptionModal } from "./PrescriptionModal";
-import { type Patient } from "./mockData";
+import { PrescriptionModal } from "./PrescriptionModal";
 
 export function PatientsManagement() {
    const { data: patients = [], isLoading, error } = usePatientsByCoach();
@@ -33,7 +34,7 @@ export function PatientsManagement() {
       setIsPrescriptionModalOpen(true);
    };
 
-   const handlePrescriptionSubmit = async (prescription: PrescriptionData) => {
+   const handlePrescriptionSubmit = async (prescription: Omit<PrescriptionData, "id" | "created_at" | "updated_at">) => {
       try {
          await prescribeByCoach(prescription);
          toast.success(`Prescription submitted`);

@@ -3,8 +3,8 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PrescriptionData } from "@/lib/zod_schemas/prescription.schema";
 import { Package } from "lucide-react";
-import { PrescriptionData } from "./PrescriptionModal";
 
 
 interface PrescriptionHistoryProps {

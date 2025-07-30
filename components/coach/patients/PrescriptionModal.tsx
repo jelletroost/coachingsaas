@@ -21,10 +21,10 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useProducts } from "@/hooks/useProducts"; // Use the cached hook instead
 import { Product as DatabaseProduct } from "@/lib/types/database";
-import { prescriptionSchema, type PrescriptionFormData } from "@/lib/zod_schemas/prescription.schema";
+import { prescriptionSchema, type PrescriptionData, type PrescriptionFormData } from "@/lib/zod_schemas/prescription.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { type Patient } from "./mockData";
 
@@ -32,23 +32,10 @@ interface PrescriptionModalProps {
    patient: Patient | null;
    isOpen: boolean;
    onClose: () => void;
-   onPrescribe: (prescription: PrescriptionData) => Promise<void>;
+   onPrescribe: (prescription: Omit<PrescriptionData, "id" | "created_at" | "updated_at">) => Promise<void>;
 }
 
-export type PrescriptionData = {
-   id: string;
-   patient_id: string;
-   patient_name: string;
-   product_name: string;
-   product_id: string;
-   dosage: string;
-   frequency: string;
-   duration: string;
-   instructions: string;
-   notes: string;
-   status: string;
-   created_at: string;
-}
+
 
 const frequencyOptions = [
    { value: "once_daily", label: "Once daily" },
@@ -92,21 +79,57 @@ export function PrescriptionModal({
       setValue,
       watch,
       reset,
+      trigger,
       formState: { errors, isValid },
    } = useForm<PrescriptionFormData>({
       resolver: zodResolver(prescriptionSchema),
-      mode: "onChange",
+      mode: "onBlur",
       defaultValues: {
+         patient_id: patient?.id || "",
+         patient_name: patient ? `${patient.user.first_name} ${patient.user.last_name}` : "",
          product_id: "",
+         product_name: "",
          dosage: "",
          frequency: "",
          duration: "",
          instructions: "",
          notes: "",
+         status: "active",
       },
    });
 
    const watchedProductId = watch("product_id");
+
+
+
+   // Reset form when modal opens or patient changes
+   useEffect(() => {
+      if (isOpen && patient) {
+         setSearchTerm("");
+         setSelectedProduct(null);
+         setError(null);
+         setSuccess(false);
+         reset({
+            patient_id: patient.id,
+            patient_name: `${patient.user.first_name} ${patient.user.last_name}`,
+            product_id: "",
+            product_name: "",
+            dosage: "",
+            frequency: "",
+            duration: "",
+            instructions: "",
+            notes: "",
+            status: "active",
+         });
+      }
+   }, [isOpen, patient, reset]);
+
+   // Cleanup effect to reset success state when modal closes
+   useEffect(() => {
+      if (!isOpen) {
+         setSuccess(false);
+      }
+   }, [isOpen]);
 
    // Filter products based on search term and status
    const filteredProducts = products.filter((product: DatabaseProduct) => {
@@ -122,34 +145,41 @@ export function PrescriptionModal({
    const handleProductSelect = (product: DatabaseProduct) => {
       setSelectedProduct(product);
       setValue("product_id", product.id);
+      setValue("product_name", product.name);
       setValue("dosage", "");
       setValue("frequency", "");
       setValue("duration", "");
       setValue("instructions", "");
       setValue("notes", "");
+      // Trigger validation after setting values
+      trigger(["product_id", "product_name"]);
    };
 
-   const onSubmit = async (data: PrescriptionFormData) => {
+   const onSubmit = async (data: any) => {
       if (!patient) return;
 
       setSubmitting(true);
       setError(null);
       try {
-         const prescription: PrescriptionData = {
+         const prescription: Omit<PrescriptionData, "id" | "created_at" | "updated_at"> = {
             patient_id: patient.id,
             product_id: data.product_id,
-            product_name: selectedProduct?.name || "",
-            patient_name: patient.user.first_name + " " + patient.user.last_name,
+            product_name: data.product_name,
+            patient_name: data.patient_name,
             dosage: data.dosage,
             frequency: data.frequency,
             duration: data.duration,
             instructions: data.instructions,
-            notes: data.notes || "",
-            status: 'active'
+            notes: data.notes || null,
+            status: data.status,
          };
 
          await onPrescribe(prescription);
          setSuccess(true);
+         // Reset success state after 2 seconds to allow user to see the message
+         setTimeout(() => {
+            setSuccess(false);
+         }, 2000);
       } catch {
          setError("Something went wrong. Please try again.");
       } finally {
@@ -173,7 +203,7 @@ export function PrescriptionModal({
                <DialogTitle>Prescribe Product to {patient ? `${patient.user.first_name} ${patient.user.last_name}` : ''}</DialogTitle>
             </DialogHeader>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-6">
                {/* Product Selection */}
                <div>
                   <Label className="text-base font-semibold">
@@ -283,7 +313,9 @@ export function PrescriptionModal({
                               <Label htmlFor="dosage">Dosage</Label>
                               <Input
                                  id="dosage"
-                                 {...register("dosage")}
+                                 {...register("dosage", {
+                                    onChange: () => trigger("dosage")
+                                 })}
                                  placeholder="e.g., 500mg, 1 tablet"
                                  className={errors.dosage ? "border-red-500" : ""}
                               />
@@ -296,7 +328,10 @@ export function PrescriptionModal({
                               <Label htmlFor="frequency">Frequency</Label>
                               <Select
                                  value={watch("frequency")}
-                                 onValueChange={(value) => setValue("frequency", value)}>
+                                 onValueChange={(value) => {
+                                    setValue("frequency", value);
+                                    trigger("frequency");
+                                 }}>
                                  <SelectTrigger className={errors.frequency ? "border-red-500" : ""}>
                                     <SelectValue placeholder="Select frequency" />
                                  </SelectTrigger>
@@ -319,7 +354,10 @@ export function PrescriptionModal({
                               <Label htmlFor="duration">Duration</Label>
                               <Select
                                  value={watch("duration")}
-                                 onValueChange={(value) => setValue("duration", value)}>
+                                 onValueChange={(value) => {
+                                    setValue("duration", value);
+                                    trigger("duration");
+                                 }}>
                                  <SelectTrigger className={errors.duration ? "border-red-500" : ""}>
                                     <SelectValue placeholder="Select duration" />
                                  </SelectTrigger>
@@ -352,7 +390,9 @@ export function PrescriptionModal({
                            <Label htmlFor="instructions">Instructions</Label>
                            <Textarea
                               id="instructions"
-                              {...register("instructions")}
+                              {...register("instructions", {
+                                 onChange: () => trigger("instructions")
+                              })}
                               placeholder="Detailed instructions for the patient"
                               rows={3}
                               className={errors.instructions ? "border-red-500" : ""}
@@ -396,6 +436,8 @@ export function PrescriptionModal({
                   </>
                )}
 
+
+
                <div className="flex justify-end space-x-2 pt-4">
                   <Button 
                      type="button" 
@@ -407,7 +449,7 @@ export function PrescriptionModal({
                   </Button>
                   <Button 
                      type="submit" 
-                     disabled={!isValid || submitting || success}
+                     disabled={!isValid || submitting}
                   >
                      {submitting ? (
                         <>
