@@ -9,6 +9,6 @@ const app = new Hono().basePath(`/${functionName}`);
 
 // Routes
 app.use("/assign-coach", checkRole(["admin"]), assignCoach);
-app.get("/get-patients-by-coach", getPatientsByCoach);
+app.use("/get-patients-by-coach",checkRole(["admin","coach"]), getPatientsByCoach);
 
 Deno.serve(withCors(app));
