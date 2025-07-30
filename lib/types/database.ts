@@ -84,6 +84,16 @@ export interface UserSession {
 export interface UserProfileWithDetails extends UserProfile {
    patient_profile?: PatientProfile;
    coach_profile?: CoachProfile;
+   patients?: Array<{
+      user_id: string;
+      assigned_coach_id: string;
+      coach: {
+         id: string;
+         first_name: string;
+         last_name: string;
+         email: string;
+      };
+   }>;
 }
 
 export interface Product {
@@ -96,6 +106,22 @@ export interface Product {
    stock_quantity: number;
    status: "active" | "inactive";
    prescription_required: boolean;
+   created_at: string;
+   updated_at: string;
+}
+
+export interface Prescription {
+   id: string;
+   patient_id: string;
+   product_id: string;
+   patient_name: string;
+   product_name: string;
+   dosage: string;
+   frequency: string;
+   duration: string;
+   instructions: string;
+   notes: string | null;
+   status: "active" | "completed" | "discontinued";
    created_at: string;
    updated_at: string;
 }
@@ -138,6 +164,13 @@ export interface Database {
             Insert: Omit<UserSession, "id" | "created_at" | "last_activity">;
             Update: Partial<
                Omit<UserSession, "id" | "created_at" | "last_activity">
+            >;
+         };
+         prescriptions: {
+            Row: Prescription;
+            Insert: Omit<Prescription, "id" | "created_at" | "updated_at">;
+            Update: Partial<
+               Omit<Prescription, "id" | "created_at" | "updated_at">
             >;
          };
       };

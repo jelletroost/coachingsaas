@@ -3,27 +3,17 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PrescriptionData } from "@/lib/zod_schemas/prescription.schema";
+import { updatePrescriptionStatus } from "@/services/patients_services";
 import { Package } from "lucide-react";
+import { useState } from "react";
+import { toast } from "react-hot-toast";
 
-interface PrescriptionData {
-   id: string;
-   patientId: string;
-   patientName: string;
-   productId: string;
-   productName: string;
-   dosage: string;
-   frequency: string;
-   duration: string;
-   instructions: string;
-   notes: string;
-   status: "active" | "completed" | "discontinued";
-   prescribedAt: string;
-   completedAt?: string;
-}
 
 interface PrescriptionHistoryProps {
    prescriptions: PrescriptionData[];
    patientName: string;
+   onRefetch?: () => void;
 }
 
 const getStatusBadgeVariant = (status: PrescriptionData["status"]) => {
@@ -42,7 +32,44 @@ const getStatusBadgeVariant = (status: PrescriptionData["status"]) => {
 export function PrescriptionHistory({
    prescriptions,
    patientName,
+   onRefetch,
 }: PrescriptionHistoryProps) {
+   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+
+   const handleStatusChange = async (prescriptionId: string, newStatus: "completed" | "discontinued") => {
+      try {
+         setUpdatingStatus(prescriptionId);
+         
+         await updatePrescriptionStatus(prescriptionId, newStatus);
+         
+         toast.success(`Prescription ${newStatus === "completed" ? "marked as complete" : "discontinued"} successfully`);
+         
+         // Refetch prescriptions to show updated data
+         if (onRefetch) {
+            onRefetch();
+         }
+      } catch (error) {
+         console.error("Error updating prescription status:", error);
+         toast.error("Failed to update prescription status. Please try again.");
+      } finally {
+         setUpdatingStatus(null);
+      }
+   };
+   
+   // Sort prescriptions: active first, then by created_at date (latest first)
+   const sortedPrescriptions = [...prescriptions].sort((a, b) => {
+      // First, sort by status: active first, then completed, then discontinued
+      const statusOrder = { active: 0, completed: 1, discontinued: 2 };
+      const statusDiff = statusOrder[a.status] - statusOrder[b.status];
+      
+      // If status is different, sort by status
+      if (statusDiff !== 0) {
+         return statusDiff;
+      }
+      
+      // If status is the same, sort by date (latest first)
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+   });
    if (prescriptions.length === 0) {
       return (
          <Card>
@@ -72,7 +99,7 @@ export function PrescriptionHistory({
          </CardHeader>
          <CardContent>
             <div className="space-y-4">
-               {prescriptions.map((prescription) => (
+               {sortedPrescriptions.map((prescription) => (
                   <div
                      key={prescription.id}
                      className="p-4 border rounded-lg hover:bg-muted/50 transition-colors">
@@ -80,7 +107,7 @@ export function PrescriptionHistory({
                         <div className="flex-1">
                            <div className="flex items-center space-x-2 mb-2">
                               <h4 className="font-medium">
-                                 {prescription.productName}
+                                 {prescription.product_name}
                               </h4>
                               <Badge
                                  variant={getStatusBadgeVariant(
@@ -108,7 +135,7 @@ export function PrescriptionHistory({
                                     Prescribed:
                                  </span>{" "}
                                  {new Date(
-                                    prescription.prescribedAt
+                                    prescription.created_at
                                  ).toLocaleDateString()}
                               </div>
                            </div>
@@ -139,11 +166,21 @@ export function PrescriptionHistory({
                         <div className="flex items-center space-x-2">
                            {prescription.status === "active" && (
                               <>
-                                 <Button variant="outline" size="sm">
-                                    Mark Complete
+                                 <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    onClick={() => handleStatusChange(prescription.id, "completed")}
+                                    disabled={updatingStatus === prescription.id}
+                                 >
+                                    {updatingStatus === prescription.id ? "Updating..." : "Mark Complete"}
                                  </Button>
-                                 <Button variant="outline" size="sm">
-                                    Discontinue
+                                 <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    onClick={() => handleStatusChange(prescription.id, "discontinued")}
+                                    disabled={updatingStatus === prescription.id}
+                                 >
+                                    {updatingStatus === prescription.id ? "Updating..." : "Discontinue"}
                                  </Button>
                               </>
                            )}
