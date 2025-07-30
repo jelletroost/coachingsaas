@@ -4,12 +4,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PrescriptionData } from "@/lib/zod_schemas/prescription.schema";
+import { updatePrescriptionStatus } from "@/services/patients_services";
 import { Package } from "lucide-react";
+import { useState } from "react";
+import { toast } from "react-hot-toast";
 
 
 interface PrescriptionHistoryProps {
    prescriptions: PrescriptionData[];
    patientName: string;
+   onRefetch?: () => void;
 }
 
 const getStatusBadgeVariant = (status: PrescriptionData["status"]) => {
@@ -28,7 +32,29 @@ const getStatusBadgeVariant = (status: PrescriptionData["status"]) => {
 export function PrescriptionHistory({
    prescriptions,
    patientName,
+   onRefetch,
 }: PrescriptionHistoryProps) {
+   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+
+   const handleStatusChange = async (prescriptionId: string, newStatus: "completed" | "discontinued") => {
+      try {
+         setUpdatingStatus(prescriptionId);
+         
+         await updatePrescriptionStatus(prescriptionId, newStatus);
+         
+         toast.success(`Prescription ${newStatus === "completed" ? "marked as complete" : "discontinued"} successfully`);
+         
+         // Refetch prescriptions to show updated data
+         if (onRefetch) {
+            onRefetch();
+         }
+      } catch (error) {
+         console.error("Error updating prescription status:", error);
+         toast.error("Failed to update prescription status. Please try again.");
+      } finally {
+         setUpdatingStatus(null);
+      }
+   };
    // Sort prescriptions by created_at date (latest first)
    const sortedPrescriptions = [...prescriptions].sort((a, b) => 
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -129,11 +155,21 @@ export function PrescriptionHistory({
                         <div className="flex items-center space-x-2">
                            {prescription.status === "active" && (
                               <>
-                                 <Button variant="outline" size="sm">
-                                    Mark Complete
+                                 <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    onClick={() => handleStatusChange(prescription.id, "completed")}
+                                    disabled={updatingStatus === prescription.id}
+                                 >
+                                    {updatingStatus === prescription.id ? "Updating..." : "Mark Complete"}
                                  </Button>
-                                 <Button variant="outline" size="sm">
-                                    Discontinue
+                                 <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    onClick={() => handleStatusChange(prescription.id, "discontinued")}
+                                    disabled={updatingStatus === prescription.id}
+                                 >
+                                    {updatingStatus === prescription.id ? "Updating..." : "Discontinue"}
                                  </Button>
                               </>
                            )}

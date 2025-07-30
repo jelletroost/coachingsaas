@@ -183,6 +183,7 @@ export function PatientProfileModal({
                      <PrescriptionHistory
                         prescriptions={prescriptions}
                         patientName={patientName}
+                        onRefetch={refetchPrescriptions}
                      />
                   </TabsContent>
                </Tabs>
