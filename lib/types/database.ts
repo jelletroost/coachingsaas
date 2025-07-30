@@ -84,6 +84,16 @@ export interface UserSession {
 export interface UserProfileWithDetails extends UserProfile {
    patient_profile?: PatientProfile;
    coach_profile?: CoachProfile;
+   patients?: Array<{
+      user_id: string;
+      assigned_coach_id: string;
+      coach: {
+         id: string;
+         first_name: string;
+         last_name: string;
+         email: string;
+      };
+   }>;
 }
 
 export interface Product {

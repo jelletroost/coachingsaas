@@ -28,6 +28,13 @@ export const transformUserForComponent = (dbUser: UserProfileWithDetails) => {
       }
    };
 
+   // Extract assigned coach info from the nested structure
+   const patientData = dbUser.patients?.[0];
+   const assignedCoach = patientData?.coach;
+   const coachName = assignedCoach 
+      ? `${assignedCoach.first_name} ${assignedCoach.last_name}`
+      : "Not Assigned";
+
    return {
       id: dbUser.id,
       name: `${dbUser.first_name} ${dbUser.last_name}`,
@@ -39,7 +46,7 @@ export const transformUserForComponent = (dbUser: UserProfileWithDetails) => {
       joinedDate: new Date(dbUser.created_at).toLocaleDateString(),
       lastActive: "Recently", // This would need to be calculated from session data
       subscription: "Active", // This would need to be fetched from subscription data
-      coach: dbUser.coach_profile ? "Assigned" : "Not Assigned",
+      coach: coachName, // Updated to show actual assigned coach
       location: "N/A", // This would need to be added to the database
       bio: dbUser.coach_profile?.bio || "No bio available",
       specializations: dbUser.coach_profile?.specialization ? [dbUser.coach_profile.specialization] : [],
