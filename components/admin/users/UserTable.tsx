@@ -5,23 +5,23 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-   DropdownMenu,
-   DropdownMenuContent,
-   DropdownMenuItem,
-   DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
-   Calendar,
-   Eye,
-   Mail,
-   MoreHorizontal,
-   Phone,
-   Search,
-   Shield,
-   UserCheck,
-   UserPlus,
-   UserX,
+    Calendar,
+    Eye,
+    Mail,
+    MoreHorizontal,
+    Phone,
+    Search,
+    Shield,
+    UserCheck,
+    UserPlus,
+    UserX,
 } from "lucide-react";
 import { useState } from "react";
 import { User } from "./types";
@@ -103,6 +103,7 @@ export function UserTable({
                         <th className="text-left p-3 font-medium">User</th>
                         <th className="text-left p-3 font-medium">Role</th>
                         <th className="text-left p-3 font-medium">Status</th>
+                        <th className="text-left p-3 font-medium">Assigned Coach</th>
                         <th className="text-left p-3 font-medium">Joined</th>
                         <th className="text-left p-3 font-medium">
                            Last Active
@@ -152,6 +153,27 @@ export function UserTable({
                            </td>
                            <td className="p-3">
                               {getStatusBadge(user.status)}
+                           </td>
+                           <td className="p-3">
+                              <div className="text-sm">
+                                 {user.role === "patient" ? (
+                                    <div className="flex items-center space-x-2">
+                                       {user.coach === "Not Assigned" ? (
+                                          <span className="text-muted-foreground flex items-center">
+                                             <UserX className="h-3 w-3 mr-1" />
+                                             {user.coach}
+                                          </span>
+                                       ) : (
+                                          <span className="text-green-600 font-medium flex items-center">
+                                             <UserCheck className="h-3 w-3 mr-1" />
+                                             {user.coach}
+                                          </span>
+                                       )}
+                                    </div>
+                                 ) : (
+                                    <span className="text-muted-foreground">-</span>
+                                 )}
+                              </div>
                            </td>
                            <td className="p-3 text-sm text-muted-foreground">
                               <div className="flex items-center">

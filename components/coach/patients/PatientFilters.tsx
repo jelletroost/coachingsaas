@@ -2,17 +2,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
-   Select,
-   SelectContent,
-   SelectItem,
-   SelectTrigger,
-   SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import { Search, X } from "lucide-react";
 
 interface Filters {
    status: string;
-   progress: string;
    searchTerm: string;
 }
 
@@ -35,14 +34,12 @@ export function PatientFilters({
    const clearFilters = () => {
       onFiltersChange({
          status: "all",
-         progress: "all",
          searchTerm: "",
       });
    };
 
    const hasActiveFilters =
       filters.status !== "all" ||
-      filters.progress !== "all" ||
       filters.searchTerm !== "";
 
    return (
@@ -79,31 +76,6 @@ export function PatientFilters({
                         <SelectItem value="active">Active</SelectItem>
                         <SelectItem value="inactive">Inactive</SelectItem>
                         <SelectItem value="pending">Pending</SelectItem>
-                     </SelectContent>
-                  </Select>
-               </div>
-
-               {/* Progress Filter */}
-               <div className="w-full sm:w-48">
-                  <Select
-                     value={filters.progress}
-                     onValueChange={(value) =>
-                        handleFilterChange("progress", value)
-                     }>
-                     <SelectTrigger>
-                        <SelectValue placeholder="Filter by progress" />
-                     </SelectTrigger>
-                     <SelectContent>
-                        <SelectItem value="all">All Progress</SelectItem>
-                        <SelectItem value="high">
-                           High Progress (80%+)
-                        </SelectItem>
-                        <SelectItem value="medium">
-                           Medium Progress (50-79%)
-                        </SelectItem>
-                        <SelectItem value="low">
-                           Low Progress (&lt;50%)
-                        </SelectItem>
                      </SelectContent>
                   </Select>
                </div>
