@@ -55,6 +55,7 @@ export function PrescriptionHistory({
          setUpdatingStatus(null);
       }
    };
+   
    // Sort prescriptions: active first, then by created_at date (latest first)
    const sortedPrescriptions = [...prescriptions].sort((a, b) => {
       // First, sort by status: active first, then completed, then discontinued
