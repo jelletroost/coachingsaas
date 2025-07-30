@@ -35,8 +35,11 @@ interface PrescriptionModalProps {
    onPrescribe: (prescription: PrescriptionData) => Promise<void>;
 }
 
-export type PrescriptionData ={
+export type PrescriptionData = {
+   id: string;
    patient_id: string;
+   patient_name: string;
+   product_name: string;
    product_id: string;
    dosage: string;
    frequency: string;
@@ -44,6 +47,7 @@ export type PrescriptionData ={
    instructions: string;
    notes: string;
    status: string;
+   created_at: string;
 }
 
 const frequencyOptions = [
@@ -134,6 +138,8 @@ export function PrescriptionModal({
          const prescription: PrescriptionData = {
             patient_id: patient.id,
             product_id: data.product_id,
+            product_name: selectedProduct?.name || "",
+            patient_name: patient.user.first_name + " " + patient.user.last_name,
             dosage: data.dosage,
             frequency: data.frequency,
             duration: data.duration,

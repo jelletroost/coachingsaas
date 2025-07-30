@@ -4,22 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package } from "lucide-react";
+import { PrescriptionData } from "./PrescriptionModal";
 
-interface PrescriptionData {
-   id: string;
-   patientId: string;
-   patientName: string;
-   productId: string;
-   productName: string;
-   dosage: string;
-   frequency: string;
-   duration: string;
-   instructions: string;
-   notes: string;
-   status: "active" | "completed" | "discontinued";
-   prescribedAt: string;
-   completedAt?: string;
-}
 
 interface PrescriptionHistoryProps {
    prescriptions: PrescriptionData[];
@@ -80,7 +66,7 @@ export function PrescriptionHistory({
                         <div className="flex-1">
                            <div className="flex items-center space-x-2 mb-2">
                               <h4 className="font-medium">
-                                 {prescription.productName}
+                                 {prescription.product_name}
                               </h4>
                               <Badge
                                  variant={getStatusBadgeVariant(
@@ -108,7 +94,7 @@ export function PrescriptionHistory({
                                     Prescribed:
                                  </span>{" "}
                                  {new Date(
-                                    prescription.prescribedAt
+                                    prescription.created_at
                                  ).toLocaleDateString()}
                               </div>
                            </div>

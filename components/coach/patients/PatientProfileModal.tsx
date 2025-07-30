@@ -3,15 +3,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
+   Dialog,
+   DialogContent,
+   DialogHeader,
+   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageSquare } from "lucide-react";
 import { type Patient } from "./mockData";
-import { PrescriptionHistory } from "./PrescriptionHistory";
 
 interface PatientProfileModalProps {
    patient: Patient;
@@ -31,39 +30,6 @@ const getStatusColor = (status: Patient["account_status"]) => {
          return "bg-gray-100 text-gray-800";
    }
 };
-
-// Mock prescription data - in a real app, this would come from the database
-const mockPrescriptions = [
-   {
-      id: "1",
-      patientId: "1",
-      patientName: "John Doe",
-      productId: "1",
-      productName: "Metformin 500mg",
-      dosage: "500mg",
-      frequency: "twice_daily",
-      duration: "30_days",
-      instructions: "Take with meals to reduce stomach upset",
-      notes: "Monitor blood sugar levels regularly",
-      status: "active" as const,
-      prescribedAt: "2024-01-15T10:30:00Z",
-   },
-   {
-      id: "2",
-      patientId: "1",
-      patientName: "John Doe",
-      productId: "2",
-      productName: "Omega-3 Fish Oil Supplement",
-      dosage: "1000mg",
-      frequency: "once_daily",
-      duration: "90_days",
-      instructions: "Take 1 softgel daily with meals",
-      notes: "Good for heart health",
-      status: "completed" as const,
-      prescribedAt: "2024-01-10T09:15:00Z",
-      completedAt: "2024-04-10T09:15:00Z",
-   },
-];
 
 export function PatientProfileModal({
    patient,
@@ -170,10 +136,10 @@ export function PatientProfileModal({
                   </TabsContent>
 
                   <TabsContent value="prescriptions" className="space-y-4">
-                     <PrescriptionHistory
-                        prescriptions={mockPrescriptions}
+                     {/* <PrescriptionHistory
+                        prescriptions={prescriptions}
                         patientName={patientName}
-                     />
+                     /> */}
                   </TabsContent>
                </Tabs>
 
