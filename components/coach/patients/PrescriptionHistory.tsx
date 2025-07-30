@@ -29,6 +29,10 @@ export function PrescriptionHistory({
    prescriptions,
    patientName,
 }: PrescriptionHistoryProps) {
+   // Sort prescriptions by created_at date (latest first)
+   const sortedPrescriptions = [...prescriptions].sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+   );
    if (prescriptions.length === 0) {
       return (
          <Card>
@@ -58,7 +62,7 @@ export function PrescriptionHistory({
          </CardHeader>
          <CardContent>
             <div className="space-y-4">
-               {prescriptions.map((prescription) => (
+               {sortedPrescriptions.map((prescription) => (
                   <div
                      key={prescription.id}
                      className="p-4 border rounded-lg hover:bg-muted/50 transition-colors">

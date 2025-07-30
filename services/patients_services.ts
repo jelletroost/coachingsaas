@@ -46,3 +46,14 @@ export const getPrescriptionsByPatient = async (patientId: string) => {
       throw error;
    }
 };
+
+// update prescription status
+export const updatePrescriptionStatus = async (prescriptionId: string, status: string) => {
+   try {
+      const response = await apiClient.post("/patients/prescription-status", { prescriptionId, status });
+      return response.data;
+   } catch (error) {
+      console.error(error);
+      throw error;
+   }
+};
