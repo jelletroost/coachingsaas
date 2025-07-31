@@ -4,7 +4,10 @@ import edgeAdminClient from "../../_shared/supabaseAdmin.ts";
 const getAllUsers = async (c: Context) => {
    const { data: users, error: usersError } = await edgeAdminClient
       .from("users")
-      .select("*");
+      .select(`
+         *,
+         role:user_roles(name)
+      `);
    
    if (usersError) {
       console.error("Error fetching users:", usersError);

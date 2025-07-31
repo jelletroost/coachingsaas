@@ -39,7 +39,7 @@ export function UsersManagement() {
       total: users.length,
       patients: users.filter((u: UserType) => u.role === "patient").length,
       coaches: users.filter((u: UserType) => u.role === "coach").length,
-      admins: users.filter((u: UserType) => u.role === "admin").length,
+      admins: users.filter((u: UserType) => u.role === "admin" || u.role === "super_admin").length,
       active: users.filter((u: UserType) => u.status === "active").length,
       suspended: users.filter((u: UserType) => u.status === "suspended").length,
       pending: users.filter((u: UserType) => u.status === "pending").length,

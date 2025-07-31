@@ -2,7 +2,7 @@ export type NavItem = {
    label: string;
    href: string;
    icon?: React.ReactNode; // Optional icon component
-   roles: Array<"patient" | "coach" | "admin">; // Who can access
+   roles: Array<"patient" | "coach" | "admin" | "super_admin">; // Who can access
 };
 
 export const NAVIGATION: NavItem[] = [
@@ -53,18 +53,18 @@ export const NAVIGATION: NavItem[] = [
       label: "Users",
       href: "/admin/users",
       icon: "👤",
-      roles: ["admin"],
+      roles: ["admin", "super_admin"],
    },
    {
       label: "Products",
       href: "/admin/products",
       icon: "💊",
-      roles: ["admin"],
+      roles: ["admin", "super_admin"],
    },
    {
       label: "Reports",
       href: "/admin/reports",
       icon: "📊",
-      roles: ["admin"],
+      roles: ["admin", "super_admin"],
    },
 ];

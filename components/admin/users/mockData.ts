@@ -2,7 +2,7 @@ export interface User {
    id: string;
    name: string;
    email: string;
-   role: "patient" | "coach" | "admin";
+   role: "patient" | "coach" | "admin" | "super_admin";
    status: "active" | "suspended" | "pending";
    avatar?: string;
    phone?: string;
@@ -210,7 +210,7 @@ export const userStats = {
    total: mockUsers.length,
    patients: mockUsers.filter((u) => u.role === "patient").length,
    coaches: mockUsers.filter((u) => u.role === "coach").length,
-   admins: mockUsers.filter((u) => u.role === "admin").length,
+   admins: mockUsers.filter((u) => u.role === "admin" || u.role === "super_admin").length,
    active: mockUsers.filter((u) => u.status === "active").length,
    suspended: mockUsers.filter((u) => u.status === "suspended").length,
    pending: mockUsers.filter((u) => u.status === "pending").length,

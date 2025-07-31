@@ -8,7 +8,7 @@ const functionName = "products";
 const app = new Hono().basePath(`/${functionName}`);
 
 // Routes
-app.use("/get-all", checkRole(["admin", "coach"]), getAllProducts);
-app.use("/create", checkRole(["admin"]), createProduct);
+app.use("/get-all", checkRole(["admin", "super_admin", "coach"]), getAllProducts);
+app.use("/create", checkRole(["admin", "super_admin"]), createProduct);
 
 Deno.serve(withCors(app));
