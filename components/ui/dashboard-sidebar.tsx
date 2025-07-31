@@ -1,12 +1,12 @@
 "use client";
 import {
-   Sidebar,
-   SidebarContent,
-   SidebarFooter,
-   SidebarHeader,
-   SidebarMenu,
-   SidebarMenuButton,
-   SidebarMenuItem
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem
 } from "@/components/ui/sidebar";
 import getSidebarItemsByRole from "@/lib/config/sidebar.config";
 import { useAuthStore } from "@/store/useAuthStore";
