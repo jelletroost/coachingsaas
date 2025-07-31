@@ -15,16 +15,6 @@ export interface UpdateFeatureFlagRequest {
    enabled: boolean;
 }
 
-const getFeatureFlags = async (userRole: string) => {
-   try {
-      const response = await apiClient.get(`/feature-flags?userRole=${userRole}`);
-      return response.data;
-   } catch (error) {
-      console.error(error);
-      throw error;
-   }
-};
-
 const getAllFeatureFlags = async (userRole: string): Promise<FeatureFlag[]> => {
    try {
       const response = await apiClient.get(`/feature-flags/get-all-feature-flags?userRole=${userRole}`);
@@ -45,5 +35,16 @@ const updateFeatureFlag = async (userRole: string, data: UpdateFeatureFlagReques
    }
 };
 
-export { getAllFeatureFlags, getFeatureFlags, updateFeatureFlag };
-export default getFeatureFlags;
+// get feature access
+const getFeatureAccess = async (userRole: string) => {
+   try {
+      const response = await apiClient.get(`/feature-flags/get-feature-access?userRole=${userRole}`);
+      return response.data;
+   } catch (error) {
+      console.error(error);
+      throw error;
+   }
+};
+
+export { getAllFeatureFlags, getFeatureAccess, updateFeatureFlag };
+export default getAllFeatureFlags;

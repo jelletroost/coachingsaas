@@ -1,4 +1,4 @@
-import { getAllFeatureFlags, updateFeatureFlag, type FeatureFlag, type UpdateFeatureFlagRequest } from "@/services/feature_flag_services";
+import { getAllFeatureFlags, getFeatureAccess, updateFeatureFlag, type FeatureFlag, type UpdateFeatureFlagRequest } from "@/services/feature_flag_services";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
@@ -72,3 +72,18 @@ export const useFeatureFlag = (flagName: string) => {
       flag,
    };
 }; 
+
+// get feature access
+export const useFeatureAccess = ({userRole}: {userRole: string}) => {
+
+   const { data: featureAccess, isLoading, error } = useQuery({
+      queryKey: ["feature-access", userRole],
+      queryFn: () => getFeatureAccess(userRole),
+   });
+
+   return {
+      featureAccess,
+      isLoading,
+      error,
+   };
+};

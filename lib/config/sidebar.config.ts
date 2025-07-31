@@ -1,3 +1,4 @@
+import { useFeatureAccess } from "@/hooks/useFeatureFlags";
 import {
    Calendar,
    CreditCard,
@@ -43,13 +44,69 @@ export const getIconComponent = (iconName: string) => {
    return iconMap[iconName];
 };
 
-// Note: To add feature flag protection to sidebar items, you would:
-// 1. Add featureFlag property to SidebarItem type (done above)
-// 2. Import useFeatureFlag hook in this file
-// 3. Filter menu items based on feature flag status
-// 4. Example: items.filter(item => !item.featureFlag || useFeatureFlag(item.featureFlag).isEnabled)
+const coachSidebarItems = [
+   {
+      label: "Overview",
+      href: "/coach/overview",
+      icon: getIconComponent("HomeIcon"),
+      featureFlag: "see_overview",
+   },
+   {
+      label: "Patients",
+      href: "/coach/patients",
+      icon: getIconComponent("UserCheck"),
+      featureFlag: "see_patients",
+   },
+   {
+      label: "Products",
+      href: "/coach/products",
+      icon: getIconComponent("Package"),
+      featureFlag: "see_products",
+   },
+   {
+      label: "Messages",
+      href: "/coach/messages",
+      icon: getIconComponent("MessageSquare"),
+      featureFlag: "see_messages",
+   },
+   {
+      label: "Orders",
+      href: "/coach/orders",
+      icon: getIconComponent("ShoppingCart"),
+      featureFlag: "see_orders",
+   },
+   {
+      label: "Settings",
+      href: "/coach/settings",
+      icon: getIconComponent("Settings"),
+      featureFlag: "see_settings",
+   },
+];
+
+// Helper function to filter items based on enabled features
+const filterItemsByFeatures = (items: SidebarItem[], enabledFeatures: string[]): SidebarItem[] => {
+   return items.filter((item) => {
+      // If no feature flag is specified, show the item
+      if (!item.featureFlag) {
+         return true;
+      }
+      // Check if the feature flag is enabled
+      return enabledFeatures.includes(item.featureFlag);
+   });
+};
 
 const getSidebarItemsByRole = (role: string): SidebarItem[] => {
+   const { featureAccess, isLoading } = useFeatureAccess({userRole: role});
+   
+   // If still loading, return empty array or show loading state
+   if (isLoading) {
+      return [];
+   }
+
+   // Get enabled features from the API response
+   const enabledFeatures = featureAccess?.enabledFeatures || [];
+   console.log(`Enabled features for ${role}:`, enabledFeatures);
+
    switch (role) {
       case "admin":
          return [
@@ -144,45 +201,10 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
             // },
          ];
       case "coach":
-         return [
-            {
-               label: "Overview",
-               href: "/coach/overview",
-               icon: getIconComponent("HomeIcon"),
-            },
-            {
-               label: "Patients",
-               href: "/coach/patients",
-               icon: getIconComponent("UserCheck"),
-            },
-            {
-               label: "Products",
-               href: "/coach/products",
-               icon: getIconComponent("Package"),
-            },
-            // {
-            //    label: "Orders",
-            //    href: "/coach/orders",
-            //    icon: getIconComponent("ShoppingCart"),
-            // },
-            // {
-            //    label: "Intakes",
-            //    href: "/coach/intakes",
-            //    icon: getIconComponent("NotepadText"),
-            // },
-            {
-               label: "Messages",
-               href: "/coach/messages",
-               icon: getIconComponent("MessageSquare"),
-            },
-            {
-               label: "Settings",
-               href: "/coach/settings",
-               icon: getIconComponent("Settings"),
-            },
-         ];
-      case "patient":
-         return [
+         // Filter coach sidebar items based on enabled features
+         return filterItemsByFeatures(coachSidebarItems, enabledFeatures);
+      case "patient": {
+         const patientItems = [
             // {
             //    label: "Dashboard",
             //    href: "/dashboard",
@@ -193,7 +215,6 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
                href: "/dashboard/intake-history",
                icon: getIconComponent("NotepadText"),
             },
-
             {
                label: "Coach Contact",
                href: "/dashboard/coach-contact",
@@ -216,6 +237,10 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
                icon: getIconComponent("User"),
             },
          ];
+         
+         // Filter patient sidebar items based on enabled features
+         return filterItemsByFeatures(patientItems, enabledFeatures);
+      }
       default:
          return [];
    }

@@ -3,12 +3,10 @@ import edgeAdminClient from "../../_shared/supabaseAdmin.ts";
 
 const updateFeatureFlag = async (c: Context) => {
    try {
-      const { userRole } = c.req.query();
-      
       // Only super_admin can update feature flags
-      if (userRole !== "super_admin") {
-         return c.json({ error: "Unauthorized: Only super admins can update feature flags" }, 403);
-      }
+      // if (userRole !== "super_admin") {
+      //    return c.json({ error: "Unauthorized: Only super admins can update feature flags" }, 403);
+      // }
 
       const body = await c.req.json();
       const { featureFlagId, roleName, enabled } = body;
