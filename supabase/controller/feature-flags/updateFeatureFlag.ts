@@ -11,10 +11,10 @@ const updateFeatureFlag = async (c: Context) => {
       }
 
       const body = await c.req.json();
-      const { featureFlagId, roleId, enabled } = body;
+      const { featureFlagId, roleName, enabled } = body;
 
-      if (!featureFlagId || !roleId || typeof enabled !== 'boolean') {
-         return c.json({ error: "Missing required fields: featureFlagId, roleId, enabled" }, 400);
+      if (!featureFlagId || !roleName || typeof enabled !== 'boolean') {
+         return c.json({ error: "Missing required fields: featureFlagId, roleName, enabled" }, 400);
       }
 
       // Get environment ID (using staging as default)
@@ -27,6 +27,19 @@ const updateFeatureFlag = async (c: Context) => {
       if (envError) {
          return c.json({ error: "Environment not found" }, 404);
       }
+
+      // Get role ID from role name
+      const { data: roleData, error: roleError } = await edgeAdminClient
+         .from("user_roles")
+         .select("id")
+         .eq("name", roleName)
+         .single();
+
+      if (roleError) {
+         return c.json({ error: "Role not found" }, 404);
+      }
+
+      const roleId = roleData.id;
 
       // Check if feature flag access record exists
       const { data: existingAccess, error: checkError } = await edgeAdminClient

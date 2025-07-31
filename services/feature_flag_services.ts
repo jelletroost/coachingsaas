@@ -11,7 +11,7 @@ export interface FeatureFlag {
 
 export interface UpdateFeatureFlagRequest {
    featureFlagId: string;
-   roleId: string;
+   roleName: string;
    enabled: boolean;
 }
 

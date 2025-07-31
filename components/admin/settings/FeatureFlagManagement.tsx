@@ -40,16 +40,16 @@ export function FeatureFlagManagement() {
 
    const handleToggleFlag = async (
       featureFlagId: string,
-      roleId: string,
+      roleName: string,
       enabled: boolean
    ) => {
-      const flagKey = `${featureFlagId}-${roleId}`;
+      const flagKey = `${featureFlagId}-${roleName}`;
       setUpdatingFlags(prev => new Set(prev).add(flagKey));
 
       try {
          await updateFeatureFlag({
             featureFlagId,
-            roleId,
+            roleName,
             enabled,
          });
       } finally {

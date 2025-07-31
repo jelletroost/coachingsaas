@@ -19,6 +19,7 @@ export type SidebarItem = {
    label: string;
    href: string;
    icon?: string | React.ComponentType;
+   featureFlag?: string; // Optional feature flag to protect this menu item
 };
 
 // Map icon names to Lucide components
@@ -41,6 +42,12 @@ export const getIconComponent = (iconName: string) => {
    };
    return iconMap[iconName];
 };
+
+// Note: To add feature flag protection to sidebar items, you would:
+// 1. Add featureFlag property to SidebarItem type (done above)
+// 2. Import useFeatureFlag hook in this file
+// 3. Filter menu items based on feature flag status
+// 4. Example: items.filter(item => !item.featureFlag || useFeatureFlag(item.featureFlag).isEnabled)
 
 const getSidebarItemsByRole = (role: string): SidebarItem[] => {
    switch (role) {
@@ -113,6 +120,7 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
                label: "Subscriptions",
                href: "/admin/subscriptions",
                icon: getIconComponent("CreditCard"),
+               featureFlag: "subscription_tiers", // Protected by feature flag
             },
             // {
             //    label: "Intake Management",
@@ -190,6 +198,7 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
                label: "Coach Contact",
                href: "/dashboard/coach-contact",
                icon: getIconComponent("MessageSquare"),
+               featureFlag: "patient_messaging", // Protected by feature flag
             },
             // {
             //    label: "Orders",
