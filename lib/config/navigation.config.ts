@@ -67,4 +67,12 @@ export const NAVIGATION: NavItem[] = [
       icon: "📊",
       roles: ["admin", "super_admin"],
    },
+   
+   // Super Admin-specific
+   {
+      label: "Feature Flags",
+      href: "/admin/feature-flags",
+      icon: "🚩",
+      roles: ["super_admin"],
+   },
 ];

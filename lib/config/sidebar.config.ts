@@ -2,6 +2,7 @@ import {
    Calendar,
    CreditCard,
    FileText,
+   Flag,
    HomeIcon,
    MessageSquare,
    NotepadText,
@@ -36,6 +37,7 @@ export const getIconComponent = (iconName: string) => {
       Settings,
       CreditCard,
       Target,
+      Flag,
    };
    return iconMap[iconName];
 };
@@ -121,6 +123,11 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
                label: "Settings",
                href: "/admin/settings",
                icon: getIconComponent("Settings"),
+            },
+            {
+               label: "Feature Flags",
+               href: "/admin/feature-flags",
+               icon: getIconComponent("Flag"),
             },
             // {
             //    label: "CMS",
