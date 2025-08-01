@@ -1,5 +1,6 @@
 const allowedOrigins = [
    "https://dev.coachingsaas.nl", 
+   "https://staging.coachingsaas.nl",
    "https://www.coachingsaas.nl", 
    "http://localhost:3000"
  ];
