@@ -1,196 +1,199 @@
-# Admin Settings Components
+# Feature Flag Management System
 
-This directory contains the components for the admin settings dashboard.
+This system allows super administrators to control feature access for different user roles in the application.
+
+## Overview
+
+The feature flag system provides:
+- **Role-based access control**: Enable/disable features for specific user roles (admin, coach, patient)
+- **Super admin only access**: Only users with `super_admin` role can manage feature flags
+- **Real-time updates**: Changes are immediately reflected across the application
+- **Caching**: Uses TanStack Query for efficient data caching and updates
 
 ## Components
 
-### AdminSettings
+### FeatureFlagManagement
+The main component for managing feature flags. Only accessible to super admins.
 
-The main settings dashboard component that orchestrates all settings functionality.
+**Location**: `components/admin/settings/FeatureFlagManagement.tsx`
 
-**Features:**
+**Features**:
+- View all feature flags with their current status for each role
+- Toggle feature access for specific roles
+- Real-time updates with loading states
+- Error handling and retry functionality
 
--  Overview cards showing system status, security, notifications, and integrations
--  Tabbed interface for different setting categories
--  Global save functionality
--  Real-time settings preview
+### FeatureFlag (Utility Component)
+A utility component for conditionally rendering content based on feature flags.
 
-### SystemSettings
+**Location**: `components/shared/FeatureFlag.tsx`
 
-Manages general system configuration and site information.
-
-**Settings:**
-
--  Site name and description
--  Contact information
--  Timezone and regional settings
--  Date format and currency
--  Maintenance mode toggle
--  Registration and email verification settings
-
-### SecuritySettings
-
-Handles security and authentication configuration.
-
-**Settings:**
-
--  Two-factor authentication
--  Session timeout management
--  Password policy configuration
--  Login attempt limits
--  IP whitelist management
--  Allowed domains configuration
-
-### NotificationSettings
-
-Manages notification preferences and delivery methods.
-
-**Settings:**
-
--  Email notification preferences
--  SMS notification settings
--  Push notification configuration
--  Automated report scheduling
--  Alert type management
-
-### IntegrationSettings
-
-Configures third-party service integrations.
-
-**Settings:**
-
--  Stripe payment integration
--  Email provider configuration (SendGrid, Mailgun, SMTP)
--  SMS provider setup (Twilio, AWS SNS)
--  API key management
--  Integration testing
-
-## Data Structure
-
-### SystemSettings Interface
-
-```typescript
-interface SystemSettings {
-   siteName: string;
-   siteDescription: string;
-   contactEmail: string;
-   supportPhone: string;
-   timezone: string;
-   dateFormat: string;
-   currency: string;
-   maintenanceMode: boolean;
-   allowRegistration: boolean;
-   requireEmailVerification: boolean;
-}
-```
-
-### SecuritySettings Interface
-
-```typescript
-interface SecuritySettings {
-   twoFactorAuth: boolean;
-   sessionTimeout: number;
-   passwordMinLength: number;
-   requireSpecialChars: boolean;
-   maxLoginAttempts: number;
-   lockoutDuration: number;
-   ipWhitelist: string[];
-   allowedDomains: string[];
-}
-```
-
-### NotificationSettings Interface
-
-```typescript
-interface NotificationSettings {
-   emailNotifications: boolean;
-   smsNotifications: boolean;
-   pushNotifications: boolean;
-   newUserAlerts: boolean;
-   paymentAlerts: boolean;
-   systemAlerts: boolean;
-   marketingEmails: boolean;
-   weeklyReports: boolean;
-   monthlyReports: boolean;
-}
-```
-
-### IntegrationSettings Interface
-
-```typescript
-interface IntegrationSettings {
-   stripeEnabled: boolean;
-   stripePublishableKey: string;
-   stripeSecretKey: string;
-   emailProvider: "sendgrid" | "mailgun" | "smtp";
-   emailApiKey: string;
-   emailFromAddress: string;
-   smsProvider: "twilio" | "aws-sns";
-   smsApiKey: string;
-   smsFromNumber: string;
-}
-```
-
-## Usage
-
+**Usage**:
 ```tsx
-import { AdminSettings } from "@/components/admin/settings";
+import { FeatureFlag } from "@/components/shared/FeatureFlag";
 
-export default function AdminSettingsPage() {
-   return <AdminSettings />;
+<FeatureFlag flag="advanced_analytics" fallback={<p>Feature not available</p>}>
+   <AdvancedAnalyticsDashboard />
+</FeatureFlag>
+```
+
+### useFeatureFlags Hook
+Custom hook for managing feature flags with TanStack Query.
+
+**Location**: `hooks/useFeatureFlags.ts`
+
+**Features**:
+- Fetch all feature flags (super admin only)
+- Update feature flag status
+- Automatic cache invalidation
+- Loading and error states
+
+### useFeatureFlag Hook
+Utility hook for checking if a specific feature is enabled for the current user.
+
+**Location**: `hooks/useFeatureFlags.ts`
+
+**Usage**:
+```tsx
+import { useFeatureFlag } from "@/hooks/useFeatureFlags";
+
+const { isEnabled } = useFeatureFlag("advanced_analytics");
+```
+
+## API Endpoints
+
+### Get Feature Flags (Role-based)
+- **Endpoint**: `GET /feature-flags/get-feature-flags?userRole={role}`
+- **Description**: Get feature flags accessible to the specified role
+- **Access**: All authenticated users
+
+### Get All Feature Flags (Super Admin)
+- **Endpoint**: `GET /feature-flags/get-all-feature-flags?userRole=super_admin`
+- **Description**: Get all feature flags with access status for each role
+- **Access**: Super admin only
+
+### Update Feature Flag
+- **Endpoint**: `POST /feature-flags/update-feature-flag?userRole=super_admin`
+- **Body**: `{ featureFlagId: string, roleId: string, enabled: boolean }`
+- **Description**: Update feature flag access for a specific role
+- **Access**: Super admin only
+
+## Database Schema
+
+### feature_flags
+- `id`: UUID (Primary Key)
+- `name`: Text (Feature flag identifier)
+- `description`: Text (Human-readable description)
+- `created_at`: Timestamp
+- `updated_at`: Timestamp
+
+### feature_flag_access
+- `id`: UUID (Primary Key)
+- `feature_flag_id`: UUID (Foreign Key to feature_flags)
+- `user_role_id`: UUID (Foreign Key to user_roles)
+- `environment_id`: UUID (Foreign Key to environments)
+- `enabled`: Boolean (Whether the feature is enabled for this role)
+- `created_at`: Timestamp
+- `updated_at`: Timestamp
+
+## Sample Feature Flags
+
+The system includes several sample feature flags for testing:
+
+1. **advanced_analytics**: Advanced analytics dashboard
+2. **patient_messaging**: Direct messaging between patients and coaches
+3. **prescription_management**: Prescription management system
+4. **subscription_tiers**: Multiple subscription tiers
+5. **mobile_app**: Mobile app features
+6. **ai_coaching**: AI-powered coaching recommendations
+7. **video_consultations**: Video consultation scheduling
+8. **health_tracking**: Health metrics tracking
+
+## Usage Examples
+
+### Protecting a Feature
+```tsx
+import { FeatureFlag } from "@/components/shared/FeatureFlag";
+
+function CoachDashboard() {
+   return (
+      <div>
+         <h1>Coach Dashboard</h1>
+         
+         <FeatureFlag flag="advanced_analytics">
+            <AdvancedAnalytics />
+         </FeatureFlag>
+         
+         <FeatureFlag flag="prescription_management">
+            <PrescriptionManager />
+         </FeatureFlag>
+      </div>
+   );
 }
 ```
 
-## Features
+### Conditional Rendering with Hook
+```tsx
+import { useFeatureFlag } from "@/hooks/useFeatureFlags";
 
-### Overview Dashboard
+function Navigation() {
+   const isMessagingEnabled = useFeatureFlag("patient_messaging");
+   
+   return (
+      <nav>
+         <a href="/dashboard">Dashboard</a>
+         {isMessagingEnabled && <a href="/messages">Messages</a>}
+      </nav>
+   );
+}
+```
 
--  Real-time status indicators for all major systems
--  Quick access to critical settings
--  Visual feedback on configuration status
+### Checking Feature Status in Logic
+```tsx
+import { useFeatureFlag } from "@/hooks/useFeatureFlags";
 
-### Tabbed Interface
-
--  Organized settings by category
--  Clean, intuitive navigation
--  Responsive design for all screen sizes
-
-### Form Validation
-
--  Input validation for all fields
--  Error handling and user feedback
--  Secure handling of sensitive data
-
-### Integration Testing
-
--  Test buttons for all integrations
--  Connection status indicators
--  Error reporting for failed connections
+function handleAction() {
+   const { isEnabled } = useFeatureFlag("ai_coaching");
+   
+   if (isEnabled) {
+      // Execute AI coaching logic
+      executeAICoaching();
+   } else {
+      // Fallback to manual coaching
+      executeManualCoaching();
+   }
+}
+```
 
 ## Security Considerations
 
--  API keys are masked in password fields
--  Sensitive data is not logged or stored in plain text
--  All form submissions are validated
--  CSRF protection for all settings updates
+1. **Role-based access**: Only super admins can modify feature flags
+2. **Environment isolation**: Feature flags are environment-specific
+3. **Audit trail**: All changes are timestamped
+4. **Validation**: Input validation on all API endpoints
 
-## Mock Data
+## Best Practices
 
-The components use mock data for demonstration purposes. In a real application, you would:
+1. **Use descriptive names**: Feature flag names should clearly indicate their purpose
+2. **Provide fallbacks**: Always provide fallback content when using FeatureFlag component
+3. **Test thoroughly**: Test both enabled and disabled states
+4. **Monitor usage**: Track which features are most commonly used
+5. **Clean up**: Remove feature flags once features are fully rolled out
 
-1. Replace mock data with API calls to your backend
-2. Implement proper error handling and loading states
-3. Add real-time validation
-4. Implement proper security measures
-5. Add audit logging for settings changes
-6. Implement role-based access control
+## Troubleshooting
 
-## Styling
+### Feature Flag Not Working
+1. Check if the user has the correct role
+2. Verify the feature flag name is correct
+3. Ensure the feature flag is enabled for the user's role
+4. Check the browser console for any errors
 
-All components use Tailwind CSS classes and follow the existing design system with:
+### Super Admin Cannot Access Management
+1. Verify the user has `super_admin` role
+2. Check if the user is properly authenticated
+3. Ensure the API endpoints are accessible
 
--  Consistent color schemes and spacing
--  Responsive design patterns
--  Accessible form controls
--  Modern UI components
--  Clear visual hierarchy
+### Changes Not Reflecting
+1. Check if TanStack Query cache needs invalidation
+2. Verify the API call was successful
+3. Check browser network tab for errors

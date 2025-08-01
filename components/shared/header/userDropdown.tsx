@@ -46,7 +46,7 @@ const UserDropdown = ({isUserDropdownOpen,setIsUserDropdownOpen,user,
             </div>
             <Link
                href={`${
-                  user?.role === "admin"
+                  user?.role === "admin" || user?.role === "super_admin"
                      ? "/admin/overview"
                      : user?.role === "coach"
                      ? "/coach/overview"

@@ -1,27 +1,26 @@
 "use client";
- 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+   DropdownMenu,
+   DropdownMenuContent,
+   DropdownMenuItem,
+   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
-    Calendar,
-    Eye,
-    Mail,
-    MoreHorizontal,
-    Phone,
-    Search,
-    Shield,
-    UserCheck,
-    UserPlus,
-    UserX,
+   Calendar,
+   Eye,
+   Mail,
+   MoreHorizontal,
+   Phone,
+   Search,
+   Shield,
+   UserCheck,
+   UserPlus,
+   UserX,
 } from "lucide-react";
 import { useState } from "react";
 import { User } from "./types";
@@ -36,21 +35,22 @@ interface UserTableProps {
 }
 
 const getRoleBadge = (role: User["role"]) => {
-   const variants = {
+   const variants: Record<User["role"], string> = {
       patient: "bg-blue-100 text-blue-800",
       coach: "bg-green-100 text-green-800",
       admin: "bg-purple-100 text-purple-800",
+      super_admin: "bg-red-100 text-red-800",
    };
 
    return (
       <Badge className={variants[role]}>
-         {role.charAt(0).toUpperCase() + role.slice(1)}
+         {role === "super_admin" ? "Super Admin" : role.charAt(0).toUpperCase() + role.slice(1)}
       </Badge>
    );
 };
 
 const getStatusBadge = (status: User["status"]) => {
-   const variants = {
+   const variants: Record<User["status"], string> = {
       active: "bg-green-100 text-green-800",
       suspended: "bg-red-100 text-red-800",
       pending: "bg-yellow-100 text-yellow-800",

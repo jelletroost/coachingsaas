@@ -10,7 +10,7 @@ const getPatientsByCoach = async (c: Context) => {
          first_name,
          last_name,
          email,
-         role,
+         role:user_roles(name),
          created_at,
          updated_at
       )

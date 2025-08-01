@@ -14,7 +14,7 @@ import { useState } from "react";
 
 const userRole: string = "patient";
 const profileUrl: string =
-   userRole === "admin"
+   userRole === "admin" || userRole === "super_admin"
       ? "/admin/profile"
       : userRole === "coach"
       ? "/coach/profile"
