@@ -15,6 +15,17 @@ export interface UpdateFeatureFlagRequest {
    enabled: boolean;
 }
 
+// New interface for the updated feature access response
+export interface FeatureAccessItem {
+   feature_name: string;
+   staging_allowed: boolean;
+   production_allowed: boolean;
+}
+
+export interface FeatureAccessResponse {
+   featureAccess: FeatureAccessItem[];
+}
+
 const getAllFeatureFlags = async (userRole: string): Promise<FeatureFlag[]> => {
    try {
       const response = await apiClient.get(`/feature-flags/get-all-feature-flags?userRole=${userRole}`);
@@ -36,7 +47,7 @@ const updateFeatureFlag = async (userRole: string, data: UpdateFeatureFlagReques
 };
 
 // get feature access
-const getFeatureAccess = async (userRole: string) => {
+const getFeatureAccess = async (userRole: string): Promise<FeatureAccessResponse> => {
    try {
       const response = await apiClient.get(`/feature-flags/get-feature-access?userRole=${userRole}`);
       return response.data;

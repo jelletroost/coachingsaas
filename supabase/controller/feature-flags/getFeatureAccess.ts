@@ -24,43 +24,21 @@ const getFeatureAccess = async (c: Context) => {
          return c.json({ error: "Role not found" }, 404);
       }
 
-      // Get the environment ID
-      const { data: envData, error: envError } = await edgeAdminClient
-         .from("environments")
-         .select("id")
-         .eq("name", APP_ENV)
-         .single();
-
-      if (envError) {
-         return c.json({ error: "Environment not found" }, 404);
-      }
-
       // Get all enabled feature names for the role in the environment
-      const { data: enabledFeatures, error: accessError } = await edgeAdminClient
-         .from("feature_flags")
+      const { data: featureAccess, error: accessError } = await edgeAdminClient
+         .from("feature_access")
          .select(`
-            name,
-            feature_flag_access!inner(
-               enabled
-            )
+            feature_name,
+            staging_allowed,
+            production_allowed
          `)
-         .eq("feature_flag_access.user_role_id", roleData.id)
-         .eq("feature_flag_access.environment_id", envData.id)
-         .eq("feature_flag_access.enabled", true);
+         .eq("user_role_id", roleData.id);
 
       if (accessError) {
          return c.json({ error: accessError.message }, 500);
       }
-
-      // Extract feature names from the result
-      const featureNames = enabledFeatures?.map(feature => feature.name) || [];
-
       return c.json({
-         userRole,
-         environment: APP_ENV,
-         enabledFeatures: featureNames,
-         count: featureNames.length,
-         message: `Found ${featureNames.length} enabled features for role '${userRole}'`
+         featureAccess,
       });
 
    } catch (error) {

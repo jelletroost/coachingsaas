@@ -81,9 +81,43 @@ export const useFeatureAccess = ({userRole}: {userRole: string}) => {
       queryFn: () => getFeatureAccess(userRole),
    });
 
+   // Helper function to check if a feature is enabled based on environment
+   const isFeatureEnabled = (featureName: string): boolean => {
+      if (!featureAccess?.featureAccess) return false;
+      
+      const feature = featureAccess.featureAccess.find(f => f.feature_name === featureName);
+      if (!feature) return false;
+
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
+      
+      // Check if it's staging or dev environment
+      if (siteUrl.includes('https://staging.coachingsaas.nl') || siteUrl.includes('https://dev.coachingsaas.nl')) {
+         return feature.staging_allowed;
+      }
+      
+      // Check if it's production environment
+      if (siteUrl.includes('https://coachingsaas.nl')) {
+         return feature.production_allowed;
+      }
+      
+      // Default to false for unknown environments
+      return false;
+   };
+
+   // Get enabled features based on environment
+   const getEnabledFeatures = (): string[] => {
+      if (!featureAccess?.featureAccess) return [];
+      
+      return featureAccess.featureAccess
+         .filter(feature => isFeatureEnabled(feature.feature_name))
+         .map(feature => feature.feature_name);
+   };
+
    return {
       featureAccess,
       isLoading,
       error,
+      isFeatureEnabled,
+      getEnabledFeatures,
    };
 };
