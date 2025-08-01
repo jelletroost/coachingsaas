@@ -82,7 +82,59 @@ const coachSidebarItems = [
       featureFlag: "coach_settings",
    },
 ];
-
+const adminSidebarItems = [
+   {
+      label: "Overview",
+      href: "/admin/overview",
+      icon: getIconComponent("HomeIcon"),
+   },
+   {
+      label: "Users",
+      href: "/admin/users",
+      icon: getIconComponent("Users"),
+   },
+   {
+      label: "Products",
+      href: "/admin/products",
+      icon: getIconComponent("Package"),
+   },
+   {
+      label: "Subscriptions",
+      href: "/admin/subscriptions",
+      icon: getIconComponent("CreditCard"),
+   },
+   {
+      label: "Settings",
+      href: "/admin/settings",
+      icon: getIconComponent("Settings"),
+   },
+];
+const superAdminSidebarItems = [
+   ...adminSidebarItems,
+   {
+      label: "Feature Flags",
+      href: "/admin/feature-flags",
+      icon: getIconComponent("Flag"),
+   },
+];
+const patientSidebarItems = [
+   {
+      label: "Intake History",
+      href: "/dashboard/intake-history",
+      icon: getIconComponent("NotepadText"),
+   },
+   {
+      label: "Coach Contact",
+      href: "/dashboard/coach-contact",
+      icon: getIconComponent("MessageSquare"),
+      featureFlag: "patient_messaging", // Protected by feature flag
+   },
+   {
+      label: "Profile",
+      href: "/dashboard/profile",
+      icon: getIconComponent("User"),
+   },
+];
 const filterItemsByFeatures = (items: SidebarItem[], isFeatureEnabled: (featureName: string) => boolean): SidebarItem[] => {
    return items.filter((item) => {
       if (!item.featureFlag) {
@@ -100,95 +152,10 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
    }
 
    switch (role) {
-      case "admin":
-         return [
-            {
-               label: "Overview",
-               href: "/admin/overview",
-               icon: getIconComponent("HomeIcon"),
-            },
-            {
-               label: "Users",
-               href: "/admin/users",
-               icon: getIconComponent("Users"),
-            },
-            {
-               label: "Products",
-               href: "/admin/products",
-               icon: getIconComponent("Package"),
-            },
-            {
-               label: "Subscriptions",
-               href: "/admin/subscriptions",
-               icon: getIconComponent("CreditCard"),
-            },
-            {
-               label: "Settings",
-               href: "/admin/settings",
-               icon: getIconComponent("Settings"),
-            },
-         ];
-      case "super_admin": {
-         const superAdminItems = [
-            {
-               label: "Overview",
-               href: "/admin/overview",
-               icon: getIconComponent("HomeIcon"),
-            },
-            {
-               label: "Users",
-               href: "/admin/users",
-               icon: getIconComponent("Users"),
-            },
-            {
-               label: "Products",
-               href: "/admin/products",
-               icon: getIconComponent("Package"),
-            },
-            {
-               label: "Subscriptions",
-               href: "/admin/subscriptions",
-               icon: getIconComponent("CreditCard"),
-               featureFlag: "subscription_tiers",
-            },
-            {
-               label: "Settings",
-               href: "/admin/settings",
-               icon: getIconComponent("Settings"),
-            },
-            {
-               label: "Feature Flags",
-               href: "/admin/feature-flags",
-               icon: getIconComponent("Flag"),
-            },
-         ];
-         
-         return filterItemsByFeatures(superAdminItems, isFeatureEnabled);
-      }
-      case "coach":
-         return filterItemsByFeatures(coachSidebarItems, isFeatureEnabled);
-      case "patient": {
-         const patientItems = [
-            {
-               label: "Intake History",
-               href: "/dashboard/intake-history",
-               icon: getIconComponent("NotepadText"),
-            },
-            {
-               label: "Coach Contact",
-               href: "/dashboard/coach-contact",
-               icon: getIconComponent("MessageSquare"),
-               featureFlag: "patient_messaging", // Protected by feature flag
-            },
-            {
-               label: "Profile",
-               href: "/dashboard/profile",
-               icon: getIconComponent("User"),
-            },
-         ];
-         
-         return filterItemsByFeatures(patientItems, isFeatureEnabled);
-      }
+      case "admin": return filterItemsByFeatures(adminSidebarItems, isFeatureEnabled);
+      case "super_admin": return superAdminSidebarItems;  
+      case "coach": return filterItemsByFeatures(coachSidebarItems, isFeatureEnabled);
+      case "patient": return filterItemsByFeatures(patientSidebarItems, isFeatureEnabled);
       default:
          return [];
    }
