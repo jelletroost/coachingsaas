@@ -13,10 +13,6 @@ const getFeatureAccess = async (c: Context) => {
    }
 
    try {
-      // If getting all features, only super_admin is allowed
-      if (shouldGetAll && userRole !== "super_admin") {
-         return c.json({ error: "Unauthorized: Only super admins can access all feature access" }, 403);
-      }
 
       if (shouldGetAll) {
          // Get all feature access with role information
