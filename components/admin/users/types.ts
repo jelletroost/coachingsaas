@@ -2,7 +2,7 @@ export interface User {
    id: string;
    name: string;
    email: string;
-   role: "patient" | "coach" | "admin";
+   role: "patient" | "coach" | "admin" | "super_admin";
    status: "active" | "suspended" | "pending";
    avatar?: string;
    phone?: string;

@@ -22,11 +22,13 @@ export const checkRole = (allowedRoles: string[]) => {
 
       const { data, error: roleError } = await edgeAdminClient
          .from("users")
-         .select("role")
+         .select(`
+            role:user_roles(name)
+         `)
          .eq("id", user.id)
          .single();
 
-      if (roleError || !allowedRoles.includes(data?.role)) {
+      if (roleError || !allowedRoles.includes(data?.role?.name)) {
          return c.json({ message: "Unauthorized" }, 401);
       }
 

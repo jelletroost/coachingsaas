@@ -11,7 +11,7 @@ interface UserTabsProps {
 export function UserTabs({ users, children }: UserTabsProps) {
    const patients = users.filter((user) => user.role === "patient");
    const coaches = users.filter((user) => user.role === "coach");
-   const admins = users.filter((user) => user.role === "admin");
+   const admins = users.filter((user) => user.role === "admin" || user.role === "super_admin");
 
    return (
       <Tabs defaultValue="all" className="w-full">

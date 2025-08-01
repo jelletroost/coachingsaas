@@ -1,7 +1,9 @@
+import { useFeatureAccess } from "@/hooks/useFeatureFlags";
 import {
    Calendar,
    CreditCard,
    FileText,
+   Flag,
    HomeIcon,
    MessageSquare,
    NotepadText,
@@ -18,6 +20,7 @@ export type SidebarItem = {
    label: string;
    href: string;
    icon?: string | React.ComponentType;
+   featureFlag?: string; // Optional feature flag to protect this menu item
 };
 
 // Map icon names to Lucide components
@@ -36,11 +39,66 @@ export const getIconComponent = (iconName: string) => {
       Settings,
       CreditCard,
       Target,
+      Flag,
    };
    return iconMap[iconName];
 };
 
+const coachSidebarItems = [
+   {
+      label: "Overview",
+      href: "/coach/overview",
+      icon: getIconComponent("HomeIcon"),
+      featureFlag: "coach_overview",
+   },
+   {
+      label: "Patients",
+      href: "/coach/patients",
+      icon: getIconComponent("UserCheck"),
+      featureFlag: "coach_patients",
+   },
+   {
+      label: "Products",
+      href: "/coach/products",
+      icon: getIconComponent("Package"),
+      featureFlag: "coach_products",
+   },
+   {
+      label: "Messages",
+      href: "/coach/messages",
+      icon: getIconComponent("MessageSquare"),
+      featureFlag: "coach_messages",
+   },
+   {
+      label: "Orders",
+      href: "/coach/orders",
+      icon: getIconComponent("ShoppingCart"),
+      featureFlag: "coach_orders",
+   },
+   {
+      label: "Settings",
+      href: "/coach/settings",
+      icon: getIconComponent("Settings"),
+      featureFlag: "coach_settings",
+   },
+];
+
+const filterItemsByFeatures = (items: SidebarItem[], isFeatureEnabled: (featureName: string) => boolean): SidebarItem[] => {
+   return items.filter((item) => {
+      if (!item.featureFlag) {
+         return true;
+      }
+      return isFeatureEnabled(item.featureFlag);
+   });
+};
+
 const getSidebarItemsByRole = (role: string): SidebarItem[] => {
+   const { isFeatureEnabled, isLoading } = useFeatureAccess({userRole: role});
+   
+   if (isLoading) {
+      return [];
+   }
+
    switch (role) {
       case "admin":
          return [
@@ -59,104 +117,78 @@ const getSidebarItemsByRole = (role: string): SidebarItem[] => {
                href: "/admin/products",
                icon: getIconComponent("Package"),
             },
-            // {
-            //    label: "Orders",
-            //    href: "/admin/orders",
-            //    icon: getIconComponent("ShoppingCart"),
-            // },
             {
                label: "Subscriptions",
                href: "/admin/subscriptions",
                icon: getIconComponent("CreditCard"),
             },
-            // {
-            //    label: "Intake Management",
-            //    href: "/admin/intake-management",
-            //    icon: getIconComponent("NotepadText"),
-            // },
             {
                label: "Settings",
                href: "/admin/settings",
                icon: getIconComponent("Settings"),
             },
-            // {
-            //    label: "CMS",
-            //    href: "/admin/cms",
-            //    icon: getIconComponent("FileText"),
-            // },
          ];
-      case "coach":
-         return [
+      case "super_admin": {
+         const superAdminItems = [
             {
                label: "Overview",
-               href: "/coach/overview",
+               href: "/admin/overview",
                icon: getIconComponent("HomeIcon"),
             },
             {
-               label: "Patients",
-               href: "/coach/patients",
-               icon: getIconComponent("UserCheck"),
+               label: "Users",
+               href: "/admin/users",
+               icon: getIconComponent("Users"),
             },
             {
                label: "Products",
-               href: "/coach/products",
+               href: "/admin/products",
                icon: getIconComponent("Package"),
             },
-            // {
-            //    label: "Orders",
-            //    href: "/coach/orders",
-            //    icon: getIconComponent("ShoppingCart"),
-            // },
-            // {
-            //    label: "Intakes",
-            //    href: "/coach/intakes",
-            //    icon: getIconComponent("NotepadText"),
-            // },
             {
-               label: "Messages",
-               href: "/coach/messages",
-               icon: getIconComponent("MessageSquare"),
+               label: "Subscriptions",
+               href: "/admin/subscriptions",
+               icon: getIconComponent("CreditCard"),
+               featureFlag: "subscription_tiers",
             },
             {
                label: "Settings",
-               href: "/coach/settings",
+               href: "/admin/settings",
                icon: getIconComponent("Settings"),
             },
+            {
+               label: "Feature Flags",
+               href: "/admin/feature-flags",
+               icon: getIconComponent("Flag"),
+            },
          ];
-      case "patient":
-         return [
-            // {
-            //    label: "Dashboard",
-            //    href: "/dashboard",
-            //    icon: getIconComponent("HomeIcon"),
-            // },
+         
+         return filterItemsByFeatures(superAdminItems, isFeatureEnabled);
+      }
+      case "coach":
+         return filterItemsByFeatures(coachSidebarItems, isFeatureEnabled);
+      case "patient": {
+         const patientItems = [
             {
                label: "Intake History",
                href: "/dashboard/intake-history",
                icon: getIconComponent("NotepadText"),
             },
-
             {
                label: "Coach Contact",
                href: "/dashboard/coach-contact",
                icon: getIconComponent("MessageSquare"),
+               featureFlag: "patient_messaging", // Protected by feature flag
             },
-            // {
-            //    label: "Orders",
-            //    href: "/dashboard/orders",
-            //    icon: getIconComponent("ShoppingCart"),
-            // },
-            // {
-            //    label: "Subscriptions",
-            //    href: "/dashboard/subscriptions",
-            //    icon: getIconComponent("CreditCard"),
-            // },
             {
                label: "Profile",
                href: "/dashboard/profile",
                icon: getIconComponent("User"),
             },
          ];
+         
+         return filterItemsByFeatures(patientItems, isFeatureEnabled);
+      }
       default:
          return [];
    }

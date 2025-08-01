@@ -6,7 +6,12 @@ const me = async (c: Context) => {
 
    const { data, error } = await edgeAdminClient
       .from("users")
-      .select("first_name, last_name, email, role")
+      .select(`
+         first_name, 
+         last_name, 
+         email, 
+         role:user_roles(name)
+      `)
       .eq("id", userId);
 
    if (error) {
