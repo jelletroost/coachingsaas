@@ -1,0 +1,13 @@
+import { Hono } from "jsr:@hono/hono";
+import { withCors } from "../../_shared/withCors.ts";
+import getFeatureAccess from "../../controller/feature-flags/getFeatureAccess.ts";
+import updateFeatureAccess from "../../controller/feature-flags/updateFeatureAccess.ts";
+
+const functionName = "feature-flags";
+const app = new Hono().basePath(`/${functionName}`);
+
+// Routes
+app.get("/get-feature-access", getFeatureAccess);
+app.use("/update-feature-access", updateFeatureAccess);
+
+Deno.serve(withCors(app));
