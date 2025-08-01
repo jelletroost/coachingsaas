@@ -68,7 +68,7 @@ export const useFeatureAccess = ({userRole}: {userRole: string}) => {
       }
       
       // Check if it's production environment
-      if (siteUrl.includes('https://coachingsaas.nl')) {
+      if (siteUrl.includes('https://www.coachingsaas.nl')) {
          return feature.production_allowed;
       }
       

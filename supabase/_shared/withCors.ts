@@ -1,8 +1,10 @@
 import type { Hono } from "jsr:@hono/hono";
-import { corsHeaders } from "./cors.ts";
+import { getCorsHeaders } from "./cors.ts";
 
 export function withCors(app: Hono) {
    return (req: Request) => {
+      const corsHeaders = getCorsHeaders(req);
+      
       if (req.method === "OPTIONS") {
          return new Response("ok", { headers: corsHeaders });
       }
