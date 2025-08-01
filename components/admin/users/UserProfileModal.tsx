@@ -1,4 +1,3 @@
- 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,21 +31,22 @@ interface UserProfileModalProps {
 }
 
 const getRoleBadge = (role: User["role"]) => {
-   const variants = {
+   const variants: Record<User["role"], string> = {
       patient: "bg-blue-100 text-blue-800",
       coach: "bg-green-100 text-green-800",
       admin: "bg-purple-100 text-purple-800",
+      super_admin: "bg-red-100 text-red-800",
    };
 
    return (
       <Badge className={variants[role]}>
-         {role.charAt(0).toUpperCase() + role.slice(1)}
+         {role === "super_admin" ? "Super Admin" : role.charAt(0).toUpperCase() + role.slice(1)}
       </Badge>
    );
 };
 
 const getStatusBadge = (status: User["status"]) => {
-   const variants = {
+   const variants: Record<User["status"], string> = {
       active: "bg-green-100 text-green-800",
       suspended: "bg-red-100 text-red-800",
       pending: "bg-yellow-100 text-yellow-800",
@@ -176,7 +176,7 @@ export function UserProfileModal({
                   </div>
                )}
 
-               {user.role === "coach" && user.specializations && (
+               {user.role === "coach" && user.specializations && user.specializations.length > 0 && (
                   <div>
                      <h3 className="font-medium mb-2">Specializations</h3>
                      <div className="flex flex-wrap gap-1">
@@ -189,7 +189,7 @@ export function UserProfileModal({
                   </div>
                )}
 
-               {user.role === "coach" && user.certifications && (
+               {user.role === "coach" && user.certifications && user.certifications.length > 0 && (
                   <div>
                      <h3 className="font-medium mb-2">Certifications</h3>
                      <div className="space-y-1">
