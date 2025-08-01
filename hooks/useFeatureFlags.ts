@@ -1,4 +1,4 @@
-import { getAllFeatureFlags, getFeatureAccess, updateFeatureFlag, type FeatureFlag, type UpdateFeatureFlagRequest } from "@/services/feature_flag_services";
+import { getAllFeatureAccess, getFeatureAccess, updateFeatureAccess, type UpdateFeatureAccessRequest } from "@/services/feature_flag_services";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
@@ -9,73 +9,45 @@ export const useFeatureFlags = () => {
    const queryClient = useQueryClient();
 
    const {
-      data: featureFlags,
+      data: featureAccessByRole,
       isLoading,
       error,
-      refetch
+      refetch: refetchFeatureAccess
    } = useQuery({
-      queryKey: ["feature-flags", userRole],
-      queryFn: () => getAllFeatureFlags(userRole),
+      queryKey: ["feature-access-by-role", userRole],
+      queryFn: () => getAllFeatureAccess(userRole),
       enabled: userRole === "super_admin",
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes
    });
 
-   const updateFeatureFlagMutation = useMutation({
-      mutationFn: (data: UpdateFeatureFlagRequest) => updateFeatureFlag(userRole, data),
+   const updateFeatureAccessMutation = useMutation({
+      mutationFn: (data: UpdateFeatureAccessRequest) => updateFeatureAccess(userRole, data),
       onSuccess: () => {
-         queryClient.invalidateQueries({ queryKey: ["feature-flags"] });
-         toast.success("Feature flag updated successfully");
+         queryClient.invalidateQueries({ queryKey: ["feature-access-by-role"] });
+         toast.success("Feature access updated successfully");
       },
       onError: (error: any) => {
-         console.error("Failed to update feature flag:", error);
-         toast.error(error?.response?.data?.error || "Failed to update feature flag");
+         console.error("Failed to update feature access:", error);
+         toast.error(error?.response?.data?.error || "Failed to update feature access");
       },
    });
 
    const isSuperAdmin = userRole === "super_admin";
 
    return {
-      featureFlags,
+      featureAccessByRole,
       isLoading,
       error,
-      refetch,
-      updateFeatureFlag: updateFeatureFlagMutation.mutate,
-      isUpdating: updateFeatureFlagMutation.isPending,
+      refetchFeatureAccess,
+      updateFeatureAccess: updateFeatureAccessMutation.mutate,
+      isUpdating: updateFeatureAccessMutation.isPending,
       isSuperAdmin,
    };
 };
 
-export const useFeatureFlag = (flagName: string) => {
-   const { user } = useAuthStore();
-   const userRole = user?.user_metadata?.role || "patient";
-
-   const {
-      data: featureFlags,
-      isLoading,
-      error
-   } = useQuery({
-      queryKey: ["feature-flags", userRole],
-      queryFn: () => getAllFeatureFlags(userRole),
-      enabled: userRole === "super_admin",
-      staleTime: 5 * 60 * 1000,
-      gcTime: 10 * 60 * 1000,
-   });
-
-   const flag = featureFlags?.find((f: FeatureFlag) => f.name === flagName);
-   const isEnabled = flag?.accessByRole[userRole]?.enabled ?? false;
-
-   return {
-      isEnabled,
-      isLoading,
-      error,
-      flag,
-   };
-}; 
-
-// get feature access
+// Get feature access for a specific user role
 export const useFeatureAccess = ({userRole}: {userRole: string}) => {
-
    const { data: featureAccess, isLoading, error } = useQuery({
       queryKey: ["feature-access", userRole],
       queryFn: () => getFeatureAccess(userRole),
