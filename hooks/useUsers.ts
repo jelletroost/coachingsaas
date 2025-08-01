@@ -40,7 +40,7 @@ export const transformUserForComponent = (dbUser: UserProfileWithDetails) => {
       id: dbUser.id,
       name: `${dbUser.first_name} ${dbUser.last_name}`,
       email: dbUser.email,
-      role: dbUser.role,
+      role: dbUser.role?.name || "patient",
       status: mapStatus(dbUser.account_status),
       avatar: dbUser.avatar_url,
       phone: dbUser.phone,

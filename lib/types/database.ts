@@ -1,4 +1,4 @@
-export type UserRole = "patient" | "coach" | "admin";
+export type UserRole = "patient" | "coach" | "admin" | "super_admin";
 
 export type CoachSpecialization =
    | "nutrition"
@@ -14,11 +14,21 @@ export type ExperienceLevel = "0-2" | "3-5" | "6-10" | "10+";
 
 export type AccountStatus = "pending" | "active" | "suspended" | "verified";
 
+// User role interface
+export interface UserRoleRecord {
+   id: string;
+   name: UserRole;
+   description: string;
+   created_at: string;
+   updated_at: string;
+}
+
 // Base user profile interface
 export interface UserProfile {
    id: string;
    user_id: string;
-   role: UserRole;
+   role_id: string;
+   role?: UserRoleRecord; // For joins
    first_name: string;
    last_name: string;
    email: string;
@@ -82,6 +92,7 @@ export interface UserSession {
 
 // Extended user profile with related data
 export interface UserProfileWithDetails extends UserProfile {
+   role: UserRoleRecord; // Make role required since we're joining it
    patient_profile?: PatientProfile;
    coach_profile?: CoachProfile;
    patients?: Array<{
@@ -138,6 +149,13 @@ export const TABLES = {
 export interface Database {
    public: {
       Tables: {
+         user_roles: {
+            Row: UserRoleRecord;
+            Insert: Omit<UserRoleRecord, "id" | "created_at" | "updated_at">;
+            Update: Partial<
+               Omit<UserRoleRecord, "id" | "created_at" | "updated_at">
+            >;
+         };
          user_profiles: {
             Row: UserProfile;
             Insert: Omit<UserProfile, "id" | "created_at" | "updated_at">;
@@ -182,7 +200,6 @@ export interface Database {
          };
       };
       Enums: {
-         user_role: UserRole;
          coach_specialization: CoachSpecialization;
          experience_level: ExperienceLevel;
          account_status: AccountStatus;

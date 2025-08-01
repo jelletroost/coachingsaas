@@ -1,0 +1,1 @@
+alter table feature_flags add column enabled boolean not null default true;

@@ -3,22 +3,23 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, Database, Globe, Save, Settings, Shield } from "lucide-react";
+import { Bell, Database, Flag, Globe, Save, Settings, Shield } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { FeatureFlagManagement } from "./FeatureFlagManagement";
 import { IntegrationSettings } from "./IntegrationSettings";
 import { NotificationSettings } from "./NotificationSettings";
 import { SecuritySettings } from "./SecuritySettings";
 import { SystemSettings } from "./SystemSettings";
 import {
-   defaultIntegrationSettings,
-   defaultNotificationSettings,
-   defaultSecuritySettings,
-   defaultSystemSettings,
-   type IntegrationSettings as IntegrationSettingsType,
-   type NotificationSettings as NotificationSettingsType,
-   type SecuritySettings as SecuritySettingsType,
-   type SystemSettings as SystemSettingsType,
+    defaultIntegrationSettings,
+    defaultNotificationSettings,
+    defaultSecuritySettings,
+    defaultSystemSettings,
+    type IntegrationSettings as IntegrationSettingsType,
+    type NotificationSettings as NotificationSettingsType,
+    type SecuritySettings as SecuritySettingsType,
+    type SystemSettings as SystemSettingsType,
 } from "./mockData";
 
 export function AdminSettings() {
@@ -196,7 +197,7 @@ export function AdminSettings() {
 
          {/* Settings Tabs */}
          <Tabs defaultValue="system" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
                <TabsTrigger value="system" className="flex items-center gap-2">
                   <Settings className="h-4 w-4" />
                   System
@@ -218,6 +219,12 @@ export function AdminSettings() {
                   className="flex items-center gap-2">
                   <Database className="h-4 w-4" />
                   Integrations
+               </TabsTrigger>
+               <TabsTrigger
+                  value="feature-flags"
+                  className="flex items-center gap-2">
+                  <Flag className="h-4 w-4" />
+                  Feature Flags
                </TabsTrigger>
             </TabsList>
 
@@ -247,6 +254,10 @@ export function AdminSettings() {
                   settings={integrationSettings}
                   onSettingsChange={handleIntegrationSettingsChange}
                />
+            </TabsContent>
+
+            <TabsContent value="feature-flags" className="space-y-6">
+               <FeatureFlagManagement />
             </TabsContent>
          </Tabs>
       </div>
