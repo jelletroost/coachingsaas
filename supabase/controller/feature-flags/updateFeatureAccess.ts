@@ -3,29 +3,11 @@ import edgeAdminClient from "../../_shared/supabaseAdmin.ts";
 
 const updateFeatureAccess = async (c: Context) => {
    try {
-      const { userRole } = c.req.query();
-      
-      // Only super_admin can update feature access
-      if (userRole !== "super_admin") {
-         return c.json({ error: "Unauthorized: Only super admins can access this endpoint" }, 403);
-      }
-
       const body = await c.req.json();
       const { id, staging_allowed, production_allowed } = body;
 
       if (!id) {
          return c.json({ error: "Missing required parameter: id" }, 400);
-      }
-
-      // Get current feature access to preserve existing values
-      const { data: currentData, error: currentError } = await edgeAdminClient
-         .from("feature_access")
-         .select("staging_allowed, production_allowed")
-         .eq("id", id)
-         .single();
-
-      if (currentError) {
-         return c.json({ error: currentError.message }, 500);
       }
 
       // Update only the specified environment, preserve the other
