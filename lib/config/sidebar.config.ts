@@ -49,37 +49,37 @@ const coachSidebarItems = [
       label: "Overview",
       href: "/coach/overview",
       icon: getIconComponent("HomeIcon"),
-      featureFlag: "coach_overview",
+      // featureFlag: "coach_overview",
    },
    {
       label: "Patients",
       href: "/coach/patients",
       icon: getIconComponent("UserCheck"),
-      featureFlag: "coach_patients",
+      // featureFlag: "coach_patients",
    },
    {
       label: "Products",
       href: "/coach/products",
       icon: getIconComponent("Package"),
-      featureFlag: "coach_products",
+      // featureFlag: "coach_products",
    },
    {
       label: "Messages",
       href: "/coach/messages",
       icon: getIconComponent("MessageSquare"),
-      featureFlag: "coach_messages",
+      // featureFlag: "coach_messages",
    },
    {
       label: "Orders",
       href: "/coach/orders",
       icon: getIconComponent("ShoppingCart"),
-      featureFlag: "coach_orders",
+      // featureFlag: "coach_orders",
    },
    {
       label: "Settings",
       href: "/coach/settings",
       icon: getIconComponent("Settings"),
-      featureFlag: "coach_settings",
+      // featureFlag: "coach_settings",
    },
 ];
 const adminSidebarItems = [
@@ -127,7 +127,7 @@ const patientSidebarItems = [
       label: "Coach Contact",
       href: "/dashboard/coach-contact",
       icon: getIconComponent("MessageSquare"),
-      featureFlag: "patient_messaging", // Protected by feature flag
+      // featureFlag: "patient_messaging",
    },
    {
       label: "Profile",

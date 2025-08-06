@@ -8,7 +8,7 @@ const functionName = "feature-flags";
 const app = new Hono().basePath(`/${functionName}`);
 
 // Routes
-app.get("/get-feature-access", checkRole(["super_admin"]), getFeatureAccess);
+app.get("/get-feature-access", getFeatureAccess);
 app.post("/update-feature-access",checkRole(["super_admin"]), updateFeatureAccess);
 
 Deno.serve(withCors(app));
