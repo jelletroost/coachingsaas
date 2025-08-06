@@ -61,7 +61,7 @@ const navigation = [
    {
       label: "FAQ",
       href: "/#faq",
-   }
+   },
 ];
 
 export default function Header() {
