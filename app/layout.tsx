@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-   title: "HealthCoach Pro - Digital Health & Medication Platform",
+   title: "Aevita - Digital Health & Medication Platform",
    description:
       "A comprehensive digital health platform connecting patients with coaches for personalized lifestyle and medication guidance. Coming soon!",
 };

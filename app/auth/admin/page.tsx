@@ -125,9 +125,7 @@ export default function AdminLoginPage() {
                <Link href="/" className="inline-block cursor-pointer">
                   <div className="flex items-center justify-center gap-2 mb-2">
                      <Shield className="w-8 h-8 text-primary" />
-                     <h1 className="text-3xl font-bold text-primary">
-                        HealthCoach Pro
-                     </h1>
+                     <h1 className="text-3xl font-bold text-primary">Aevita</h1>
                   </div>
                </Link>
                <p className="text-muted-foreground">

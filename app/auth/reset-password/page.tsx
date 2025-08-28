@@ -156,7 +156,7 @@ export default function ResetPasswordPage() {
             <div ref={headerRef} className="text-center mb-8">
                <Link href="/" className="inline-block cursor-pointer">
                   <h1 className="text-3xl font-bold text-primary mb-2">
-                     HealthCoach Pro
+                     Aevita
                   </h1>
                </Link>
                <p className="text-muted-foreground">
