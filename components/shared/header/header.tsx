@@ -2,9 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/useAuthStore";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import Logo from "../logo";
 import MobileMenu from "./mobileMenu";
 import UserDropdown from "./userDropdown";
 
@@ -92,7 +92,12 @@ export default function Header() {
                   href="/"
                   className="flex items-center"
                   onClick={closeMobileMenu}>
-                  <Logo />
+                  <Image
+                     src="/logo-black.svg"
+                     alt="Aevita"
+                     width={120}
+                     height={120}
+                  />
                </Link>
 
                {/* Desktop Navigation */}

@@ -2,13 +2,13 @@ import { Button } from "@/components/ui/button";
 import {
    Award,
    Facebook,
-   Heart,
    Instagram,
    Linkedin,
    Shield,
    Twitter,
    Users,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Footer() {
@@ -59,16 +59,16 @@ export default function Footer() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
                {/* Brand Section */}
                <div className="lg:col-span-2 space-y-6">
-                  <div className="flex items-center gap-2">
-                     <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
-                        <Heart className="w-4 h-4 text-primary" />
-                     </div>
-                     <h3 className="text-xl font-bold text-primary">
-                        HealthCoach Pro
-                     </h3>
-                  </div>
+                  <Link href="/">
+                     <Image
+                        src="/logo-white.svg"
+                        alt="Aevita"
+                        width={120}
+                        height={120}
+                     />
+                  </Link>
 
-                  <p className="text-gray-300 leading-relaxed">
+                  <p className="text-gray-300 leading-relaxed pt-4">
                      Transform your health journey with personalized coaching,
                      automated medication management, and continuous support
                      from certified healthcare professionals.
