@@ -1,9 +1,9 @@
+import { AuthProvider } from "@/lib/providers/authProvider";
 import { QueryProvider } from "@/lib/providers/queryProviders";
-import { currentUserSSR } from "@/lib/supabase/supabaseServer";
+import supabaseServerClient from "@/lib/supabase/supabaseServer";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
-import { AuthProvider } from "./AuthProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,13 +27,15 @@ export default async function RootLayout({
 }: Readonly<{
    children: React.ReactNode;
 }>) {
-   const userData: any | null = await currentUserSSR();
+   const supabase = await supabaseServerClient();
+   const { data } = await supabase.auth.getUser();
+   const serverUser = data?.user;
    return (
       <html lang="en">
          <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
             <QueryProvider>
-               <AuthProvider user={userData}>{children}</AuthProvider>
+               <AuthProvider serverUser={serverUser}>{children}</AuthProvider>
                <Toaster position="top-center" />
             </QueryProvider>
          </body>

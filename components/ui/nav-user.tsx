@@ -1,16 +1,14 @@
 "use client";
-import { signOut } from "@/app/actions/actions";
 import { Button } from "@/components/ui/button";
 import {
    Popover,
    PopoverContent,
    PopoverTrigger,
 } from "@/components/ui/popover";
-import { useAuthStore } from "@/store/useAuthStore";
+import { useAuth } from "@/lib/providers/authProvider";
 import { ChevronDownIcon, HomeIcon, User2Icon, UserIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-
 
 const userRole: string = "patient";
 const profileUrl: string =
@@ -21,7 +19,7 @@ const profileUrl: string =
       : "/dashboard/profile";
 
 const NavUser = () => {
-   const { user } = useAuthStore();
+   const { user, signOut } = useAuth();
    const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
    return (
       <Popover open={isUserDropdownOpen} onOpenChange={setIsUserDropdownOpen}>

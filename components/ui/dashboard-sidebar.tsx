@@ -9,13 +9,13 @@ import {
    SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import getSidebarItemsByRole from "@/lib/config/sidebar.config";
-import { useAuthStore } from "@/store/useAuthStore";
+import { useAuth } from "@/lib/providers/authProvider";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export function DashboardSidebar() {
-   const { user } = useAuthStore();
+   const { user } = useAuth();
    const allMenuItems = getSidebarItemsByRole(
       user?.user_metadata?.role || "patient"
    );

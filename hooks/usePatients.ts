@@ -1,10 +1,10 @@
+import { useAuth } from "@/lib/providers/authProvider";
 import { getPatientsByCoach } from "@/services/patients_services";
-import { useAuthStore } from "@/store/useAuthStore";
 import { useQuery } from "@tanstack/react-query";
 
 export const usePatientsByCoach = () => {
-   const { user } = useAuthStore();
-   
+   const { user } = useAuth();
+
    return useQuery({
       queryKey: ["patients", "coach", user?.id],
       queryFn: () => getPatientsByCoach(user?.id || ""),
@@ -15,4 +15,4 @@ export const usePatientsByCoach = () => {
       refetchOnMount: false,
       refetchOnReconnect: true,
    });
-}; 
+};
