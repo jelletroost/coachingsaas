@@ -1,10 +1,15 @@
-import { getAllFeatureAccess, getFeatureAccess, updateFeatureAccess, type UpdateFeatureAccessRequest } from "@/services/feature_flag_services";
-import { useAuthStore } from "@/store/useAuthStore";
+import { useAuth } from "@/lib/providers/authProvider";
+import {
+   getAllFeatureAccess,
+   getFeatureAccess,
+   updateFeatureAccess,
+   type UpdateFeatureAccessRequest,
+} from "@/services/feature_flag_services";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 
 export const useFeatureFlags = () => {
-   const { user } = useAuthStore();
+   const { user } = useAuth();
    const userRole = user?.user_metadata?.role || "patient";
    const queryClient = useQueryClient();
 
@@ -12,7 +17,7 @@ export const useFeatureFlags = () => {
       data: featureAccessByRole,
       isLoading,
       error,
-      refetch: refetchFeatureAccess
+      refetch: refetchFeatureAccess,
    } = useQuery({
       queryKey: ["feature-access-by-role", userRole],
       queryFn: () => getAllFeatureAccess(userRole),
@@ -22,14 +27,19 @@ export const useFeatureFlags = () => {
    });
 
    const updateFeatureAccessMutation = useMutation({
-      mutationFn: (data: UpdateFeatureAccessRequest) => updateFeatureAccess(userRole, data),
+      mutationFn: (data: UpdateFeatureAccessRequest) =>
+         updateFeatureAccess(userRole, data),
       onSuccess: () => {
-         queryClient.invalidateQueries({ queryKey: ["feature-access-by-role"] });
+         queryClient.invalidateQueries({
+            queryKey: ["feature-access-by-role"],
+         });
          toast.success("Feature access updated successfully");
       },
       onError: (error: any) => {
          console.error("Failed to update feature access:", error);
-         toast.error(error?.response?.data?.error || "Failed to update feature access");
+         toast.error(
+            error?.response?.data?.error || "Failed to update feature access"
+         );
       },
    });
 
@@ -47,8 +57,12 @@ export const useFeatureFlags = () => {
 };
 
 // Get feature access for a specific user role
-export const useFeatureAccess = ({userRole}: {userRole: string}) => {
-   const { data: featureAccess, isLoading, error } = useQuery({
+export const useFeatureAccess = ({ userRole }: { userRole: string }) => {
+   const {
+      data: featureAccess,
+      isLoading,
+      error,
+   } = useQuery({
       queryKey: ["feature-access", userRole],
       queryFn: () => getFeatureAccess(userRole),
    });
@@ -56,22 +70,27 @@ export const useFeatureAccess = ({userRole}: {userRole: string}) => {
    // Helper function to check if a feature is enabled based on environment
    const isFeatureEnabled = (featureName: string): boolean => {
       if (!featureAccess?.featureAccess) return false;
-      
-      const feature = featureAccess.featureAccess.find(f => f.feature_name === featureName);
+
+      const feature = featureAccess.featureAccess.find(
+         (f) => f.feature_name === featureName
+      );
       if (!feature) return false;
 
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
-      
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "";
+
       // Check if it's staging or dev environment
-      if (siteUrl.includes('https://staging.coachingsaas.nl') || siteUrl.includes('https://dev.coachingsaas.nl')) {
+      if (
+         siteUrl.includes("https://staging.coachingsaas.nl") ||
+         siteUrl.includes("https://dev.coachingsaas.nl")
+      ) {
          return feature.staging_allowed;
       }
-      
+
       // Check if it's production environment
-      if (siteUrl.includes('https://www.coachingsaas.nl')) {
+      if (siteUrl.includes("https://www.coachingsaas.nl")) {
          return feature.production_allowed;
       }
-      
+
       // Default to false for unknown environments
       return false;
    };
@@ -79,10 +98,10 @@ export const useFeatureAccess = ({userRole}: {userRole: string}) => {
    // Get enabled features based on environment
    const getEnabledFeatures = (): string[] => {
       if (!featureAccess?.featureAccess) return [];
-      
+
       return featureAccess.featureAccess
-         .filter(feature => isFeatureEnabled(feature.feature_name))
-         .map(feature => feature.feature_name);
+         .filter((feature) => isFeatureEnabled(feature.feature_name))
+         .map((feature) => feature.feature_name);
    };
 
    return {

@@ -52,7 +52,7 @@ export function AuthProvider({
 
    const signOut = async () => {
       await supabase.auth.signOut();
-      window.location.href = "/auth/signin";
+      window.location.href = "/";
       setUser(null);
    };
 

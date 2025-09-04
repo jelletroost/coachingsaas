@@ -1,6 +1,6 @@
 "use client";
 import { useFeatureAccess } from "@/hooks/useFeatureFlags";
-import { useAuthStore } from "@/store/useAuthStore";
+import { useAuth } from "@/lib/providers/authProvider";
 import { ReactNode } from "react";
 
 interface FeatureFlagProps {
@@ -9,8 +9,12 @@ interface FeatureFlagProps {
    fallback?: ReactNode;
 }
 
-export function FeatureFlag({ flag, children, fallback = null }: FeatureFlagProps) {
-   const { user } = useAuthStore();
+export function FeatureFlag({
+   flag,
+   children,
+   fallback = null,
+}: FeatureFlagProps) {
+   const { user } = useAuth();
    const userRole = user?.user_metadata?.role || "patient";
    const { isFeatureEnabled, isLoading } = useFeatureAccess({ userRole });
 
@@ -28,8 +32,8 @@ export function FeatureFlag({ flag, children, fallback = null }: FeatureFlagProp
 }
 
 export function useFeatureFlagEnabled(flag: string): boolean {
-   const { user } = useAuthStore();
+   const { user } = useAuth();
    const userRole = user?.user_metadata?.role || "patient";
    const { isFeatureEnabled } = useFeatureAccess({ userRole });
    return isFeatureEnabled(flag);
-} 
+}
