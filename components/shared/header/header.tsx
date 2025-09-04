@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/store/useAuthStore";
+import { useAuth } from "@/lib/providers/authProvider";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -65,7 +65,7 @@ const navigation = [
 ];
 
 export default function Header() {
-   const user = useAuthStore((state) => state.user);
+   const { user } = useAuth();
    const isAuthenticated = user?.aud === "authenticated" ? true : false;
    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
    const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
@@ -118,7 +118,6 @@ export default function Header() {
                      <UserDropdown
                         isUserDropdownOpen={isUserDropdownOpen}
                         setIsUserDropdownOpen={setIsUserDropdownOpen}
-                        user={user}
                      />
                   ) : (
                      <>
