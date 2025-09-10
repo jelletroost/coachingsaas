@@ -16,6 +16,7 @@ const UserDropdown = ({
    setIsUserDropdownOpen: (open: boolean) => void;
 }) => {
    const { user, signOut } = useAuth();
+   console.log(user);
    return (
       <Popover open={isUserDropdownOpen} onOpenChange={setIsUserDropdownOpen}>
          <PopoverTrigger asChild>
