@@ -52,6 +52,7 @@
       "@eslint/eslintrc": "^3",
       "@eslint/js": "^9.31.0",
       "@tailwindcss/postcss": "^4",
+      "@types/google-one-tap": "^1.2.6",
       "@types/node": "^20",
       "@types/react": "^19",
       "@types/react-dom": "^19",
