@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { currentUserSSR } from "./lib/supabase/supabaseServer";
+import supabaseServerClient from "./lib/supabase/supabaseServer";
 
 export default async function middleware(req: NextRequest) {
    const PUBLIC_ROUTES = [
@@ -20,7 +20,9 @@ export default async function middleware(req: NextRequest) {
    }
 
    try {
-      const userData = await currentUserSSR();
+      const supabase = await supabaseServerClient();
+      const { data } = await supabase.auth.getUser();
+      const userData = data?.user;
 
       // Redirect to signin if no session
       if (!userData) {
@@ -31,9 +33,31 @@ export default async function middleware(req: NextRequest) {
 
       // Define role-based access patterns
       const roleAccessPatterns = {
-         super_admin: ["/admin/overview", "/admin/products", "/admin/cms", "/admin/users", "/admin/feature-flags", "/admin/settings", "/admin/subscriptions"],
-         admin: ["/admin/overview", "/admin/products", "/admin/cms", "/admin/users", "/admin/settings", "/admin/subscriptions"],
-         coach: ["/coach/overview", "/coach/patients", "/coach/products", "/coach/overview", "/coach/messages", "/coach/settings"],
+         super_admin: [
+            "/admin/overview",
+            "/admin/products",
+            "/admin/cms",
+            "/admin/users",
+            "/admin/feature-flags",
+            "/admin/settings",
+            "/admin/subscriptions",
+         ],
+         admin: [
+            "/admin/overview",
+            "/admin/products",
+            "/admin/cms",
+            "/admin/users",
+            "/admin/settings",
+            "/admin/subscriptions",
+         ],
+         coach: [
+            "/coach/overview",
+            "/coach/patients",
+            "/coach/products",
+            "/coach/overview",
+            "/coach/messages",
+            "/coach/settings",
+         ],
          patient: ["/dashboard"],
       };
 
