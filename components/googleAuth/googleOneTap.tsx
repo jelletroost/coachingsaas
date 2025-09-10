@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/lib/providers/authProvider";
 import { createSupabaseClient } from "@/lib/supabase/supabaseClient";
 import type { accounts, CredentialResponse } from "google-one-tap";
 import { useRouter } from "next/navigation";
@@ -26,6 +27,7 @@ const generateNonce = async (): Promise<string[]> => {
 const OneTapComponent = () => {
    const supabase = createSupabaseClient();
    const router = useRouter();
+   const { user } = useAuth();
 
    const initializeGoogleOneTap = async () => {
       console.log("Initializing Google One Tap");
@@ -45,18 +47,20 @@ const OneTapComponent = () => {
          callback: async (response: CredentialResponse) => {
             try {
                // send id token returned in response.credential to supabase
-               const { data, error } = await supabase.auth.signInWithIdToken({
+               const { error } = await supabase.auth.signInWithIdToken({
                   provider: "google",
                   token: response.credential,
                   nonce,
                });
 
                if (error) throw error;
-               console.log("Session data: ", data);
-               console.log("Successfully logged in with Google One Tap");
 
-               // redirect to protected page
-               router.push("/");
+               // check if user has a role
+               if (!user?.user_metadata?.role) {
+                  router.push("/choose-role");
+               } else {
+                  router.push("/");
+               }
             } catch (error) {
                console.error("Error logging in with Google One Tap", error);
             }

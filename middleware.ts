@@ -58,7 +58,7 @@ export default async function middleware(req: NextRequest) {
             "/coach/messages",
             "/coach/settings",
          ],
-         patient: ["/dashboard"],
+         patient: ["/dashboard", "/dashboard/profile"],
       };
 
       // Check if user has access to the requested path

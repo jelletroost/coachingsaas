@@ -62,3 +62,16 @@ export const submitNewPassword = async (
       throw error;
    }
 };
+
+export const updateRole = async (role: string) => {
+   try {
+      const response = await axios.post(
+         `${process.env.NEXT_PUBLIC_SITE_URL}/api/update-role`,
+         { role }
+      );
+      return response.data;
+   } catch (error) {
+      console.error(error);
+      throw error;
+   }
+};
