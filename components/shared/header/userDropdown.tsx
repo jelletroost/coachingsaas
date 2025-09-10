@@ -1,22 +1,21 @@
-import { signOut } from "@/app/actions/actions";
 import { Button } from "@/components/ui/button";
 import {
    Popover,
    PopoverContent,
    PopoverTrigger,
 } from "@/components/ui/popover";
+import { useAuth } from "@/lib/providers/authProvider";
 import { ChevronDownIcon, UserIcon } from "lucide-react";
 import Link from "next/link";
 
 const UserDropdown = ({
    isUserDropdownOpen,
    setIsUserDropdownOpen,
-   user,
 }: {
    isUserDropdownOpen: boolean;
    setIsUserDropdownOpen: (open: boolean) => void;
-   user: any;
 }) => {
+   const { user, signOut } = useAuth();
    return (
       <Popover open={isUserDropdownOpen} onOpenChange={setIsUserDropdownOpen}>
          <PopoverTrigger asChild>
@@ -25,7 +24,7 @@ const UserDropdown = ({
                className="flex cursor-pointer items-center gap-2 px-3 py-2 h-auto"
                size="sm">
                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  {user?.avatar_url ? (
+                  {user?.user_metadata?.avatar_url ? (
                      <img
                         src={user?.user_metadata?.avatar_url}
                         alt={`${user?.user_metadata?.first_name} ${user?.user_metadata?.last_name}`}
@@ -54,9 +53,10 @@ const UserDropdown = ({
                </div>
                <Link
                   href={`${
-                     user?.role === "admin" || user?.role === "super_admin"
+                     user?.user_metadata?.role === "admin" ||
+                     user?.user_metadata?.role === "super_admin"
                         ? "/admin/overview"
-                        : user?.role === "coach"
+                        : user?.user_metadata?.role === "coach"
                         ? "/coach/overview"
                         : "/dashboard"
                   }`}

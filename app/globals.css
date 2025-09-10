@@ -47,9 +47,9 @@
    --radius: 0.625rem;
 
    /* Global Brand Colors - Easy to change */
-   --brand-primary: #2563eb; /* Blue-600 */
-   --brand-accent: #3b82f6; /* Blue-500 */
-   --brand-secondary: #f59e0b; /* Amber-500 */
+   --brand-primary: #00a8b5;
+   --brand-accent: #00a8b5;
+   --brand-secondary: #00a8b5;
 
    /* Background and Foreground */
    --background: oklch(1 0 0);

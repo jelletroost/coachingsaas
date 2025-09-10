@@ -24,6 +24,7 @@ import { signin } from "@/services/auth_service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { animate, inView } from "motion";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -99,9 +100,12 @@ export default function SigninPage() {
             {/* Header */}
             <div ref={headerRef} className="text-center mb-8">
                <Link href="/" className="inline-block cursor-pointer">
-                  <h1 className="text-3xl font-bold text-primary mb-2">
-                     HealthCoach Pro
-                  </h1>
+                  <Image
+                     src="/logo-black.svg"
+                     alt="Aevita"
+                     width={150}
+                     height={150}
+                  />
                </Link>
                <p className="text-muted-foreground">
                   Welcome back! Sign in to your account

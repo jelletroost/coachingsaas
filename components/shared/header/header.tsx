@@ -1,10 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/store/useAuthStore";
+import { useAuth } from "@/lib/providers/authProvider";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import Logo from "../logo";
 import MobileMenu from "./mobileMenu";
 import UserDropdown from "./userDropdown";
 
@@ -65,7 +65,7 @@ const navigation = [
 ];
 
 export default function Header() {
-   const user = useAuthStore((state) => state.user);
+   const { user } = useAuth();
    const isAuthenticated = user?.aud === "authenticated" ? true : false;
    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
    const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
@@ -92,7 +92,12 @@ export default function Header() {
                   href="/"
                   className="flex items-center"
                   onClick={closeMobileMenu}>
-                  <Logo />
+                  <Image
+                     src="/logo-black.svg"
+                     alt="Aevita"
+                     width={120}
+                     height={120}
+                  />
                </Link>
 
                {/* Desktop Navigation */}
@@ -113,7 +118,6 @@ export default function Header() {
                      <UserDropdown
                         isUserDropdownOpen={isUserDropdownOpen}
                         setIsUserDropdownOpen={setIsUserDropdownOpen}
-                        user={user}
                      />
                   ) : (
                      <>

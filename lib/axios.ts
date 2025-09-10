@@ -1,5 +1,5 @@
 import axios from "axios";
-import supabaseClient from "./supabase/supabaseClient";
+import { createSupabaseClient } from "./supabase/supabaseClient";
 
 const apiClient = axios.create({
    baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -20,7 +20,7 @@ apiClient.interceptors.response.use(
 
 // Request interceptor to include auth token
 apiClient.interceptors.request.use(async (config) => {
-   const supabase = supabaseClient;
+   const supabase = createSupabaseClient();
    const {
       data: { session },
    } = await supabase.auth.getSession();

@@ -3,6 +3,7 @@ import edgeAdminClient from "../../_shared/supabaseAdmin.ts";
 
 const signup = async (c: Context) => {
    const { email, password, first_name, last_name, role } = await c.req.json();
+   console.log("signup", email, password, first_name, last_name, role);
 
    if (!email || !password) {
       return c.json({ message: "Email and password are required" }, 400);
@@ -16,10 +17,7 @@ const signup = async (c: Context) => {
       .single();
 
    if (roleError || !roleData) {
-      return c.json(
-         { message: "Invalid role specified" },
-         400
-      );
+      return c.json({ message: "Invalid role specified" }, 400);
    }
 
    const { data, error } = await edgeAdminClient.auth.signUp({
@@ -29,7 +27,7 @@ const signup = async (c: Context) => {
          data: {
             first_name,
             last_name,
-            role
+            role,
          },
       },
    });
@@ -40,7 +38,6 @@ const signup = async (c: Context) => {
          500
       );
    }
-
 
    const userId = data.user?.id;
 
