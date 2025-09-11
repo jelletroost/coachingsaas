@@ -1,0 +1,3 @@
+-  Get user data from centralize api
+-  Make role enum
+-  Make sure provider login and manual login works
