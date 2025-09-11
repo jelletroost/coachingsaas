@@ -28,8 +28,11 @@ export default async function middleware(req: NextRequest) {
       if (!userData) {
          return NextResponse.redirect(new URL("/auth/signin", req.url));
       }
+      let userRole = userData?.app_metadata?.role;
 
-      const userRole = userData?.user_metadata?.role;
+      if (userData?.app_metadata?.provider !== "google") {
+         userRole = userData?.user_metadata?.role;
+      }
 
       // Define role-based access patterns
       const roleAccessPatterns = {
