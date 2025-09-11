@@ -65,10 +65,7 @@ export const submitNewPassword = async (
 
 export const updateRole = async (role: string) => {
    try {
-      const response = await axios.post(
-         `${process.env.NEXT_PUBLIC_API_URL}/auth/update-role`,
-         { role }
-      );
+      const response = await apiClient.post("/auth/update-role", { role });
       return response.data;
    } catch (error) {
       console.error(error);

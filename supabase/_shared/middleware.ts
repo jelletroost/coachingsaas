@@ -43,10 +43,12 @@ export const checkRole = (allowedRoles: string[]) => {
 export const verifyUser = async (c: Context, next: Next) => {
    try {
       const authHeader = c.req.header("Authorization");
+      console.log("authHeader", authHeader);
       const token = authHeader?.replace("Bearer ", "");
       if (!token) {
          return c.json({ error: "Unauthorized Access" }, 401);
       }
+      console.log("token", token);
 
       // Get user data
       const {
@@ -56,6 +58,7 @@ export const verifyUser = async (c: Context, next: Next) => {
       if (error || !user) {
          return c.json({ error: "Unauthorized Access" }, 401);
       }
+      console.log("user", user);
 
       // Store user in context for use in route handlers
       c.set("user", user);
