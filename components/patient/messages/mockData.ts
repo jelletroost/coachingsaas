@@ -7,11 +7,21 @@ export interface Message {
    content: string;
    timestamp: string;
    isRead: boolean;
+   messageType?: "text" | "meeting";
    attachments?: {
       type: "image" | "document" | "video";
       url: string;
       name: string;
    }[];
+   meetingData?: {
+      type: "phone" | "google-meet";
+      date: string;
+      time: string;
+      duration: string;
+      notes?: string;
+      status: "pending" | "confirmed" | "cancelled" | "completed";
+      meetingId?: string;
+   };
 }
 
 export interface Conversation {
@@ -167,6 +177,43 @@ export const messagesData: Message[] = [
          "I've been able to exercise 4 days this week. Feeling much stronger!",
       timestamp: "2024-01-20T10:30:00Z",
       isRead: true,
+   },
+   {
+      id: "msg_1_5",
+      conversationId: "conv_1",
+      senderId: "patient_1",
+      senderType: "patient",
+      content: "Meeting scheduled: Phone Call on Mon Jan 22 2024 at 14:00",
+      timestamp: "2024-01-20T11:00:00Z",
+      isRead: true,
+      messageType: "meeting",
+      meetingData: {
+         type: "phone",
+         date: "2024-01-22T00:00:00Z",
+         time: "14:00",
+         duration: "30",
+         notes: "Weekly check-in about exercise progress",
+         status: "pending",
+      },
+   },
+   {
+      id: "msg_1_6",
+      conversationId: "conv_1",
+      senderId: "coach_1",
+      senderType: "coach",
+      content: "Meeting confirmed: Google Meet on Tomorrow at 15:30",
+      timestamp: "2024-01-20T12:00:00Z",
+      isRead: true,
+      messageType: "meeting",
+      meetingData: {
+         type: "google-meet",
+         date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
+         time: "15:30",
+         duration: "45",
+         notes: "Follow-up discussion about your progress",
+         status: "confirmed",
+         meetingId: "abc-defg-hij",
+      },
    },
 
    // Conversation 2 - Dr. Michael Rodriguez

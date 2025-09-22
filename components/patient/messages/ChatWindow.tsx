@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Paperclip, Send, Smile } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
+import MeetingMessage from "./MeetingMessage";
 import MeetingScheduler, { MeetingData } from "./MeetingScheduler";
 import { Conversation, Message } from "./mockData";
 
@@ -14,6 +15,7 @@ interface ChatWindowProps {
    messages: Message[];
    onSendMessage: (content: string) => void;
    onTyping: (isTyping: boolean) => void;
+   onAddMeetingMessage?: (meetingData: MeetingData) => void;
 }
 
 export default function ChatWindow({
@@ -21,6 +23,7 @@ export default function ChatWindow({
    messages,
    onSendMessage,
    onTyping,
+   onAddMeetingMessage,
 }: ChatWindowProps) {
    const [newMessage, setNewMessage] = useState("");
    const [isTyping, setIsTyping] = useState(false);
@@ -86,10 +89,12 @@ export default function ChatWindow({
    };
 
    const handleMeetingSubmit = (meetingData: MeetingData) => {
-      // TODO: Implement meeting scheduling logic
-      console.log("Meeting scheduled:", meetingData);
-      // You can add API call here to save the meeting request
-      // For now, we'll just show a success message
+      // Create a meeting message and add it to the chat
+      if (onAddMeetingMessage) {
+         onAddMeetingMessage(meetingData);
+      }
+
+      // Show success message
       alert(
          `Meeting request submitted!\nType: ${
             meetingData.type
@@ -223,27 +228,34 @@ export default function ChatWindow({
                                     </AvatarFallback>
                                  </Avatar>
                               )}
-                              <div
-                                 className={`rounded-lg px-3 py-2 ${
-                                    isOwnMessage
-                                       ? "bg-blue-600 text-white"
-                                       : "bg-white text-gray-900 border border-gray-200"
-                                 }`}>
-                                 <p className="text-sm">{message.content}</p>
-                                 <p
-                                    className={`text-xs mt-1 ${
+                              {message.messageType === "meeting" ? (
+                                 <MeetingMessage
+                                    message={message}
+                                    isOwnMessage={isOwnMessage}
+                                 />
+                              ) : (
+                                 <div
+                                    className={`rounded-lg px-3 py-2 ${
                                        isOwnMessage
-                                          ? "text-blue-100"
-                                          : "text-gray-500"
+                                          ? "bg-blue-600 text-white"
+                                          : "bg-white text-gray-900 border border-gray-200"
                                     }`}>
-                                    {formatMessageTime(message.timestamp)}
-                                    {isOwnMessage && (
-                                       <span className="ml-2">
-                                          {message.isRead ? "✓✓" : "✓"}
-                                       </span>
-                                    )}
-                                 </p>
-                              </div>
+                                    <p className="text-sm">{message.content}</p>
+                                    <p
+                                       className={`text-xs mt-1 ${
+                                          isOwnMessage
+                                             ? "text-blue-100"
+                                             : "text-gray-500"
+                                       }`}>
+                                       {formatMessageTime(message.timestamp)}
+                                       {isOwnMessage && (
+                                          <span className="ml-2">
+                                             {message.isRead ? "✓✓" : "✓"}
+                                          </span>
+                                       )}
+                                    </p>
+                                 </div>
+                              )}
                            </div>
                         </div>
                      </div>

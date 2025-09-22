@@ -3,6 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import ChatWindow from "./ChatWindow";
+import { MeetingData } from "./MeetingScheduler";
 import MessageList from "./MessageList";
 import {
    Conversation,
@@ -98,6 +99,53 @@ export default function MessagesManagement() {
       console.log("Typing:", isTyping);
    };
 
+   const handleAddMeetingMessage = (meetingData: MeetingData) => {
+      if (!selectedConversationId) return;
+
+      const newMeetingMessage: Message = {
+         id: `meeting_${Date.now()}`,
+         conversationId: selectedConversationId,
+         senderId: "patient_1",
+         senderType: "patient",
+         content: `Meeting scheduled: ${
+            meetingData.type === "phone" ? "Phone Call" : "Google Meet"
+         } on ${meetingData.date.toDateString()} at ${meetingData.time}`,
+         timestamp: new Date().toISOString(),
+         isRead: false,
+         messageType: "meeting",
+         meetingData: {
+            type: meetingData.type,
+            date: meetingData.date.toISOString(),
+            time: meetingData.time,
+            duration: meetingData.duration,
+            notes: meetingData.notes,
+            status: "pending",
+            meetingId:
+               meetingData.type === "google-meet"
+                  ? `meet-${Date.now()}`
+                  : undefined,
+         },
+      };
+
+      // Add meeting message to messages list
+      setMessages((prev) => [...prev, newMeetingMessage]);
+
+      // Update conversation's last message
+      const updatedConversations = conversations.map((conv) =>
+         conv.id === selectedConversationId
+            ? {
+                 ...conv,
+                 lastMessage: `Meeting scheduled: ${
+                    meetingData.type === "phone" ? "Phone Call" : "Google Meet"
+                 }`,
+                 lastMessageTime: new Date().toISOString(),
+                 lastActivity: new Date().toISOString(),
+              }
+            : conv
+      );
+      setConversations(updatedConversations);
+   };
+
    const selectedConversation = selectedConversationId
       ? getConversationById(selectedConversationId)
       : undefined;
@@ -125,6 +173,7 @@ export default function MessagesManagement() {
                         messages={messages}
                         onSendMessage={handleSendMessage}
                         onTyping={handleTyping}
+                        onAddMeetingMessage={handleAddMeetingMessage}
                      />
                   </div>
                </div>
