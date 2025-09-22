@@ -77,18 +77,6 @@ export const coachesData: Coach[] = [
       rating: 4.9,
       experience: "12 years",
    },
-   {
-      id: "coach_3",
-      name: "Dr. Emily Johnson",
-      email: "emily.johnson@healthcoach.com",
-      avatar: "/avatars/emily-johnson.jpg",
-      specialty: "Mental Health",
-      status: "offline",
-      lastActive: "2024-01-19T16:45:00Z",
-      unreadMessages: 1,
-      rating: 4.7,
-      experience: "6 years",
-   },
 ];
 
 // Mock conversations data
