@@ -1,9 +1,6 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 import ChatWindow from "./ChatWindow";
 import MessageList from "./MessageList";
@@ -12,8 +9,6 @@ import {
    conversationsData,
    getConversationById,
    getMessagesByConversationId,
-   getTotalUnreadMessages,
-   getUnreadConversations,
    Message,
 } from "./mockData";
 
@@ -25,7 +20,6 @@ export default function MessagesManagement() {
    >();
    const [messages, setMessages] = useState<Message[]>([]);
    const [searchQuery, setSearchQuery] = useState("");
-   const [activeTab, setActiveTab] = useState("all");
    const [filteredConversations, setFilteredConversations] =
       useState<Conversation[]>(conversations);
 
@@ -41,7 +35,7 @@ export default function MessagesManagement() {
       }
    }, [selectedConversationId]);
 
-   // Filter conversations based on search and active tab
+   // Filter conversations based on search query
    useEffect(() => {
       let filtered = conversations;
 
@@ -58,23 +52,8 @@ export default function MessagesManagement() {
          );
       }
 
-      // Filter by active tab
-      switch (activeTab) {
-         case "unread":
-            filtered = filtered.filter((conv) => conv.unreadCount > 0);
-            break;
-         case "active":
-            filtered = filtered.filter((conv) => conv.status === "active");
-            break;
-         case "archived":
-            filtered = filtered.filter((conv) => conv.status === "archived");
-            break;
-         default:
-            break;
-      }
-
       setFilteredConversations(filtered);
-   }, [conversations, searchQuery, activeTab]);
+   }, [conversations, searchQuery]);
 
    const handleSelectConversation = (conversationId: string) => {
       setSelectedConversationId(conversationId);
@@ -123,57 +102,8 @@ export default function MessagesManagement() {
       ? getConversationById(selectedConversationId)
       : undefined;
 
-   const totalUnread = getTotalUnreadMessages();
-   const unreadConversations = getUnreadConversations();
-
    return (
       <div className="h-full">
-         <div className="mb-6">
-            <div className="flex items-center justify-between mb-4">
-               <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
-                  <p className="text-gray-600">Chat with your health coaches</p>
-               </div>
-               <div className="flex items-center space-x-2">
-                  {totalUnread > 0 && (
-                     <Badge variant="destructive">{totalUnread} unread</Badge>
-                  )}
-                  <Button variant="outline" size="sm">
-                     Find Coach
-                  </Button>
-               </div>
-            </div>
-
-            {/* Tabs */}
-            <Tabs
-               value={activeTab}
-               onValueChange={setActiveTab}
-               className="w-full">
-               <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger
-                     value="all"
-                     className="flex items-center space-x-2">
-                     <span>All</span>
-                     <Badge variant="secondary" className="ml-1">
-                        {conversations.length}
-                     </Badge>
-                  </TabsTrigger>
-                  <TabsTrigger
-                     value="unread"
-                     className="flex items-center space-x-2">
-                     <span>Unread</span>
-                     {unreadConversations.length > 0 && (
-                        <Badge variant="destructive" className="ml-1">
-                           {unreadConversations.length}
-                        </Badge>
-                     )}
-                  </TabsTrigger>
-                  <TabsTrigger value="active">Active</TabsTrigger>
-                  <TabsTrigger value="archived">Archived</TabsTrigger>
-               </TabsList>
-            </Tabs>
-         </div>
-
          {/* Messages Interface */}
          <Card className="h-[calc(100vh-200px)]">
             <CardContent className="p-0 h-full">

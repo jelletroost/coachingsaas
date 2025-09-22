@@ -152,6 +152,7 @@ export default function ChatWindow({
                   </div>
                </div>
             </div>
+            <Button>Schedule a Meeting</Button>
          </div>
 
          {/* Messages Area */}
