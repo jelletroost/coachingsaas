@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Paperclip, Send, Smile } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
+import MeetingScheduler, { MeetingData } from "./MeetingScheduler";
 import { Conversation, Message } from "./mockData";
 
 interface ChatWindowProps {
@@ -23,6 +24,7 @@ export default function ChatWindow({
 }: ChatWindowProps) {
    const [newMessage, setNewMessage] = useState("");
    const [isTyping, setIsTyping] = useState(false);
+   const [isMeetingSchedulerOpen, setIsMeetingSchedulerOpen] = useState(false);
    const messagesEndRef = useRef<HTMLDivElement>(null);
    const inputRef = useRef<HTMLInputElement>(null);
 
@@ -81,6 +83,18 @@ export default function ChatWindow({
       } else {
          return date.toLocaleDateString();
       }
+   };
+
+   const handleMeetingSubmit = (meetingData: MeetingData) => {
+      // TODO: Implement meeting scheduling logic
+      console.log("Meeting scheduled:", meetingData);
+      // You can add API call here to save the meeting request
+      // For now, we'll just show a success message
+      alert(
+         `Meeting request submitted!\nType: ${
+            meetingData.type
+         }\nDate: ${meetingData.date.toDateString()}\nTime: ${meetingData.time}`
+      );
    };
 
    if (!conversation) {
@@ -152,7 +166,9 @@ export default function ChatWindow({
                   </div>
                </div>
             </div>
-            <Button>Schedule a Meeting</Button>
+            <Button onClick={() => setIsMeetingSchedulerOpen(true)}>
+               Schedule a Meeting
+            </Button>
          </div>
 
          {/* Messages Area */}
@@ -268,6 +284,16 @@ export default function ChatWindow({
                </Button>
             </div>
          </div>
+
+         {/* Meeting Scheduler Modal */}
+         {conversation && (
+            <MeetingScheduler
+               isOpen={isMeetingSchedulerOpen}
+               onClose={() => setIsMeetingSchedulerOpen(false)}
+               coachName={conversation.coachName}
+               onSubmit={handleMeetingSubmit}
+            />
+         )}
       </div>
    );
 }
