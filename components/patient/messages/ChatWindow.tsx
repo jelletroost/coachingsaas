@@ -3,21 +3,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-   DropdownMenu,
-   DropdownMenuContent,
-   DropdownMenuItem,
-   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import {
-   MoreVertical,
-   Paperclip,
-   Phone,
-   Send,
-   Smile,
-   Video,
-} from "lucide-react";
+import { Paperclip, Send, Smile } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { Conversation, Message } from "./mockData";
 
@@ -164,26 +151,6 @@ export default function ChatWindow({
                      </span>
                   </div>
                </div>
-            </div>
-            <div className="flex items-center space-x-2">
-               <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <Phone className="h-4 w-4" />
-               </Button>
-               <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <Video className="h-4 w-4" />
-               </Button>
-               <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                     <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <MoreVertical className="h-4 w-4" />
-                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                     <DropdownMenuItem>View Profile</DropdownMenuItem>
-                     <DropdownMenuItem>Schedule Appointment</DropdownMenuItem>
-                     <DropdownMenuItem>Archive Conversation</DropdownMenuItem>
-                  </DropdownMenuContent>
-               </DropdownMenu>
             </div>
          </div>
 

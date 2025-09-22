@@ -3,7 +3,7 @@ import { createSupabaseClient } from "./supabase/supabaseClient";
 
 const apiClient = axios.create({
    baseURL: process.env.NEXT_PUBLIC_API_URL,
-   withCredentials: true,
+   // withCredentials: true,
 });
 
 apiClient.interceptors.response.use(
