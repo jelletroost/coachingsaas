@@ -97,16 +97,16 @@ export default function MeetingMessage({
          setIsMeetingLinkDialogOpen(true);
       } else {
          // For phone calls, accept directly
-         if (onAcceptMeeting) {
-            onAcceptMeeting(message.id!);
+         if (onAcceptMeeting && message.meeting_id?.id) {
+            onAcceptMeeting(message.meeting_id.id);
          }
       }
    };
 
    const handleAcceptWithLink = () => {
-      if (meetingLink.trim()) {
+      if (meetingLink.trim() && message.meeting_id?.id) {
          if (onAcceptMeeting) {
-            onAcceptMeeting(message.id!, meetingLink.trim());
+            onAcceptMeeting(message.meeting_id.id, meetingLink.trim());
          }
          setIsMeetingLinkDialogOpen(false);
          setMeetingLink("");
@@ -119,8 +119,8 @@ export default function MeetingMessage({
    };
 
    const handleReject = () => {
-      if (onRejectMeeting) {
-         onRejectMeeting(message.id!);
+      if (onRejectMeeting && message.meeting_id?.id) {
+         onRejectMeeting(message.meeting_id.id);
       }
    };
 

@@ -78,3 +78,21 @@ export const getMemberRooms = async () => {
       throw error;
    }
 };
+
+export const updateMeeting = async (
+   meetingId: string,
+   action: "confirmed" | "cancelled",
+   meetingLink?: string
+) => {
+   try {
+      const response = await apiClient.post("/message/update-meeting", {
+         meetingId,
+         action,
+         meetingLink,
+      });
+      return response.data;
+   } catch (error) {
+      console.error(error);
+      throw error;
+   }
+};

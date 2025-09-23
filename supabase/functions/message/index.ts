@@ -5,6 +5,7 @@ import createRoom from "../../controller/message/createRoom.ts";
 import getMemberRooms from "../../controller/message/getMemberRooms.ts";
 import getMessages from "../../controller/message/getMessages.ts";
 import sendMessage from "../../controller/message/sendMessage.ts";
+import updateMeeting from "../../controller/message/updateMeeting.ts";
 import { verifyUser } from "./../../_shared/middleware.ts";
 
 const functionName = "message";
@@ -16,5 +17,6 @@ app.use("/get-member-rooms", verifyUser, getMemberRooms);
 app.use("/send-message", sendMessage);
 app.use("/get-messages", getMessages);
 app.use("/create-meeting", createMeeting);
+app.use("/update-meeting", updateMeeting);
 
 Deno.serve(withCors(app));

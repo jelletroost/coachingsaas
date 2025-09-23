@@ -10,6 +10,7 @@ export interface Message {
    isRead: boolean;
    is_error?: boolean;
    meeting_id?: {
+      id?: string;
       type: string;
       senderId?: string;
       date: Date;

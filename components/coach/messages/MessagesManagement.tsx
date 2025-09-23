@@ -8,6 +8,7 @@ import {
    getMemberRooms,
    getMessages,
    sendMessage,
+   updateMeeting,
 } from "@/services/message.service";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -125,53 +126,60 @@ export default function MessagesManagement() {
       console.log("Typing:", isTyping);
    };
 
-   const handleAcceptMeeting = (messageId: string, meetingLink?: string) => {
-      // Update the meeting status to confirmed
-      setMessages((prev) =>
-         prev.map((msg) =>
-            msg.id === messageId && msg.meeting_id
-               ? {
-                    ...msg,
-                    meeting_id: {
-                       ...msg.meeting_id,
-                       status: "confirmed",
-                       meeting_link: meetingLink || msg.meeting_id.meeting_link,
-                    },
-                 }
-               : msg
-         )
-      );
+   const handleAcceptMeeting = async (
+      meetingId: string,
+      meetingLink?: string
+   ) => {
+      try {
+         // Call API to accept the meeting
+         await updateMeeting(meetingId, "confirmed", meetingLink);
 
-      // TODO: Call API to accept the meeting
-      console.log("API Call: Accept meeting", {
-         messageId,
-         roomId: selectedConversation?.room_id,
-         coachId: user?.id,
-         action: "accept",
-         meetingLink: meetingLink || "phone_call",
-      });
+         // Update the meeting status to confirmed
+         setMessages((prev) =>
+            prev.map((msg) =>
+               msg.meeting_id?.id === meetingId && msg.meeting_id
+                  ? {
+                       ...msg,
+                       meeting_id: {
+                          ...msg.meeting_id,
+                          status: "confirmed",
+                          meeting_link:
+                             meetingLink || msg.meeting_id.meeting_link,
+                       },
+                    }
+                  : msg
+            )
+         );
+
+         console.log("Meeting accepted successfully:", meetingId);
+      } catch (error) {
+         console.error("Failed to accept meeting:", error);
+         // You could add a toast notification here
+      }
    };
 
-   const handleRejectMeeting = (messageId: string) => {
-      // Update the meeting status to cancelled
-      setMessages((prev) =>
-         prev.map((msg) =>
-            msg.id === messageId && msg.meeting_id
-               ? {
-                    ...msg,
-                    meeting_id: { ...msg.meeting_id, status: "cancelled" },
-                 }
-               : msg
-         )
-      );
+   const handleRejectMeeting = async (meetingId: string) => {
+      try {
+         // Call API to reject the meeting
+         await updateMeeting(meetingId, "cancelled");
 
-      // TODO: Call API to reject the meeting
-      console.log("API Call: Reject meeting", {
-         messageId,
-         roomId: selectedConversation?.room_id,
-         coachId: user?.id,
-         action: "reject",
-      });
+         // Update the meeting status to cancelled
+         setMessages((prev) =>
+            prev.map((msg) =>
+               msg.meeting_id?.id === meetingId && msg.meeting_id
+                  ? {
+                       ...msg,
+                       meeting_id: { ...msg.meeting_id, status: "cancelled" },
+                    }
+                  : msg
+            )
+         );
+
+         console.log("Meeting rejected successfully:", meetingId);
+      } catch (error) {
+         console.error("Failed to reject meeting:", error);
+         // You could add a toast notification here
+      }
    };
 
    // Calculate unread conversations from API data
