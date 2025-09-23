@@ -43,7 +43,7 @@ export default function MessagesManagement() {
         )
       : undefined;
 
-   // Fetch messages for selected conversation
+   // Fetch messages for selected conversation with polling
    const {
       data: messagesData,
       refetch: refetchMessages,
@@ -52,7 +52,9 @@ export default function MessagesManagement() {
       queryKey: ["messages", selectedConversationId],
       queryFn: () => getMessages(selectedConversation?.room_id || ""),
       enabled: !!selectedConversation?.room_id,
-      staleTime: 2 * 60 * 1000, // 2 minutes
+      staleTime: 0, // Always consider data stale
+      refetchInterval: 3000, // Poll every 3 seconds
+      refetchIntervalInBackground: true, // Continue polling when tab is not active
    });
 
    // Load messages from API data
@@ -64,7 +66,7 @@ export default function MessagesManagement() {
       }
    }, [messagesData]);
 
-   // Send message mutation
+   // Send message mutation with optimistic updates
    const { mutate: sendMessageMutation, isPending: isSendMessagePending } =
       useMutation({
          mutationFn: (newMessage: Message) =>
@@ -73,17 +75,29 @@ export default function MessagesManagement() {
                newMessage.sender_id,
                newMessage.content
             ),
+         onMutate: async (newMessage) => {
+            // Cancel any outgoing refetches
+            await refetchMessages();
+
+            // Optimistically update the UI
+            const optimisticMessage = {
+               ...newMessage,
+               id: `temp_${Date.now()}`,
+               timestamp: new Date().toISOString(),
+            };
+
+            setMessages((prev) => [...prev, optimisticMessage]);
+         },
          onSuccess: () => {
+            // Refetch messages to get the real message from server
             refetchMessages();
             refetchConversations();
          },
          onError: (error, newMessage) => {
             console.error("Failed to send message:", error);
-            // Mark the message as failed
+            // Remove the optimistic message on error
             setMessages((prev) =>
-               prev.map((msg) =>
-                  msg.id === newMessage.id ? { ...msg, is_error: true } : msg
-               )
+               prev.filter((msg) => msg.id !== `temp_${Date.now()}`)
             );
          },
       });
@@ -113,10 +127,7 @@ export default function MessagesManagement() {
          is_error: false,
       };
 
-      // Add message to local state immediately
-      setMessages((prev) => [...prev, newMessage]);
-
-      // Send message via API
+      // Send message via API (optimistic update handled in mutation)
       sendMessageMutation(newMessage);
    };
 
