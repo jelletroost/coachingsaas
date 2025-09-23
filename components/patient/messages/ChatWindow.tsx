@@ -194,12 +194,12 @@ export default function ChatWindow({
                                              ? "text-blue-100"
                                              : "text-gray-500"
                                        }`}>
-                                       {/* {formatMessageTime(message.timestamp)}
+                                       {moment(message.created_at).format(
+                                          "HH:mm"
+                                       )}
                                        {isOwnMessage && (
-                                          <span className="ml-2">
-                                             {message.isRead ? "✓✓" : "✓"}
-                                          </span>
-                                       )} */}
+                                          <span className="ml-2">✓✓</span>
+                                       )}
                                     </p>
                                  </div>
                               )}

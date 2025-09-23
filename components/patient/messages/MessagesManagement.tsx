@@ -39,7 +39,7 @@ export default function MessagesManagement() {
       queryFn: getPatientProfile,
    });
 
-   // CreaMessagete or get room
+   // Create or get room
    const { data: room } = useQuery({
       queryKey: ["room"],
       queryFn: () =>
@@ -48,7 +48,7 @@ export default function MessagesManagement() {
    });
 
    // Get messages
-   const { data: messagesData } = useQuery({
+   const { data: messagesData, refetch: refetchMessages } = useQuery({
       queryKey: ["messagesData"],
       queryFn: () => getMessages(room?.data?.room_id),
       enabled: !!room?.data?.room_id,
@@ -67,6 +67,9 @@ export default function MessagesManagement() {
             newMessage.sender_id,
             newMessage.content
          ),
+      onSuccess: () => {
+         refetchMessages();
+      },
    });
 
    const handleSendMessage = (content: string) => {
@@ -93,6 +96,9 @@ export default function MessagesManagement() {
             meetingData.meeting_id?.notes || "",
             meetingData.room_id
          ),
+      onSuccess: () => {
+         refetchMessages();
+      },
    });
 
    const handleAddMeetingMessage = (meetingData: MeetingData) => {
