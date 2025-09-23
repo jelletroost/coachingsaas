@@ -18,6 +18,7 @@ import {
    Smile,
    Video,
 } from "lucide-react";
+import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import { Conversation, Message } from "./mockData";
 
@@ -26,6 +27,8 @@ interface ChatWindowProps {
    messages: Message[];
    onSendMessage: (content: string) => void;
    onTyping: (isTyping: boolean) => void;
+   isMessagesPending?: boolean;
+   isSendMessagePending?: boolean;
 }
 
 export default function ChatWindow({
@@ -33,6 +36,8 @@ export default function ChatWindow({
    messages,
    onSendMessage,
    onTyping,
+   isMessagesPending,
+   isSendMessagePending,
 }: ChatWindowProps) {
    const [newMessage, setNewMessage] = useState("");
    const [isTyping, setIsTyping] = useState(false);
@@ -74,25 +79,22 @@ export default function ChatWindow({
    };
 
    const formatMessageTime = (timestamp: string) => {
-      const date = new Date(timestamp);
-      return date.toLocaleTimeString([], {
-         hour: "2-digit",
-         minute: "2-digit",
-      });
+      return moment(timestamp).format("HH:mm");
    };
 
    const formatMessageDate = (timestamp: string) => {
-      const date = new Date(timestamp);
-      const today = new Date();
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
+      const messageDate = moment(timestamp);
+      const today = moment();
+      const yesterday = moment().subtract(1, "day");
 
-      if (date.toDateString() === today.toDateString()) {
+      if (messageDate.isSame(today, "day")) {
          return "Today";
-      } else if (date.toDateString() === yesterday.toDateString()) {
+      } else if (messageDate.isSame(yesterday, "day")) {
          return "Yesterday";
+      } else if (messageDate.isSame(today, "year")) {
+         return messageDate.format("MMM DD");
       } else {
-         return date.toLocaleDateString();
+         return messageDate.format("MMM DD, YYYY");
       }
    };
 
@@ -132,32 +134,26 @@ export default function ChatWindow({
             <div className="flex items-center space-x-3">
                <Avatar className="h-10 w-10">
                   <AvatarImage
-                     src={conversation.patientAvatar}
-                     alt={conversation.patientName}
+                     src={`/avatars/${conversation.message_room.name
+                        .toLowerCase()
+                        .replace(/\s+/g, "_")}.jpg`}
+                     alt={conversation.message_room.name}
                   />
                   <AvatarFallback>
-                     {conversation.patientName
+                     {conversation.message_room.name
                         .split(" ")
-                        .map((n) => n[0])
+                        .map((n: string) => n[0])
                         .join("")}
                   </AvatarFallback>
                </Avatar>
                <div>
                   <h3 className="text-sm font-medium text-gray-900">
-                     {conversation.patientName}
+                     {conversation.message_room.name}
                   </h3>
                   <div className="flex items-center space-x-2">
-                     <div
-                        className={`w-2 h-2 rounded-full ${
-                           conversation.patientStatus === "online"
-                              ? "bg-green-500"
-                              : conversation.patientStatus === "away"
-                              ? "bg-yellow-500"
-                              : "bg-gray-400"
-                        }`}
-                     />
+                     <div className="w-2 h-2 rounded-full bg-green-500" />
                      <span className="text-xs text-gray-500 capitalize">
-                        {conversation.patientStatus}
+                        online
                      </span>
                   </div>
                </div>
@@ -186,12 +182,18 @@ export default function ChatWindow({
 
          {/* Messages Area */}
          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-            {messages.length === 0 ? (
+            {isMessagesPending ? (
+               <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mb-2"></div>
+                  <p className="text-sm">Loading messages...</p>
+               </div>
+            ) : messages.length === 0 ? (
                <div className="flex flex-col items-center justify-center h-full text-gray-500">
                   <div className="text-center">
                      <p className="text-sm">No messages yet</p>
                      <p className="text-xs mt-1">
-                        Start the conversation with {conversation.patientName}
+                        Start the conversation with{" "}
+                        {conversation?.message_room?.name}
                      </p>
                   </div>
                </div>
@@ -225,13 +227,15 @@ export default function ChatWindow({
                               {!isOwnMessage && (
                                  <Avatar className="h-6 w-6 flex-shrink-0">
                                     <AvatarImage
-                                       src={conversation.patientAvatar}
-                                       alt={conversation.patientName}
+                                       src={`/avatars/${conversation.message_room.name
+                                          .toLowerCase()
+                                          .replace(/\s+/g, "_")}.jpg`}
+                                       alt={conversation.message_room.name}
                                     />
                                     <AvatarFallback className="text-xs">
-                                       {conversation.patientName
+                                       {conversation.message_room.name
                                           .split(" ")
-                                          .map((n) => n[0])
+                                          .map((n: string) => n[0])
                                           .join("")}
                                     </AvatarFallback>
                                  </Avatar>
@@ -290,10 +294,14 @@ export default function ChatWindow({
                </div>
                <Button
                   onClick={handleSendMessage}
-                  disabled={!newMessage.trim()}
+                  disabled={!newMessage.trim() || isSendMessagePending}
                   size="sm"
                   className="h-8 w-8 p-0">
-                  <Send className="h-4 w-4" />
+                  {isSendMessagePending ? (
+                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  ) : (
+                     <Send className="h-4 w-4" />
+                  )}
                </Button>
             </div>
          </div>

@@ -3,12 +3,16 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { getMemberRooms } from "@/services/message.service";
-import { useQuery } from "@tanstack/react-query";
+import {
+   getMemberRooms,
+   getMessages,
+   sendMessage,
+} from "@/services/message.service";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import ChatWindow from "./ChatWindow";
 import MessageList from "./MessageList";
-import { Conversation, getMessagesByConversationId, Message } from "./mockData";
+import { Conversation, Message } from "./mockData";
 
 export default function MessagesManagement() {
    const [selectedConversationId, setSelectedConversationId] = useState<
@@ -30,17 +34,51 @@ export default function MessagesManagement() {
 
    const conversations = conversationsData?.data || [];
 
-   // Load messages when conversation is selected
+   // Get selected conversation
+   const selectedConversation = selectedConversationId
+      ? conversations.find(
+           (conv: Conversation) => conv.id === selectedConversationId
+        )
+      : undefined;
+
+   // Fetch messages for selected conversation
+   const {
+      data: messagesData,
+      refetch: refetchMessages,
+      isPending: isMessagesPending,
+   } = useQuery({
+      queryKey: ["messages", selectedConversationId],
+      queryFn: () => getMessages(selectedConversation?.room_id || ""),
+      enabled: !!selectedConversation?.room_id,
+      staleTime: 2 * 60 * 1000, // 2 minutes
+   });
+
+   // Load messages from API data
    useEffect(() => {
-      if (selectedConversationId) {
-         const conversationMessages = getMessagesByConversationId(
-            selectedConversationId
-         );
-         setMessages(conversationMessages);
+      if (messagesData?.data) {
+         setMessages(messagesData.data);
       } else {
          setMessages([]);
       }
-   }, [selectedConversationId]);
+   }, [messagesData]);
+
+   // Send message mutation
+   const { mutate: sendMessageMutation, isPending: isSendMessagePending } =
+      useMutation({
+         mutationFn: (newMessage: Message) =>
+            sendMessage(
+               newMessage.conversationId,
+               newMessage.senderId,
+               newMessage.content
+            ),
+         onSuccess: () => {
+            refetchMessages();
+            refetchConversations();
+         },
+         onError: (error) => {
+            console.error("Failed to send message:", error);
+         },
+      });
 
    const handleSelectConversation = (conversationId: string) => {
       setSelectedConversationId(conversationId);
@@ -49,36 +87,26 @@ export default function MessagesManagement() {
    };
 
    const handleSendMessage = (content: string) => {
-      if (!selectedConversationId) return;
+      if (!selectedConversationId || !selectedConversation?.room_id) return;
 
       const newMessage: Message = {
          id: `msg_${Date.now()}`,
          conversationId: selectedConversationId,
-         senderId: "coach_1",
+         senderId: "coach_1", // This should be the actual coach ID from auth
          senderType: "coach",
          content,
          timestamp: new Date().toISOString(),
          isRead: false,
       };
 
-      // Add message to messages list
-      setMessages((prev) => [...prev, newMessage]);
-
-      // Note: In a real implementation, you would call an API to send the message
-      // and then refetch the conversations to get updated timestamps
-      // For now, we'll just add the message to local state
+      // Send message via API
+      sendMessageMutation(newMessage);
    };
 
    const handleTyping = (isTyping: boolean) => {
       // Handle typing indicator logic here
       console.log("Typing:", isTyping);
    };
-
-   const selectedConversation = selectedConversationId
-      ? conversations.find(
-           (conv: Conversation) => conv.id === selectedConversationId
-        )
-      : undefined;
 
    // Calculate unread conversations from API data
    const totalUnread = conversations.filter(
@@ -152,6 +180,8 @@ export default function MessagesManagement() {
                         messages={messages}
                         onSendMessage={handleSendMessage}
                         onTyping={handleTyping}
+                        isMessagesPending={isMessagesPending}
+                        isSendMessagePending={isSendMessagePending}
                      />
                   </div>
                </div>
