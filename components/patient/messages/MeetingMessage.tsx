@@ -61,23 +61,6 @@ export default function MeetingMessage({
    const meetingDate = new Date(meeting_id.date);
    const isPastMeeting = meetingDate < new Date();
 
-   const handleJoinMeeting = () => {
-      if (meeting_id.type === "google-meet") {
-         // In a real app, this would open the Google Meet link
-         alert("Opening Google Meet...");
-      } else {
-         // For phone calls, this might initiate the call
-         alert("Initiating phone call...");
-      }
-   };
-
-   // const handleCancel = () => {
-   //    // In a real app, this would cancel the meeting
-   //    if (confirm("Are you sure you want to cancel this meeting?")) {
-   //       alert("Meeting cancelled");
-   //    }
-   // };
-
    return (
       <>
          <div
@@ -135,12 +118,17 @@ export default function MeetingMessage({
                </Button>
 
                {meeting_id.status === "confirmed" && !isPastMeeting && (
-                  <Button
-                     variant="default"
-                     size="sm"
-                     onClick={handleJoinMeeting}
-                     className="text-xs">
-                     {meeting_id.type === "phone" ? "Call Now" : "Join Meeting"}
+                  <Button variant="default" size="sm" className="text-xs">
+                     {meeting_id.type === "phone" ? (
+                        "Call Now"
+                     ) : (
+                        <a
+                           href={meeting_id.meeting_link}
+                           target="_blank"
+                           rel="noopener noreferrer">
+                           Join Meeting
+                        </a>
+                     )}
                   </Button>
                )}
             </div>
@@ -253,10 +241,17 @@ export default function MeetingMessage({
                      Close
                   </Button>
                   {meeting_id.status === "confirmed" && !isPastMeeting && (
-                     <Button onClick={handleJoinMeeting}>
-                        {meeting_id.type === "phone"
-                           ? "Call Now"
-                           : "Join Meeting"}
+                     <Button>
+                        {meeting_id.type === "phone" ? (
+                           "Call Now"
+                        ) : (
+                           <a
+                              href={meeting_id.meeting_link}
+                              target="_blank"
+                              rel="noopener noreferrer">
+                              Join Meeting
+                           </a>
+                        )}
                      </Button>
                   )}
                </div>
