@@ -3,23 +3,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-   DropdownMenu,
-   DropdownMenuContent,
-   DropdownMenuItem,
-   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { useTypingIndicator } from "@/hooks/useTypingIndicator";
-import {
-   MessageSquareWarning,
-   MoreVertical,
-   Paperclip,
-   Phone,
-   Send,
-   Smile,
-   Video,
-} from "lucide-react";
+import { MessageSquareWarning, Paperclip, Send, Smile } from "lucide-react";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import MeetingMessage from "./MeetingMessage";
@@ -53,14 +38,6 @@ export default function ChatWindow({
    const messagesEndRef = useRef<HTMLDivElement>(null);
    const inputRef = useRef<HTMLInputElement>(null);
 
-   // Typing indicator for realtime
-   const { typingUsers, setIsTyping: setRealtimeTyping } = useTypingIndicator({
-      roomId: conversation?.room_id,
-      userId: currentUserId,
-      userName: "Coach", // You might want to get this from user context
-      enabled: !!conversation?.room_id,
-   });
-
    const scrollToBottom = () => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
    };
@@ -88,11 +65,9 @@ export default function ChatWindow({
       setNewMessage(e.target.value);
       if (e.target.value.length > 0 && !isTyping) {
          setIsTyping(true);
-         setRealtimeTyping(true);
          onTyping(true);
       } else if (e.target.value.length === 0 && isTyping) {
          setIsTyping(false);
-         setRealtimeTyping(false);
          onTyping(false);
       }
    };
@@ -176,26 +151,6 @@ export default function ChatWindow({
                      </span>
                   </div>
                </div>
-            </div>
-            <div className="flex items-center space-x-2">
-               <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <Phone className="h-4 w-4" />
-               </Button>
-               <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <Video className="h-4 w-4" />
-               </Button>
-               <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                     <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <MoreVertical className="h-4 w-4" />
-                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                     <DropdownMenuItem>View Profile</DropdownMenuItem>
-                     <DropdownMenuItem>Mute Notifications</DropdownMenuItem>
-                     <DropdownMenuItem>Block</DropdownMenuItem>
-                  </DropdownMenuContent>
-               </DropdownMenu>
             </div>
          </div>
 
@@ -312,28 +267,6 @@ export default function ChatWindow({
                      </div>
                   );
                })
-            )}
-
-            {/* Typing Indicator */}
-            {typingUsers.length > 0 && (
-               <div className="flex items-center space-x-2 px-4 py-2">
-                  <div className="flex space-x-1">
-                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                     <div
-                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.1s" }}
-                     />
-                     <div
-                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.2s" }}
-                     />
-                  </div>
-                  <span className="text-sm text-gray-500">
-                     {typingUsers.length === 1
-                        ? `${typingUsers[0].name || "Someone"} is typing...`
-                        : `${typingUsers.length} people are typing...`}
-                  </span>
-               </div>
             )}
 
             <div ref={messagesEndRef} />
