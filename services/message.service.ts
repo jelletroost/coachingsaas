@@ -68,3 +68,13 @@ export const createMeeting = async (
       throw error;
    }
 };
+
+export const getMemberRooms = async () => {
+   try {
+      const response = await apiClient.get("/message/get-member-rooms");
+      return response.data;
+   } catch (error) {
+      console.error(error);
+      throw error;
+   }
+};

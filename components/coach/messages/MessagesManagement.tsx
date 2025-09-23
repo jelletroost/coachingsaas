@@ -3,28 +3,32 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { getMemberRooms } from "@/services/message.service";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import ChatWindow from "./ChatWindow";
 import MessageList from "./MessageList";
-import {
-   Conversation,
-   conversationsData,
-   getConversationById,
-   getMessagesByConversationId,
-   getTotalUnreadMessages,
-   Message,
-} from "./mockData";
+import { Conversation, getMessagesByConversationId, Message } from "./mockData";
 
 export default function MessagesManagement() {
-   const [conversations, setConversations] =
-      useState<Conversation[]>(conversationsData);
    const [selectedConversationId, setSelectedConversationId] = useState<
       string | undefined
    >();
    const [messages, setMessages] = useState<Message[]>([]);
-   const [searchQuery, setSearchQuery] = useState("");
-   const [filteredConversations, setFilteredConversations] =
-      useState<Conversation[]>(conversations);
+
+   // Fetch conversations using useQuery
+   const {
+      data: conversationsData,
+      isLoading: conversationsLoading,
+      error: conversationsError,
+      refetch: refetchConversations,
+   } = useQuery({
+      queryKey: ["memberRooms"],
+      queryFn: getMemberRooms,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+   });
+
+   const conversations = conversationsData?.data || [];
 
    // Load messages when conversation is selected
    useEffect(() => {
@@ -38,34 +42,10 @@ export default function MessagesManagement() {
       }
    }, [selectedConversationId]);
 
-   // Filter conversations based on search
-   useEffect(() => {
-      let filtered = conversations;
-
-      // Filter by search query
-      if (searchQuery) {
-         filtered = filtered.filter(
-            (conv) =>
-               conv.patientName
-                  .toLowerCase()
-                  .includes(searchQuery.toLowerCase()) ||
-               conv.lastMessage
-                  .toLowerCase()
-                  .includes(searchQuery.toLowerCase())
-         );
-      }
-
-      setFilteredConversations(filtered);
-   }, [conversations, searchQuery]);
-
    const handleSelectConversation = (conversationId: string) => {
       setSelectedConversationId(conversationId);
-
-      // Mark messages as read
-      const updatedConversations = conversations.map((conv) =>
-         conv.id === conversationId ? { ...conv, unreadCount: 0 } : conv
-      );
-      setConversations(updatedConversations);
+      // Note: In a real implementation, you would call an API to mark messages as read
+      // For now, we'll just update the local state or trigger a refetch
    };
 
    const handleSendMessage = (content: string) => {
@@ -84,22 +64,9 @@ export default function MessagesManagement() {
       // Add message to messages list
       setMessages((prev) => [...prev, newMessage]);
 
-      // Update conversation's last message
-      const updatedConversations = conversations.map((conv) =>
-         conv.id === selectedConversationId
-            ? {
-                 ...conv,
-                 lastMessage: content,
-                 lastMessageTime: new Date().toISOString(),
-                 lastActivity: new Date().toISOString(),
-              }
-            : conv
-      );
-      setConversations(updatedConversations);
-   };
-
-   const handleSearch = (query: string) => {
-      setSearchQuery(query);
+      // Note: In a real implementation, you would call an API to send the message
+      // and then refetch the conversations to get updated timestamps
+      // For now, we'll just add the message to local state
    };
 
    const handleTyping = (isTyping: boolean) => {
@@ -108,10 +75,41 @@ export default function MessagesManagement() {
    };
 
    const selectedConversation = selectedConversationId
-      ? getConversationById(selectedConversationId)
+      ? conversations.find(
+           (conv: Conversation) => conv.id === selectedConversationId
+        )
       : undefined;
 
-   const totalUnread = getTotalUnreadMessages();
+   // Calculate unread conversations from API data
+   const totalUnread = conversations.filter(
+      (conv: Conversation) => conv.last_read_message_id === null
+   ).length;
+
+   // Show loading state
+   if (conversationsLoading) {
+      return (
+         <div className="h-full flex items-center justify-center">
+            <div className="text-center">
+               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+               <p className="text-gray-600">Loading conversations...</p>
+            </div>
+         </div>
+      );
+   }
+
+   // Show error state
+   if (conversationsError) {
+      return (
+         <div className="h-full flex items-center justify-center">
+            <div className="text-center">
+               <p className="text-red-600 mb-4">Failed to load conversations</p>
+               <Button onClick={() => refetchConversations()} variant="outline">
+                  Try Again
+               </Button>
+            </div>
+         </div>
+      );
+   }
 
    return (
       <div className="h-full">
@@ -141,10 +139,9 @@ export default function MessagesManagement() {
                   {/* Message List */}
                   <div className="w-1/3 border-r border-gray-200">
                      <MessageList
-                        conversations={filteredConversations}
+                        conversations={conversations}
                         selectedConversationId={selectedConversationId}
                         onSelectConversation={handleSelectConversation}
-                        onSearch={handleSearch}
                      />
                   </div>
 

@@ -16,15 +16,20 @@ export interface Message {
 
 export interface Conversation {
    id: string;
-   patientId: string;
-   patientName: string;
-   patientAvatar?: string;
-   lastMessage: string;
-   lastMessageTime: string;
-   unreadCount: number;
-   status: "active" | "archived";
-   lastActivity: string;
-   patientStatus: "online" | "offline" | "away";
+   user_id: string;
+   role: string;
+   last_read_message_id: string | null;
+   created_at: string;
+   updated_at: string;
+   room_id: string;
+   message_room: {
+      id: string;
+      name: string;
+      room_id: string;
+      is_group: boolean;
+      created_at: string;
+      updated_at: string;
+   };
 }
 
 export interface Patient {
@@ -38,81 +43,121 @@ export interface Patient {
    assignedCoach: string;
 }
 
-// Mock conversations data
+// Mock conversations data matching API format
 export const conversationsData: Conversation[] = [
    {
-      id: "conv_1",
-      patientId: "1",
-      patientName: "Sarah Johnson",
-      patientAvatar: "/avatars/sarah.jpg",
-      lastMessage:
-         "Thank you for the exercise recommendations! I've been following them and feeling much better.",
-      lastMessageTime: "2 minutes ago",
-      unreadCount: 0,
-      status: "active",
-      lastActivity: "2024-01-20T10:30:00Z",
-      patientStatus: "online",
+      id: "cd4f5480-026b-456e-a679-323120497792",
+      user_id: "fccdf17b-94b2-4cbe-b871-f3c32df45625",
+      role: "member",
+      last_read_message_id: null,
+      created_at: "2025-09-23T12:30:21.759503+00:00",
+      updated_at: "2025-09-23T12:30:21.759503+00:00",
+      room_id:
+         "fccdf17b-94b2-4cbe-b871-f3c32df456251b638786-1953-42e7-b0e2-baa84d701469",
+      message_room: {
+         id: "4da19483-8a91-4cfb-b5dd-face18226a92",
+         name: "Shannon Heath",
+         room_id:
+            "fccdf17b-94b2-4cbe-b871-f3c32df456251b638786-1953-42e7-b0e2-baa84d701469",
+         is_group: false,
+         created_at: "2025-09-23T12:30:21.740012+00:00",
+         updated_at: "2025-09-23T12:30:21.740012+00:00",
+      },
    },
    {
-      id: "conv_2",
-      patientId: "2",
-      patientName: "Mike Davis",
-      patientAvatar: "/avatars/mike.jpg",
-      lastMessage:
-         "I'm experiencing some side effects from the new medication. Should I be concerned?",
-      lastMessageTime: "15 minutes ago",
-      unreadCount: 1,
-      status: "active",
-      lastActivity: "2024-01-20T10:15:00Z",
-      patientStatus: "away",
+      id: "cd4f5480-026b-456e-a679-323120497793",
+      user_id: "fccdf17b-94b2-4cbe-b871-f3c32df45626",
+      role: "member",
+      last_read_message_id: null,
+      created_at: "2025-09-23T11:30:21.759503+00:00",
+      updated_at: "2025-09-23T11:30:21.759503+00:00",
+      room_id:
+         "fccdf17b-94b2-4cbe-b871-f3c32df456261b638786-1953-42e7-b0e2-baa84d701470",
+      message_room: {
+         id: "4da19483-8a91-4cfb-b5dd-face18226a93",
+         name: "Mike Davis",
+         room_id:
+            "fccdf17b-94b2-4cbe-b871-f3c32df456261b638786-1953-42e7-b0e2-baa84d701470",
+         is_group: false,
+         created_at: "2025-09-23T11:30:21.740012+00:00",
+         updated_at: "2025-09-23T11:30:21.740012+00:00",
+      },
    },
    {
-      id: "conv_3",
-      patientId: "3",
-      patientName: "Emma Wilson",
-      patientAvatar: "/avatars/emma.jpg",
-      lastMessage: "Great news! I've achieved my fitness goal for this month.",
-      lastMessageTime: "1 hour ago",
-      unreadCount: 0,
-      status: "active",
-      lastActivity: "2024-01-20T09:30:00Z",
-      patientStatus: "offline",
+      id: "cd4f5480-026b-456e-a679-323120497794",
+      user_id: "fccdf17b-94b2-4cbe-b871-f3c32df45627",
+      role: "member",
+      last_read_message_id: null,
+      created_at: "2025-09-23T10:30:21.759503+00:00",
+      updated_at: "2025-09-23T10:30:21.759503+00:00",
+      room_id:
+         "fccdf17b-94b2-4cbe-b871-f3c32df456271b638786-1953-42e7-b0e2-baa84d701471",
+      message_room: {
+         id: "4da19483-8a91-4cfb-b5dd-face18226a94",
+         name: "Emma Wilson",
+         room_id:
+            "fccdf17b-94b2-4cbe-b871-f3c32df456271b638786-1953-42e7-b0e2-baa84d701471",
+         is_group: false,
+         created_at: "2025-09-23T10:30:21.740012+00:00",
+         updated_at: "2025-09-23T10:30:21.740012+00:00",
+      },
    },
    {
-      id: "conv_4",
-      patientId: "4",
-      patientName: "David Brown",
-      patientAvatar: "/avatars/david.jpg",
-      lastMessage: "Can you help me with meal planning for next week?",
-      lastMessageTime: "3 hours ago",
-      unreadCount: 2,
-      status: "active",
-      lastActivity: "2024-01-20T07:30:00Z",
-      patientStatus: "offline",
+      id: "cd4f5480-026b-456e-a679-323120497795",
+      user_id: "fccdf17b-94b2-4cbe-b871-f3c32df45628",
+      role: "member",
+      last_read_message_id: null,
+      created_at: "2025-09-23T09:30:21.759503+00:00",
+      updated_at: "2025-09-23T09:30:21.759503+00:00",
+      room_id:
+         "fccdf17b-94b2-4cbe-b871-f3c32df456281b638786-1953-42e7-b0e2-baa84d701472",
+      message_room: {
+         id: "4da19483-8a91-4cfb-b5dd-face18226a95",
+         name: "David Brown",
+         room_id:
+            "fccdf17b-94b2-4cbe-b871-f3c32df456281b638786-1953-42e7-b0e2-baa84d701472",
+         is_group: false,
+         created_at: "2025-09-23T09:30:21.740012+00:00",
+         updated_at: "2025-09-23T09:30:21.740012+00:00",
+      },
    },
    {
-      id: "conv_5",
-      patientId: "5",
-      patientName: "Lisa Chen",
-      patientAvatar: "/avatars/lisa.jpg",
-      lastMessage: "I've been struggling with sleep lately. Any suggestions?",
-      lastMessageTime: "1 day ago",
-      unreadCount: 0,
-      status: "active",
-      lastActivity: "2024-01-19T14:20:00Z",
-      patientStatus: "offline",
+      id: "cd4f5480-026b-456e-a679-323120497796",
+      user_id: "fccdf17b-94b2-4cbe-b871-f3c32df45629",
+      role: "member",
+      last_read_message_id: null,
+      created_at: "2025-09-23T08:30:21.759503+00:00",
+      updated_at: "2025-09-23T08:30:21.759503+00:00",
+      room_id:
+         "fccdf17b-94b2-4cbe-b871-f3c32df456291b638786-1953-42e7-b0e2-baa84d701473",
+      message_room: {
+         id: "4da19483-8a91-4cfb-b5dd-face18226a96",
+         name: "Lisa Chen",
+         room_id:
+            "fccdf17b-94b2-4cbe-b871-f3c32df456291b638786-1953-42e7-b0e2-baa84d701473",
+         is_group: false,
+         created_at: "2025-09-23T08:30:21.740012+00:00",
+         updated_at: "2025-09-23T08:30:21.740012+00:00",
+      },
    },
    {
-      id: "conv_6",
-      patientId: "6",
-      patientName: "John Smith",
-      patientAvatar: "/avatars/john.jpg",
-      lastMessage: "Looking forward to our first session next week!",
-      lastMessageTime: "2 days ago",
-      unreadCount: 0,
-      status: "active",
-      lastActivity: "2024-01-18T16:45:00Z",
-      patientStatus: "offline",
+      id: "cd4f5480-026b-456e-a679-323120497797",
+      user_id: "fccdf17b-94b2-4cbe-b871-f3c32df45630",
+      role: "member",
+      last_read_message_id: null,
+      created_at: "2025-09-23T07:30:21.759503+00:00",
+      updated_at: "2025-09-23T07:30:21.759503+00:00",
+      room_id:
+         "fccdf17b-94b2-4cbe-b871-f3c32df456301b638786-1953-42e7-b0e2-baa84d701474",
+      message_room: {
+         id: "4da19483-8a91-4cfb-b5dd-face18226a97",
+         name: "John Smith",
+         room_id:
+            "fccdf17b-94b2-4cbe-b871-f3c32df456301b638786-1953-42e7-b0e2-baa84d701474",
+         is_group: false,
+         created_at: "2025-09-23T07:30:21.740012+00:00",
+         updated_at: "2025-09-23T07:30:21.740012+00:00",
+      },
    },
 ];
 
@@ -340,12 +385,14 @@ export const getPatientById = (patientId: string): Patient | undefined => {
 };
 
 export const getUnreadConversations = (): Conversation[] => {
-   return conversationsData.filter((conv) => conv.unreadCount > 0);
+   // For API format, we'll consider conversations with null last_read_message_id as unread
+   return conversationsData.filter(
+      (conv) => conv.last_read_message_id === null
+   );
 };
 
 export const getTotalUnreadMessages = (): number => {
-   return conversationsData.reduce(
-      (total, conv) => total + conv.unreadCount,
-      0
-   );
+   // For API format, count conversations with null last_read_message_id
+   return conversationsData.filter((conv) => conv.last_read_message_id === null)
+      .length;
 };

@@ -1,7 +1,6 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
    DropdownMenu,
@@ -9,43 +8,23 @@ import {
    DropdownMenuItem,
    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Archive, MoreVertical, Search, Trash2 } from "lucide-react";
-import React, { useState } from "react";
+import { Archive, MoreVertical, Trash2 } from "lucide-react";
 import { Conversation } from "./mockData";
 
 interface MessageListProps {
    conversations: Conversation[];
    selectedConversationId?: string;
    onSelectConversation: (conversationId: string) => void;
-   onSearch: (query: string) => void;
 }
 
 export default function MessageList({
    conversations,
    selectedConversationId,
    onSelectConversation,
-   onSearch,
 }: MessageListProps) {
-   const [searchQuery, setSearchQuery] = useState("");
-
-   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const query = e.target.value;
-      setSearchQuery(query);
-      onSearch(query);
-   };
-
-   const getStatusColor = (status: string) => {
-      switch (status) {
-         case "online":
-            return "bg-green-500";
-         case "away":
-            return "bg-yellow-500";
-         case "offline":
-            return "bg-gray-400";
-         default:
-            return "bg-gray-400";
-      }
+   const getStatusColor = () => {
+      // For now, we'll show all conversations as online since we don't have status info in API
+      return "bg-green-500";
    };
 
    const formatTime = (timestamp: string) => {
@@ -69,18 +48,7 @@ export default function MessageList({
       <div className="flex flex-col h-full border-r border-gray-200">
          {/* Header */}
          <div className="p-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-               Messages
-            </h2>
-            <div className="relative">
-               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-               <Input
-                  placeholder="Search conversations..."
-                  value={searchQuery}
-                  onChange={handleSearch}
-                  className="pl-10"
-               />
-            </div>
+            <h2 className="text-lg font-semibold text-gray-900">Messages</h2>
          </div>
 
          {/* Conversations List */}
@@ -109,20 +77,20 @@ export default function MessageList({
                         <div className="relative">
                            <Avatar className="h-12 w-12">
                               <AvatarImage
-                                 src={conversation.patientAvatar}
-                                 alt={conversation.patientName}
+                                 src={`/avatars/${conversation.message_room.name
+                                    .toLowerCase()
+                                    .replace(/\s+/g, "_")}.jpg`}
+                                 alt={conversation.message_room.name}
                               />
                               <AvatarFallback>
-                                 {conversation.patientName
+                                 {conversation.message_room.name
                                     .split(" ")
-                                    .map((n) => n[0])
+                                    .map((n: string) => n[0])
                                     .join("")}
                               </AvatarFallback>
                            </Avatar>
                            <div
-                              className={`absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white ${getStatusColor(
-                                 conversation.patientStatus
-                              )}`}
+                              className={`absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white ${getStatusColor()}`}
                            />
                         </div>
 
@@ -130,19 +98,12 @@ export default function MessageList({
                         <div className="flex-1 min-w-0">
                            <div className="flex items-center justify-between">
                               <h3 className="text-sm font-medium text-gray-900 truncate">
-                                 {conversation.patientName}
+                                 {conversation.message_room.name}
                               </h3>
                               <div className="flex items-center space-x-2">
                                  <span className="text-xs text-gray-500">
-                                    {formatTime(conversation.lastMessageTime)}
+                                    {formatTime(conversation.updated_at)}
                                  </span>
-                                 {conversation.unreadCount > 0 && (
-                                    <Badge
-                                       variant="destructive"
-                                       className="h-5 w-5 rounded-full p-0 text-xs">
-                                       {conversation.unreadCount}
-                                    </Badge>
-                                 )}
                                  <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                        <Button
@@ -166,7 +127,9 @@ export default function MessageList({
                               </div>
                            </div>
                            <p className="text-sm text-gray-600 truncate mt-1">
-                              {conversation.lastMessage}
+                              {conversation.message_room.is_group
+                                 ? "Group conversation"
+                                 : "Direct message"}
                            </p>
                         </div>
                      </div>
