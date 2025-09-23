@@ -20,33 +20,33 @@ interface MeetingMessageProps {
 }
 
 const getStatusColor = (status: string) => {
-    switch (status) {
-       case "pending":
-          return "bg-yellow-100 text-yellow-800";
-       case "confirmed":
-          return "bg-green-100 text-green-800";
-       case "cancelled":
-          return "bg-red-100 text-red-800";
-       case "completed":
-          return "bg-gray-100 text-gray-800";
-       default:
-          return "bg-gray-100 text-gray-800";
-    }
+   switch (status) {
+      case "pending":
+         return "bg-yellow-100 text-yellow-800";
+      case "confirmed":
+         return "bg-green-100 text-green-800";
+      case "cancelled":
+         return "bg-red-100 text-red-800";
+      case "completed":
+         return "bg-gray-100 text-gray-800";
+      default:
+         return "bg-gray-100 text-gray-800";
+   }
 };
 
 const getStatusText = (status: string) => {
-    switch (status) {
-       case "pending":
-          return "Pending";
-       case "confirmed":
-          return "Confirmed";
-       case "cancelled":
-          return "Cancelled";
-       case "completed":
-          return "Completed";
-       default:
-          return "Unknown";
-    }
+   switch (status) {
+      case "pending":
+         return "Pending";
+      case "confirmed":
+         return "Confirmed";
+      case "cancelled":
+         return "Cancelled";
+      case "completed":
+         return "Completed";
+      default:
+         return "Unknown";
+   }
 };
 
 export default function MeetingMessage({
@@ -55,14 +55,14 @@ export default function MeetingMessage({
 }: MeetingMessageProps) {
    const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
-   if (!message.meetingData) return null;
+   if (!message.meeting_id) return null;
 
-   const { meetingData } = message;
-   const meetingDate = new Date(meetingData.date);
+   const { meeting_id } = message;
+   const meetingDate = new Date(meeting_id.date);
    const isPastMeeting = meetingDate < new Date();
 
    const handleJoinMeeting = () => {
-      if (meetingData.type === "google-meet") {
+      if (meeting_id.type === "google-meet") {
          // In a real app, this would open the Google Meet link
          alert("Opening Google Meet...");
       } else {
@@ -71,13 +71,12 @@ export default function MeetingMessage({
       }
    };
 
-
-   const handleCancel = () => {
-      // In a real app, this would cancel the meeting
-      if (confirm("Are you sure you want to cancel this meeting?")) {
-         alert("Meeting cancelled");
-      }
-   };
+   // const handleCancel = () => {
+   //    // In a real app, this would cancel the meeting
+   //    if (confirm("Are you sure you want to cancel this meeting?")) {
+   //       alert("Meeting cancelled");
+   //    }
+   // };
 
    return (
       <>
@@ -89,19 +88,19 @@ export default function MeetingMessage({
             }`}>
             <div className="flex items-start justify-between mb-3">
                <div className="flex items-center space-x-2">
-                  {meetingData.type === "phone" ? (
+                  {meeting_id.type === "phone" ? (
                      <Phone className="h-5 w-5 text-blue-600" />
                   ) : (
                      <Video className="h-5 w-5 text-green-600" />
                   )}
                   <span className="font-medium text-sm">
-                     {meetingData.type === "phone"
+                     {meeting_id.type === "phone"
                         ? "Phone Call"
                         : "Google Meet"}
                   </span>
                </div>
-               <Badge className={getStatusColor(meetingData.status)}>
-                  {getStatusText(meetingData.status)}
+               <Badge className={getStatusColor(meeting_id.status)}>
+                  {getStatusText(meeting_id.status)}
                </Badge>
             </div>
 
@@ -112,59 +111,47 @@ export default function MeetingMessage({
                </div>
                <div className="flex items-center space-x-2 text-sm">
                   <Clock className="h-4 w-4 text-gray-500" />
-                  <span>{meetingData.time}</span>
+                  <span>{meeting_id.time}</span>
                   <span className="text-gray-400">•</span>
-                  <span>{meetingData.duration} minutes</span>
+                  <span>{meeting_id.duration} minutes</span>
                </div>
-               {meetingData.notes && (
+               {meeting_id.notes && (
                   <div className="flex items-start space-x-2 text-sm">
                      <FileText className="h-4 w-4 text-gray-500 mt-0.5" />
                      <span className="text-gray-600 line-clamp-2">
-                        {meetingData.notes}
+                        {meeting_id.notes}
                      </span>
                   </div>
                )}
             </div>
 
-             <div className="flex space-x-2">
-                <Button
-                   variant="outline"
-                   size="sm"
-                   onClick={() => setIsDetailsOpen(true)}
-                   className="text-xs">
-                   View Details
-                </Button>
+            <div className="flex space-x-2">
+               <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsDetailsOpen(true)}
+                  className="text-xs">
+                  View Details
+               </Button>
 
-                {meetingData.status === "confirmed" && !isPastMeeting && (
-                   <Button
-                      variant="default"
-                      size="sm"
-                      onClick={handleJoinMeeting}
-                      className="text-xs">
-                      {meetingData.type === "phone"
-                         ? "Call Now"
-                         : "Join Meeting"}
-                   </Button>
-                )}
-
-                {meetingData.status === "pending" && i
+               {meeting_id.status === "confirmed" && !isPastMeeting && (
                   <Button
-            ghost"
-                   size="sm"
-                    onClick={handeCancel}
-                    className"text-xs txt-red-600 hover:text-ed-700">
-                   Cancel
+                     variant="default"
+                     size="sm"
+                     onClick={handleJoinMeeting}
+                     className="text-xs">
+                     {meeting_id.type === "phone" ? "Call Now" : "Join Meeting"}
                   </Button>
                )}
             </div>
          </div>
 
-       {/*eeting Details Dialog */}
-         <Dialog op={i sDetailsOpen} onOpenChange={setIsDetailsOpen}>
+         {/*Meeting Details Dialog */}
+         <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
             <DialogContent className="sm:max-w-[500px]">
                <DialogHeader>
                   <DialogTitle className="flex items-center space-x-2">
-                     {meetingData.type === "phone" ? (
+                     {meeting_id.type === "phone" ? (
                         <Phone className="h-5 w-5 text-blue-600" />
                      ) : (
                         <Video className="h-5 w-5 text-green-600" />
@@ -183,7 +170,7 @@ export default function MeetingMessage({
                            Type
                         </label>
                         <p className="text-sm">
-                           {meetingData.type === "phone"
+                           {meeting_id.type === "phone"
                               ? "Phone Call"
                               : "Google Meet"}
                         </p>
@@ -193,9 +180,8 @@ export default function MeetingMessage({
                            Status
                         </label>
                         <div className="mt-1">
-                           <Badge
-                              className={getStatusColor(meetingData.status)}>
-                              {getStatusText(meetingData.status)}
+                           <Badge className={getStatusColor(meeting_id.status)}>
+                              {getStatusText(meeting_id.status)}
                            </Badge>
                         </div>
                      </div>
@@ -214,7 +200,7 @@ export default function MeetingMessage({
                         <label className="text-sm font-medium text-gray-500">
                            Time
                         </label>
-                        <p className="text-sm">{meetingData.time}</p>
+                        <p className="text-sm">{meeting_id.time}</p>
                      </div>
                   </div>
 
@@ -223,62 +209,59 @@ export default function MeetingMessage({
                         <label className="text-sm font-medium text-gray-500">
                            Duration
                         </label>
-                        <p className="text-sm">
-                           {meetingData.duration} minutes
-                        </p>
+                        <p className="text-sm">{meeting_id.duration} minutes</p>
                      </div>
                      <div>
                         <label className="text-sm font-medium text-gray-500">
                            Meeting ID
                         </label>
-                        <p className="text-xs font-mono">
-                           {meetingData.meetingId || "Not assigned"}
-                        </p>
+                        {/* <p className="text-xs font-mono">
+                           {meeting_id.meetingId || "Not assigned"}
+                        </p> */}
                      </div>
                   </div>
 
-                  {meetingData.notes && (
+                  {meeting_id.notes && (
                      <div>
                         <label className="text-sm font-medium text-gray-500">
                            Notes
                         </label>
                         <p className="text-sm bg-gray-50 p-3 rounded-md mt-1">
-                           {meetingData.notes}
+                           {meeting_id.notes}
                         </p>
                      </div>
                   )}
 
-                  {meetingData.type === "google-meet" && (
+                  {meeting_id.type === "google-meet" && (
                      <div>
                         <label className="text-sm font-medium text-gray-500">
                            Meeting Link
                         </label>
-                        <p className="text-sm text-blue-600 underline">
-                           {meetingData.meetingId
-                              ? `https://meet.google.com/${meetingData.meetingId}`
+                        {/* <p className="text-sm text-blue-600 underline">
+                           {meeting_id.meetingId
+                              ? `https://meet.google.com/${meeting_id.meetingId}`
                               : "Link will be provided closer to the meeting time"}
-                        </p>
+                        </p> */}
                      </div>
                   )}
                </div>
 
                <div className="flex justify-end space-x-2 pt-4">
                   <Button
-                     var iant="outline"
-                     onClick={() =>  setIsDetailsOpen(false)}>
-                      Close
-                   </Button>
-                  {meetingData.status === "confirmed" && !isPastMe eting  && (
-                     <B utton onClick={handleJoinMeeting}>
-                        {meetingData.type === "phone"
-                            ? "Call Now"
-                            : "Join Meeting"}
+                     variant="outline"
+                     onClick={() => setIsDetailsOpen(false)}>
+                     Close
+                  </Button>
+                  {meeting_id.status === "confirmed" && !isPastMeeting && (
+                     <Button onClick={handleJoinMeeting}>
+                        {meeting_id.type === "phone"
+                           ? "Call Now"
+                           : "Join Meeting"}
                      </Button>
-                   )}
-                </div>
+                  )}
+               </div>
             </DialogContent>
-         </Dialog> 
-      </> 
+         </Dialog>
+      </>
    );
 }
- 

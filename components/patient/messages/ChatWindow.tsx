@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Paperclip, Send, Smile } from "lucide-react";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
+import MeetingMessage from "./MeetingMessage";
 import MeetingScheduler, { MeetingData } from "./MeetingScheduler";
 import { Conversation, Message } from "./mockData";
 
@@ -22,7 +23,6 @@ interface ChatWindowProps {
    conversation: Conversation;
    messages: Message[];
    onSendMessage: (content: string) => void;
-   onTyping: (isTyping: boolean) => void;
    onAddMeetingMessage?: (meetingData: MeetingData) => void;
 }
 
@@ -31,11 +31,9 @@ export default function ChatWindow({
    conversation,
    messages,
    onSendMessage,
-   onTyping,
    onAddMeetingMessage,
 }: ChatWindowProps) {
    const [newMessage, setNewMessage] = useState("");
-   const [isTyping, setIsTyping] = useState(false);
    const [isMeetingSchedulerOpen, setIsMeetingSchedulerOpen] = useState(false);
    const messagesEndRef = useRef<HTMLDivElement>(null);
    const inputRef = useRef<HTMLInputElement>(null);
@@ -52,7 +50,6 @@ export default function ChatWindow({
       if (newMessage.trim()) {
          onSendMessage(newMessage.trim());
          setNewMessage("");
-         setIsTyping(false);
       }
    };
 
@@ -62,40 +59,6 @@ export default function ChatWindow({
          handleSendMessage();
       }
    };
-
-   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setNewMessage(e.target.value);
-      if (e.target.value.length > 0 && !isTyping) {
-         setIsTyping(true);
-         onTyping(true);
-      } else if (e.target.value.length === 0 && isTyping) {
-         setIsTyping(false);
-         onTyping(false);
-      }
-   };
-
-   // const formatMessageTime = (timestamp: string) => {
-   //    const date = new Date(timestamp);
-   //    return date.toLocaleTimeString([], {
-   //       hour: "2-digit",
-   //       minute: "2-digit",
-   //    });
-   // };
-
-   // const formatMessageDate = (timestamp: string) => {
-   //    const date = new Date(timestamp);
-   //    const today = new Date();
-   //    const yesterday = new Date(today);
-   //    yesterday.setDate(yesterday.getDate() - 1);
-
-   //    if (date.toDateString() === today.toDateString()) {
-   //       return "Today";
-   //    } else if (date.toDateString() === yesterday.toDateString()) {
-   //       return "Yesterday";
-   //    } else {
-   //       return date.toLocaleDateString();
-   //    }
-   // };
 
    const handleMeetingSubmit = (meetingData: MeetingData) => {
       // Create a meeting message and add it to the chat
@@ -213,11 +176,10 @@ export default function ChatWindow({
                                  </Avatar>
                               )}
                               {message.content.includes("Meeting scheduled") ? (
-                                 // <MeetingMessage
-                                 //    message={message}
-                                 //    isOwnMessage={isOwnMessage}
-                                 // />
-                                 <p>Meeting</p>
+                                 <MeetingMessage
+                                    message={message}
+                                    isOwnMessage={isOwnMessage}
+                                 />
                               ) : (
                                  <div
                                     className={`rounded-lg px-3 py-2 ${
@@ -260,8 +222,8 @@ export default function ChatWindow({
                   <Input
                      ref={inputRef}
                      value={newMessage}
-                     onChange={handleInputChange}
                      onKeyPress={handleKeyPress}
+                     onChange={(e) => setNewMessage(e.target.value)}
                      placeholder="Type a message..."
                      className="pr-10"
                   />

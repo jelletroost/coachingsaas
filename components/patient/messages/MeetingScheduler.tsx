@@ -31,6 +31,7 @@ interface MeetingSchedulerProps {
 }
 
 export interface MeetingData {
+   roomId?: string;
    type: "phone" | "google-meet";
    date: Date;
    time: string;

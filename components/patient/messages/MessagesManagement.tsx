@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import {
+   createMeeting,
    createRoom,
    getMessages,
    sendMessage,
@@ -10,6 +11,7 @@ import { getPatientProfile } from "@/services/patients_services";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import ChatWindow from "./ChatWindow";
+import { MeetingData } from "./MeetingScheduler";
 import { Conversation, Message } from "./mockData";
 
 export default function MessagesManagement() {
@@ -54,7 +56,6 @@ export default function MessagesManagement() {
 
    // Load messages for the assigned coach
    useEffect(() => {
-      console.log("messagesData", messagesData?.data);
       setMessages(messagesData?.data);
    }, [messagesData]);
 
@@ -81,38 +82,42 @@ export default function MessagesManagement() {
       setMessages((prev) => [...prev, newMessage]);
    };
 
-   const handleTyping = (isTyping: boolean) => {
-      // Handle typing indicator logic here
-      console.log("Typing:", isTyping);
+   const { mutate: createMeetingMutation } = useMutation({
+      mutationFn: (meetingData: Message) =>
+         createMeeting(
+            meetingData.sender_id,
+            meetingData.meeting_id?.type || "phone",
+            meetingData.meeting_id?.date || new Date(),
+            meetingData.meeting_id?.time || "09:00",
+            meetingData.meeting_id?.duration || 30,
+            meetingData.meeting_id?.notes || "",
+            meetingData.room_id
+         ),
+   });
+
+   const handleAddMeetingMessage = (meetingData: MeetingData) => {
+      const newMeetingMessage: Message = {
+         room_id: room?.data?.room_id,
+         sender_id: patientProfile?.id,
+         content: `Meeting scheduled: ${
+            meetingData.type === "phone" ? "Phone Call" : "Google Meet"
+         } on ${meetingData.date.toDateString()} at ${meetingData.time}`,
+         meeting_id: {
+            senderId: patientProfile?.id,
+            type: meetingData.type,
+            date: meetingData.date,
+            time: meetingData.time,
+            duration: parseInt(meetingData.duration),
+            notes: meetingData.notes || "",
+            status: "pending",
+         },
+      };
+      console.log("newMeetingMessage", newMeetingMessage);
+      createMeetingMutation(newMeetingMessage);
+
+      // Add meeting message to messages list
+      setMessages((prev) => [...prev, newMeetingMessage]);
    };
-
-   // const handleAddMeetingMessage = (meetingData: MeetingData) => {
-   //    const newMeetingMessage: Message = {
-   //       room_id: room?.data?.room_id,
-   //       sender_id: patientProfile?.id,
-   //       content: `Meeting scheduled: ${
-   //          meetingData.type === "phone" ? "Phone Call" : "Google Meet"
-   //       } on ${meetingData.date.toDateString()} at ${meetingData.time}`,
-   //       content: `Meeting scheduled: ${
-   //          meetingData.type === "phone" ? "Phone Call" : "Google Meet"
-   //       } on ${meetingData.date.toDateString()} at ${meetingData.time}`,
-   //       meetingData: {
-   //          type: meetingData.type,
-   //          date: meetingData.date.toISOString(),
-   //          time: meetingData.time,
-   //          duration: meetingData.duration,
-   //          notes: meetingData.notes,
-   //          status: "pending",
-   //          meetingId:
-   //             meetingData.type === "google-meet"
-   //                ? `meet-${Date.now()}`
-   //                : undefined,
-   //       },
-   //    };
-
-   //    // Add meeting message to messages list
-   //    setMessages((prev) => [...prev, newMeetingMessage]);
-   // };
 
    return (
       <div className="h-full">
@@ -127,8 +132,7 @@ export default function MessagesManagement() {
                         conversation={assignedConversation}
                         messages={messages}
                         onSendMessage={handleSendMessage}
-                        onTyping={handleTyping}
-                        // onAddMeetingMessage={handleAddMeetingMessage}
+                        onAddMeetingMessage={handleAddMeetingMessage}
                      />
                   </div>
                </div>

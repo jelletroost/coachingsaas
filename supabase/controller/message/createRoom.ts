@@ -8,7 +8,6 @@ const getPatientProfile = async (c: Context) => {
       return c.json({ error: "Coach ID and patient ID are required" }, 400);
    }
    const roomId = coachId + patientId;
-   console.log(roomId);
 
    // Check if room already exists
    const { data, error } = await edgeAdminClient

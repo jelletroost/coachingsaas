@@ -42,3 +42,29 @@ export const getMessages = async (roomId: string) => {
       throw error;
    }
 };
+
+export const createMeeting = async (
+   senderId: string,
+   type: string,
+   date: Date,
+   time: string,
+   duration: number,
+   notes: string,
+   roomId: string
+) => {
+   try {
+      const response = await apiClient.post("/message/create-meeting", {
+         senderId,
+         type,
+         date,
+         time,
+         duration,
+         notes,
+         roomId,
+      });
+      return response.data;
+   } catch (error) {
+      console.error(error);
+      throw error;
+   }
+};
