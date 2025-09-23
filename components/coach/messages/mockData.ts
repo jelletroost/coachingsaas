@@ -1,6 +1,6 @@
 // Message and conversation data for coach messaging system
 export interface Message {
-   id: string;
+   id?: string;
    conversationId: string;
    room_id?: string;
    sender_id: string;
@@ -8,6 +8,17 @@ export interface Message {
    content: string;
    timestamp: string;
    isRead: boolean;
+   is_error?: boolean;
+   meeting_id?: {
+      type: string;
+      senderId?: string;
+      date: Date;
+      meeting_link?: string;
+      time: string;
+      duration: number;
+      notes: string;
+      status: string;
+   };
    attachments?: {
       type: "image" | "document" | "video";
       url: string;

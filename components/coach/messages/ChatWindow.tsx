@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
+   MessageSquareWarning,
    MoreVertical,
    Paperclip,
    Phone,
@@ -20,6 +21,7 @@ import {
 } from "lucide-react";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
+import MeetingMessage from "./MeetingMessage";
 import { Conversation, Message } from "./mockData";
 
 interface ChatWindowProps {
@@ -27,6 +29,8 @@ interface ChatWindowProps {
    messages: Message[];
    onSendMessage: (content: string) => void;
    onTyping: (isTyping: boolean) => void;
+   onAcceptMeeting?: (messageId: string) => void;
+   onRejectMeeting?: (messageId: string) => void;
    isMessagesPending?: boolean;
    isSendMessagePending?: boolean;
    currentUserId?: string;
@@ -37,6 +41,8 @@ export default function ChatWindow({
    messages,
    onSendMessage,
    onTyping,
+   onAcceptMeeting,
+   onRejectMeeting,
    isMessagesPending,
    isSendMessagePending,
    currentUserId,
@@ -242,27 +248,54 @@ export default function ChatWindow({
                                     </AvatarFallback>
                                  </Avatar>
                               )}
-                              <div
-                                 className={`rounded-lg px-3 py-2 ${
-                                    isOwnMessage
-                                       ? "bg-blue-600 text-white"
-                                       : "bg-white text-gray-900 border border-gray-200"
-                                 }`}>
-                                 <p className="text-sm">{message.content}</p>
-                                 <p
-                                    className={`text-xs mt-1 ${
-                                       isOwnMessage
-                                          ? "text-blue-100"
-                                          : "text-gray-500"
-                                    }`}>
-                                    {formatMessageTime(message.timestamp)}
-                                    {isOwnMessage && (
-                                       <span className="ml-2">
-                                          {message.isRead ? "✓✓" : "✓"}
-                                       </span>
+                              {message?.content.includes(
+                                 "Meeting scheduled"
+                              ) ? (
+                                 <MeetingMessage
+                                    message={message}
+                                    isOwnMessage={isOwnMessage}
+                                    onAcceptMeeting={onAcceptMeeting}
+                                    onRejectMeeting={onRejectMeeting}
+                                    isCoachView={true}
+                                 />
+                              ) : (
+                                 <div className="flex flex-col items-start gap-1">
+                                    <div
+                                       className={`rounded-lg px-3 py-2 ${
+                                          isOwnMessage
+                                             ? "bg-blue-600 text-white"
+                                             : "bg-white text-gray-900 border border-gray-200"
+                                       }`}>
+                                       <p className="text-sm">
+                                          {message.content}
+                                       </p>
+                                       <p
+                                          className={`text-xs mt-1 ${
+                                             isOwnMessage
+                                                ? "text-blue-100"
+                                                : "text-gray-500"
+                                          }`}>
+                                          {formatMessageTime(message.timestamp)}
+                                          {isOwnMessage && (
+                                             <span className="ml-2">
+                                                {isSendMessagePending ||
+                                                message.is_error
+                                                   ? "✓"
+                                                   : "✓✓"}
+                                             </span>
+                                          )}
+                                       </p>
+                                    </div>
+                                    {message.is_error && (
+                                       <div className="flex justify-start items-center h-full">
+                                          <p className="text-red-500 ml-2 text-[14px] flex items-center gap-1">
+                                             <MessageSquareWarning className="w-4 h-4" />{" "}
+                                             Failed!
+                                          </p>
+                                       </div>
                                     )}
-                                 </p>
-                              </div>
+                                 </div>
+                              )}
                            </div>
                         </div>
                      </div>

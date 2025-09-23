@@ -77,8 +77,14 @@ export default function MessagesManagement() {
             refetchMessages();
             refetchConversations();
          },
-         onError: (error) => {
+         onError: (error, newMessage) => {
             console.error("Failed to send message:", error);
+            // Mark the message as failed
+            setMessages((prev) =>
+               prev.map((msg) =>
+                  msg.id === newMessage.id ? { ...msg, is_error: true } : msg
+               )
+            );
          },
       });
 
@@ -97,15 +103,18 @@ export default function MessagesManagement() {
          return;
 
       const newMessage: Message = {
-         id: `msg_${Date.now()}`,
          conversationId: selectedConversationId,
-         room_id: selectedConversation.room_id, // Add room_id for API call
-         sender_id: user.id, // Use authenticated user's ID
+         room_id: selectedConversation.room_id,
+         sender_id: user.id,
          senderType: "coach",
          content,
          timestamp: new Date().toISOString(),
          isRead: false,
+         is_error: false,
       };
+
+      // Add message to local state immediately
+      setMessages((prev) => [...prev, newMessage]);
 
       // Send message via API
       sendMessageMutation(newMessage);
@@ -114,6 +123,55 @@ export default function MessagesManagement() {
    const handleTyping = (isTyping: boolean) => {
       // Handle typing indicator logic here
       console.log("Typing:", isTyping);
+   };
+
+   const handleAcceptMeeting = (messageId: string, meetingLink?: string) => {
+      // Update the meeting status to confirmed
+      setMessages((prev) =>
+         prev.map((msg) =>
+            msg.id === messageId && msg.meeting_id
+               ? {
+                    ...msg,
+                    meeting_id: {
+                       ...msg.meeting_id,
+                       status: "confirmed",
+                       meeting_link: meetingLink || msg.meeting_id.meeting_link,
+                    },
+                 }
+               : msg
+         )
+      );
+
+      // TODO: Call API to accept the meeting
+      console.log("API Call: Accept meeting", {
+         messageId,
+         roomId: selectedConversation?.room_id,
+         coachId: user?.id,
+         action: "accept",
+         meetingLink: meetingLink || "phone_call",
+      });
+   };
+
+   const handleRejectMeeting = (messageId: string) => {
+      // Update the meeting status to cancelled
+      setMessages((prev) =>
+         prev.map((msg) =>
+            msg.id === messageId && msg.meeting_id
+               ? {
+                    ...msg,
+                    meeting_id: { ...msg.meeting_id, status: "cancelled" },
+                 }
+               : msg
+         )
+      );
+
+      // TODO: Call API to reject the meeting
+      console.log("API Call: Reject meeting", {
+         messageId,
+         roomId: selectedConversation?.room_id,
+         coachId: user?.id,
+         action: "reject",
+      });
    };
 
    // Calculate unread conversations from API data
@@ -188,6 +246,8 @@ export default function MessagesManagement() {
                         messages={messages}
                         onSendMessage={handleSendMessage}
                         onTyping={handleTyping}
+                        onAcceptMeeting={handleAcceptMeeting}
+                        onRejectMeeting={handleRejectMeeting}
                         isMessagesPending={isMessagesPending}
                         isSendMessagePending={isSendMessagePending}
                         currentUserId={user?.id}
