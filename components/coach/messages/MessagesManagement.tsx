@@ -12,7 +12,6 @@ import {
    getConversationById,
    getMessagesByConversationId,
    getTotalUnreadMessages,
-   getUnreadConversations,
    Message,
 } from "./mockData";
 
@@ -113,7 +112,6 @@ export default function MessagesManagement() {
       : undefined;
 
    const totalUnread = getTotalUnreadMessages();
-   const unreadConversations = getUnreadConversations();
 
    return (
       <div className="h-full">

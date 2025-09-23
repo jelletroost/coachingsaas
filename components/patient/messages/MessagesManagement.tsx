@@ -43,8 +43,8 @@ export default function MessagesManagement() {
    const { data: room } = useQuery({
       queryKey: ["room"],
       queryFn: () =>
-         createRoom(patientProfile?.assigned_coach_id, patientProfile?.id),
-      enabled: !!patientProfile?.assigned_coach_id && !!patientProfile?.id,
+         createRoom(patientProfile?.assigned_coach_id, patientProfile?.user_id),
+      enabled: !!patientProfile?.assigned_coach_id && !!patientProfile?.user_id,
    });
 
    // Get messages
