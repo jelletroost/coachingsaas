@@ -9,12 +9,12 @@ export interface Message {
       type: string;
       senderId?: string;
       date: Date;
+      meeting_link?: string;
       time: string;
       duration: number;
       notes: string;
       status: string;
    };
-   meetingId?: string;
 }
 
 export interface Conversation {

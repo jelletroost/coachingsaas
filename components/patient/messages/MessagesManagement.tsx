@@ -112,7 +112,6 @@ export default function MessagesManagement() {
             status: "pending",
          },
       };
-      console.log("newMeetingMessage", newMeetingMessage);
       createMeetingMutation(newMeetingMessage);
 
       // Add meeting message to messages list

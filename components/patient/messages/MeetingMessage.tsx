@@ -212,12 +212,25 @@ export default function MeetingMessage({
                         <p className="text-sm">{meeting_id.duration} minutes</p>
                      </div>
                      <div>
-                        <label className="text-sm font-medium text-gray-500">
-                           Meeting ID
-                        </label>
-                        {/* <p className="text-xs font-mono">
-                           {meeting_id.meetingId || "Not assigned"}
-                        </p> */}
+                        {meeting_id.type === "google-meet" && (
+                           <div>
+                              <label className="text-sm font-medium text-gray-500">
+                                 Meeting Link
+                              </label>
+                              <p className="text-sm text-blue-600 underline">
+                                 {meeting_id.meeting_link ? (
+                                    <a
+                                       href={meeting_id.meeting_link}
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+                                       {meeting_id.meeting_link}
+                                    </a>
+                                 ) : (
+                                    "Not provided yet"
+                                 )}
+                              </p>
+                           </div>
+                        )}
                      </div>
                   </div>
 
@@ -229,19 +242,6 @@ export default function MeetingMessage({
                         <p className="text-sm bg-gray-50 p-3 rounded-md mt-1">
                            {meeting_id.notes}
                         </p>
-                     </div>
-                  )}
-
-                  {meeting_id.type === "google-meet" && (
-                     <div>
-                        <label className="text-sm font-medium text-gray-500">
-                           Meeting Link
-                        </label>
-                        {/* <p className="text-sm text-blue-600 underline">
-                           {meeting_id.meetingId
-                              ? `https://meet.google.com/${meeting_id.meetingId}`
-                              : "Link will be provided closer to the meeting time"}
-                        </p> */}
                      </div>
                   )}
                </div>
