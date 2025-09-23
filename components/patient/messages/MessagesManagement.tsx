@@ -48,7 +48,11 @@ export default function MessagesManagement() {
    });
 
    // Get messages
-   const { data: messagesData, refetch: refetchMessages } = useQuery({
+   const {
+      data: messagesData,
+      refetch: refetchMessages,
+      isPending: isMessagesPending,
+   } = useQuery({
       queryKey: ["messagesData"],
       queryFn: () => getMessages(room?.data?.room_id),
       enabled: !!room?.data?.room_id,
@@ -60,18 +64,21 @@ export default function MessagesManagement() {
    }, [messagesData]);
 
    // Send message mutation
-   const { mutate: sendMessageMutation, isError: isSendMessageError } =
-      useMutation({
-         mutationFn: (newMessage: Message) =>
-            sendMessage(
-               newMessage.room_id,
-               newMessage.sender_id,
-               newMessage.content
-            ),
-         onSuccess: () => {
-            refetchMessages();
-         },
-      });
+   const {
+      mutate: sendMessageMutation,
+      isError: isSendMessageError,
+      isPending: isSendMessagePending,
+   } = useMutation({
+      mutationFn: (newMessage: Message) =>
+         sendMessage(
+            newMessage.room_id,
+            newMessage.sender_id,
+            newMessage.content
+         ),
+      onSuccess: () => {
+         refetchMessages();
+      },
+   });
 
    const handleSendMessage = (content: string) => {
       const newMessage: Message = {
@@ -142,6 +149,8 @@ export default function MessagesManagement() {
                         messages={messages}
                         onSendMessage={handleSendMessage}
                         onAddMeetingMessage={handleAddMeetingMessage}
+                        isMessagesPending={isMessagesPending}
+                        isSendMessagePending={isSendMessagePending}
                      />
                   </div>
                </div>

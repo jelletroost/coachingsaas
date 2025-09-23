@@ -26,6 +26,8 @@ interface ChatWindowProps {
    onAddMeetingMessage?: (meetingData: MeetingData) => void;
    isSendMessageError?: boolean;
    isCreateMeetingError?: boolean;
+   isMessagesPending?: boolean;
+   isSendMessagePending?: boolean;
 }
 
 export default function ChatWindow({
@@ -34,6 +36,8 @@ export default function ChatWindow({
    messages,
    onSendMessage,
    onAddMeetingMessage,
+   isMessagesPending,
+   isSendMessagePending,
 }: ChatWindowProps) {
    const [newMessage, setNewMessage] = useState("");
    const [isMeetingSchedulerOpen, setIsMeetingSchedulerOpen] = useState(false);
@@ -123,7 +127,13 @@ export default function ChatWindow({
 
          {/* Messages Area */}
          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-            {messages?.length === 0 ? (
+            {isMessagesPending ? (
+               <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                  <div className="text-center">
+                     <p className="text-sm">Loading messages...</p>
+                  </div>
+               </div>
+            ) : messages?.length === 0 ? (
                <div className="flex flex-col items-center justify-center h-full text-gray-500">
                   <div className="text-center">
                      <p className="text-sm">No messages yet</p>
@@ -206,7 +216,12 @@ export default function ChatWindow({
                                              "HH:mm"
                                           )}
                                           {isOwnMessage && (
-                                             <span className="ml-2">✓✓</span>
+                                             <span className="ml-2">
+                                                {isSendMessagePending ||
+                                                message?.is_error
+                                                   ? "✓"
+                                                   : "✓✓"}
+                                             </span>
                                           )}
                                        </p>
                                     </div>
