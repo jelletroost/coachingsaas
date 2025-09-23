@@ -60,17 +60,18 @@ export default function MessagesManagement() {
    }, [messagesData]);
 
    // Send message mutation
-   const { mutate: sendMessageMutation } = useMutation({
-      mutationFn: (newMessage: Message) =>
-         sendMessage(
-            newMessage.room_id,
-            newMessage.sender_id,
-            newMessage.content
-         ),
-      onSuccess: () => {
-         refetchMessages();
-      },
-   });
+   const { mutate: sendMessageMutation, isError: isSendMessageError } =
+      useMutation({
+         mutationFn: (newMessage: Message) =>
+            sendMessage(
+               newMessage.room_id,
+               newMessage.sender_id,
+               newMessage.content
+            ),
+         onSuccess: () => {
+            refetchMessages();
+         },
+      });
 
    const handleSendMessage = (content: string) => {
       const newMessage: Message = {
@@ -82,24 +83,26 @@ export default function MessagesManagement() {
       sendMessageMutation(newMessage);
 
       // Add message to messages list
+      newMessage.is_error = isSendMessageError;
       setMessages((prev) => [...prev, newMessage]);
    };
 
-   const { mutate: createMeetingMutation } = useMutation({
-      mutationFn: (meetingData: Message) =>
-         createMeeting(
-            meetingData.sender_id,
-            meetingData.meeting_id?.type || "phone",
-            meetingData.meeting_id?.date || new Date(),
-            meetingData.meeting_id?.time || "09:00",
-            meetingData.meeting_id?.duration || 30,
-            meetingData.meeting_id?.notes || "",
-            meetingData.room_id
-         ),
-      onSuccess: () => {
-         refetchMessages();
-      },
-   });
+   const { mutate: createMeetingMutation, isError: isCreateMeetingError } =
+      useMutation({
+         mutationFn: (meetingData: Message) =>
+            createMeeting(
+               meetingData.sender_id,
+               meetingData.meeting_id?.type || "phone",
+               meetingData.meeting_id?.date || new Date(),
+               meetingData.meeting_id?.time || "09:00",
+               meetingData.meeting_id?.duration || 30,
+               meetingData.meeting_id?.notes || "",
+               meetingData.room_id
+            ),
+         onSuccess: () => {
+            refetchMessages();
+         },
+      });
 
    const handleAddMeetingMessage = (meetingData: MeetingData) => {
       const newMeetingMessage: Message = {
@@ -121,6 +124,7 @@ export default function MessagesManagement() {
       createMeetingMutation(newMeetingMessage);
 
       // Add meeting message to messages list
+      newMeetingMessage.is_error = isCreateMeetingError;
       setMessages((prev) => [...prev, newMeetingMessage]);
    };
 

@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Paperclip, Send, Smile } from "lucide-react";
+import { MessageSquareWarning, Paperclip, Send, Smile } from "lucide-react";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import MeetingMessage from "./MeetingMessage";
@@ -24,6 +24,8 @@ interface ChatWindowProps {
    messages: Message[];
    onSendMessage: (content: string) => void;
    onAddMeetingMessage?: (meetingData: MeetingData) => void;
+   isSendMessageError?: boolean;
+   isCreateMeetingError?: boolean;
 }
 
 export default function ChatWindow({
@@ -132,20 +134,21 @@ export default function ChatWindow({
                </div>
             ) : (
                messages?.map((message, index) => {
-                  const isOwnMessage = message.sender_id === patientProfile?.id;
+                  const isOwnMessage =
+                     message?.sender_id === patientProfile?.id;
                   const showDate =
                      index === 0 ||
-                     moment(message.created_at).format("YYYY-MM-DD") !==
+                     moment(message?.created_at).format("YYYY-MM-DD") !==
                         moment(messages[index - 1]?.created_at).format(
                            "YYYY-MM-DD"
                         );
 
                   return (
-                     <div key={message.id}>
+                     <div key={message?.id}>
                         {showDate && (
                            <div className="flex justify-center mb-4">
                               <Badge variant="secondary" className="text-xs">
-                                 {moment(message.created_at).format(
+                                 {moment(message?.created_at).format(
                                     "YYYY-MM-DD"
                                  )}
                               </Badge>
@@ -175,32 +178,46 @@ export default function ChatWindow({
                                     </AvatarFallback>
                                  </Avatar>
                               )}
-                              {message.content.includes("Meeting scheduled") ? (
+                              {message?.content.includes(
+                                 "Meeting scheduled"
+                              ) ? (
                                  <MeetingMessage
                                     message={message}
                                     isOwnMessage={isOwnMessage}
                                  />
                               ) : (
-                                 <div
-                                    className={`rounded-lg px-3 py-2 ${
-                                       isOwnMessage
-                                          ? "bg-blue-600 text-white"
-                                          : "bg-white text-gray-900 border border-gray-200"
-                                    }`}>
-                                    <p className="text-sm">{message.content}</p>
-                                    <p
-                                       className={`text-xs mt-1 ${
+                                 <div className="flex flex-col items-start gap-1">
+                                    <div
+                                       className={`rounded-lg px-3 py-2 ${
                                           isOwnMessage
-                                             ? "text-blue-100"
-                                             : "text-gray-500"
+                                             ? "bg-blue-600 text-white"
+                                             : "bg-white text-gray-900 border border-gray-200"
                                        }`}>
-                                       {moment(message.created_at).format(
-                                          "HH:mm"
-                                       )}
-                                       {isOwnMessage && (
-                                          <span className="ml-2">✓✓</span>
-                                       )}
-                                    </p>
+                                       <p className="text-sm">
+                                          {message?.content}
+                                       </p>
+                                       <p
+                                          className={`text-xs mt-1 ${
+                                             isOwnMessage
+                                                ? "text-blue-100"
+                                                : "text-gray-500"
+                                          }`}>
+                                          {moment(message?.created_at).format(
+                                             "HH:mm"
+                                          )}
+                                          {isOwnMessage && (
+                                             <span className="ml-2">✓✓</span>
+                                          )}
+                                       </p>
+                                    </div>
+                                    {message?.is_error && (
+                                       <div className="flex justify-start items-center h-full">
+                                          <p className="text-red-500 ml-2 text-[14px] flex items-center gap-1">
+                                             <MessageSquareWarning className="w-4 h-4" />{" "}
+                                             Failed!
+                                          </p>
+                                       </div>
+                                    )}
                                  </div>
                               )}
                            </div>

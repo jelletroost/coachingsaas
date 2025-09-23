@@ -5,6 +5,7 @@ export interface Message {
    sender_id: string;
    content: string;
    created_at?: string;
+   is_error?: boolean;
    meeting_id?: {
       type: string;
       senderId?: string;
