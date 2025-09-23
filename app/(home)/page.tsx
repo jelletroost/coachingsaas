@@ -1,3 +1,4 @@
+import GoogleOneTap from "@/components/googleAuth/googleOneTap";
 import AppDownload from "@/components/home/appDownload";
 import CTA from "@/components/home/CTA";
 import FAQ from "@/components/home/faq";
@@ -10,6 +11,7 @@ import Testimonial from "@/components/home/testimonial";
 export default function HomePage() {
    return (
       <div className="min-h-screen bg-background">
+         <GoogleOneTap />
          <Hero />
          <HowWork />
          <Pricing />

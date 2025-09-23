@@ -1,200 +1,156 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+   createMeeting,
+   createRoom,
+   getMessages,
+   sendMessage,
+} from "@/services/message.service";
+import { getPatientProfile } from "@/services/patients_services";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import ChatWindow from "./ChatWindow";
-import MessageList from "./MessageList";
-import {
-   Conversation,
-   conversationsData,
-   getConversationById,
-   getMessagesByConversationId,
-   getTotalUnreadMessages,
-   getUnreadConversations,
-   Message,
-} from "./mockData";
+import { MeetingData } from "./MeetingScheduler";
+import { Conversation, Message } from "./mockData";
 
 export default function MessagesManagement() {
-   const [conversations, setConversations] =
-      useState<Conversation[]>(conversationsData);
-   const [selectedConversationId, setSelectedConversationId] = useState<
-      string | undefined
-   >();
+   // Patient is assigned to only one coach - Dr. Sarah Chen
+
+   const [assignedConversation] = useState<Conversation>({
+      id: "122",
+      coachId: "122",
+      coachName: "Dr. Sarah Chen",
+      coachAvatar: "/avatars/sarah-chen.jpg",
+      coachSpecialty: "Cardiovascular Health",
+      lastMessage:
+         "That's excellent! How many days have you been able to exercise this week?",
+      lastMessageTime: "2024-01-20T10:10:00Z",
+      unreadCount: 0,
+      status: "active",
+      lastActivity: "2024-01-20T10:30:00Z",
+      coachStatus: "online",
+   });
+
    const [messages, setMessages] = useState<Message[]>([]);
-   const [searchQuery, setSearchQuery] = useState("");
-   const [activeTab, setActiveTab] = useState("all");
-   const [filteredConversations, setFilteredConversations] =
-      useState<Conversation[]>(conversations);
 
-   // Load messages when conversation is selected
+   const { data: patientProfile } = useQuery({
+      queryKey: ["patientProfile"],
+      queryFn: getPatientProfile,
+   });
+
+   // Create or get room
+   const { data: room } = useQuery({
+      queryKey: ["room"],
+      queryFn: () =>
+         createRoom(patientProfile?.assigned_coach_id, patientProfile?.user_id),
+      enabled: !!patientProfile?.assigned_coach_id && !!patientProfile?.user_id,
+   });
+
+   // Get messages
+   const {
+      data: messagesData,
+      refetch: refetchMessages,
+      isPending: isMessagesPending,
+   } = useQuery({
+      queryKey: ["messagesData"],
+      queryFn: () => getMessages(room?.data?.room_id),
+      enabled: !!room?.data?.room_id,
+   });
+
+   // Load messages for the assigned coach
    useEffect(() => {
-      if (selectedConversationId) {
-         const conversationMessages = getMessagesByConversationId(
-            selectedConversationId
-         );
-         setMessages(conversationMessages);
-      } else {
-         setMessages([]);
-      }
-   }, [selectedConversationId]);
+      setMessages(messagesData?.data);
+   }, [messagesData]);
 
-   // Filter conversations based on search and active tab
-   useEffect(() => {
-      let filtered = conversations;
-
-      // Filter by search query
-      if (searchQuery) {
-         filtered = filtered.filter(
-            (conv) =>
-               conv.coachName
-                  .toLowerCase()
-                  .includes(searchQuery.toLowerCase()) ||
-               conv.lastMessage
-                  .toLowerCase()
-                  .includes(searchQuery.toLowerCase())
-         );
-      }
-
-      // Filter by active tab
-      switch (activeTab) {
-         case "unread":
-            filtered = filtered.filter((conv) => conv.unreadCount > 0);
-            break;
-         case "active":
-            filtered = filtered.filter((conv) => conv.status === "active");
-            break;
-         case "archived":
-            filtered = filtered.filter((conv) => conv.status === "archived");
-            break;
-         default:
-            break;
-      }
-
-      setFilteredConversations(filtered);
-   }, [conversations, searchQuery, activeTab]);
-
-   const handleSelectConversation = (conversationId: string) => {
-      setSelectedConversationId(conversationId);
-   };
+   // Send message mutation
+   const {
+      mutate: sendMessageMutation,
+      isError: isSendMessageError,
+      isPending: isSendMessagePending,
+   } = useMutation({
+      mutationFn: (newMessage: Message) =>
+         sendMessage(
+            newMessage.room_id,
+            newMessage.sender_id,
+            newMessage.content
+         ),
+      onSuccess: () => {
+         refetchMessages();
+      },
+   });
 
    const handleSendMessage = (content: string) => {
-      if (!selectedConversationId) return;
-
       const newMessage: Message = {
-         id: `msg_${Date.now()}`,
-         conversationId: selectedConversationId,
-         senderId: "patient_1",
-         senderType: "patient",
+         room_id: room?.data?.room_id,
+         sender_id: patientProfile?.id,
          content,
-         timestamp: new Date().toISOString(),
-         isRead: false,
       };
 
+      sendMessageMutation(newMessage);
+
       // Add message to messages list
+      newMessage.is_error = isSendMessageError;
       setMessages((prev) => [...prev, newMessage]);
-
-      // Update conversation's last message
-      const updatedConversations = conversations.map((conv) =>
-         conv.id === selectedConversationId
-            ? {
-                 ...conv,
-                 lastMessage: content,
-                 lastMessageTime: new Date().toISOString(),
-                 lastActivity: new Date().toISOString(),
-              }
-            : conv
-      );
-      setConversations(updatedConversations);
    };
 
-   const handleSearch = (query: string) => {
-      setSearchQuery(query);
+   const { mutate: createMeetingMutation, isError: isCreateMeetingError } =
+      useMutation({
+         mutationFn: (meetingData: Message) =>
+            createMeeting(
+               meetingData.sender_id,
+               meetingData.meeting_id?.type || "phone",
+               meetingData.meeting_id?.date || new Date(),
+               meetingData.meeting_id?.time || "09:00",
+               meetingData.meeting_id?.duration || 30,
+               meetingData.meeting_id?.notes || "",
+               meetingData.room_id
+            ),
+         onSuccess: () => {
+            refetchMessages();
+         },
+      });
+
+   const handleAddMeetingMessage = (meetingData: MeetingData) => {
+      const newMeetingMessage: Message = {
+         room_id: room?.data?.room_id,
+         sender_id: patientProfile?.id,
+         content: `Meeting scheduled: ${
+            meetingData.type === "phone" ? "Phone Call" : "Google Meet"
+         } on ${meetingData.date.toDateString()} at ${meetingData.time}`,
+         meeting_id: {
+            senderId: patientProfile?.id,
+            type: meetingData.type,
+            date: meetingData.date,
+            time: meetingData.time,
+            duration: parseInt(meetingData.duration),
+            notes: meetingData.notes || "",
+            status: "pending",
+         },
+      };
+      createMeetingMutation(newMeetingMessage);
+
+      // Add meeting message to messages list
+      newMeetingMessage.is_error = isCreateMeetingError;
+      setMessages((prev) => [...prev, newMeetingMessage]);
    };
-
-   const handleTyping = (isTyping: boolean) => {
-      // Handle typing indicator logic here
-      console.log("Typing:", isTyping);
-   };
-
-   const selectedConversation = selectedConversationId
-      ? getConversationById(selectedConversationId)
-      : undefined;
-
-   const totalUnread = getTotalUnreadMessages();
-   const unreadConversations = getUnreadConversations();
 
    return (
       <div className="h-full">
-         <div className="mb-6">
-            <div className="flex items-center justify-between mb-4">
-               <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
-                  <p className="text-gray-600">Chat with your health coaches</p>
-               </div>
-               <div className="flex items-center space-x-2">
-                  {totalUnread > 0 && (
-                     <Badge variant="destructive">{totalUnread} unread</Badge>
-                  )}
-                  <Button variant="outline" size="sm">
-                     Find Coach
-                  </Button>
-               </div>
-            </div>
-
-            {/* Tabs */}
-            <Tabs
-               value={activeTab}
-               onValueChange={setActiveTab}
-               className="w-full">
-               <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger
-                     value="all"
-                     className="flex items-center space-x-2">
-                     <span>All</span>
-                     <Badge variant="secondary" className="ml-1">
-                        {conversations.length}
-                     </Badge>
-                  </TabsTrigger>
-                  <TabsTrigger
-                     value="unread"
-                     className="flex items-center space-x-2">
-                     <span>Unread</span>
-                     {unreadConversations.length > 0 && (
-                        <Badge variant="destructive" className="ml-1">
-                           {unreadConversations.length}
-                        </Badge>
-                     )}
-                  </TabsTrigger>
-                  <TabsTrigger value="active">Active</TabsTrigger>
-                  <TabsTrigger value="archived">Archived</TabsTrigger>
-               </TabsList>
-            </Tabs>
-         </div>
-
          {/* Messages Interface */}
          <Card className="h-[calc(100vh-200px)]">
             <CardContent className="p-0 h-full">
                <div className="flex h-full">
-                  {/* Message List */}
-                  <div className="w-1/3 border-r border-gray-200">
-                     <MessageList
-                        conversations={filteredConversations}
-                        selectedConversationId={selectedConversationId}
-                        onSelectConversation={handleSelectConversation}
-                        onSearch={handleSearch}
-                     />
-                  </div>
-
-                  {/* Chat Window */}
+                  {/* Chat Window - Direct chat with assigned coach */}
                   <div className="flex-1">
                      <ChatWindow
-                        conversation={selectedConversation}
+                        patientProfile={patientProfile}
+                        conversation={assignedConversation}
                         messages={messages}
                         onSendMessage={handleSendMessage}
-                        onTyping={handleTyping}
+                        onAddMeetingMessage={handleAddMeetingMessage}
+                        isMessagesPending={isMessagesPending}
+                        isSendMessagePending={isSendMessagePending}
                      />
                   </div>
                </div>
