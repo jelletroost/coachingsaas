@@ -1,6 +1,7 @@
 import apiClient from "@/lib/axios";
 import { SIGNUP_URL } from "@/lib/constant";
 import {
+   AdminCreateUserFormData,
    NewPasswordFormData,
    PasswordResetFormData,
    SigninFormData,
@@ -10,6 +11,17 @@ import axios from "axios";
 
 // User Signup
 export const signup = async (data: SignupFormData) => {
+   try {
+      const response = await apiClient.post(SIGNUP_URL, data);
+      return response.data;
+   } catch (error) {
+      console.error(error);
+      throw error;
+   }
+};
+
+// Admin Create User
+export const adminCreateUser = async (data: AdminCreateUserFormData) => {
    try {
       const response = await apiClient.post(SIGNUP_URL, data);
       return response.data;
