@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { AddUserModal } from "./AddUserModal";
 import { AssignCoachModal } from "./AssignCoachModal";
 import { type User as UserType } from "./types";
 import { UserProfileModal } from "./UserProfileModal";
@@ -26,10 +27,15 @@ export function UsersManagement() {
    const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
    const [isAssignCoachModalOpen, setIsAssignCoachModalOpen] = useState(false);
-   const [selectedPatient, setSelectedPatient] = useState<UserType | null>(null);
+   const [selectedPatient, setSelectedPatient] = useState<UserType | null>(
+      null
+   );
+   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
 
    // Transform database users to component format
-   const users = dbUsers ? dbUsers.map(transformUserForComponent) as UserType[] : [];
+   const users = dbUsers
+      ? (dbUsers.map(transformUserForComponent) as UserType[])
+      : [];
 
    // Get coaches for assignment
    const coaches = users.filter((u: UserType) => u.role === "coach");
@@ -39,7 +45,9 @@ export function UsersManagement() {
       total: users.length,
       patients: users.filter((u: UserType) => u.role === "patient").length,
       coaches: users.filter((u: UserType) => u.role === "coach").length,
-      admins: users.filter((u: UserType) => u.role === "admin" || u.role === "super_admin").length,
+      admins: users.filter(
+         (u: UserType) => u.role === "admin" || u.role === "super_admin"
+      ).length,
       active: users.filter((u: UserType) => u.status === "active").length,
       suspended: users.filter((u: UserType) => u.status === "suspended").length,
       pending: users.filter((u: UserType) => u.status === "pending").length,
@@ -67,7 +75,7 @@ export function UsersManagement() {
    };
 
    const handleAddUser = () => {
-      toast.success("Add user functionality coming soon!");
+      setIsAddUserModalOpen(true);
    };
 
    const handleExportUsers = () => {
@@ -81,6 +89,10 @@ export function UsersManagement() {
 
    const handleAssignCoachSuccess = () => {
       refetch(); // Refresh data after assignment
+   };
+
+   const handleAddUserSuccess = () => {
+      refetch(); // Refresh data after adding user
    };
 
    if (isLoading) {
@@ -228,6 +240,11 @@ export function UsersManagement() {
          </UserTabs>
 
          {/* Modals */}
+         <AddUserModal
+            isOpen={isAddUserModalOpen}
+            onClose={() => setIsAddUserModalOpen(false)}
+            onSuccess={handleAddUserSuccess}
+         />
          <UserProfileModal
             user={selectedUser}
             isOpen={isProfileModalOpen}

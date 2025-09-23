@@ -8,7 +8,7 @@ export const signupSchema = z
       email: z.string().email("Please enter a valid email address"),
       password: z.string().min(8, "Password must be at least 8 characters"),
       confirmPassword: z.string(),
-      role: z.enum(["patient", "coach"]),
+      role: z.literal("patient"),
    })
    .refine((data) => data.password === data.confirmPassword, {
       message: "Passwords don't match",
@@ -38,7 +38,23 @@ export const newPasswordSchema = z
       path: ["confirmPassword"],
    });
 
+// Admin User Creation Schema
+export const adminCreateUserSchema = z
+   .object({
+      first_name: z.string().min(2, "First name must be at least 2 characters"),
+      last_name: z.string().min(2, "Last name must be at least 2 characters"),
+      email: z.string().email("Please enter a valid email address"),
+      password: z.string().min(8, "Password must be at least 8 characters"),
+      confirmPassword: z.string(),
+      role: z.enum(["patient", "coach", "admin"]),
+   })
+   .refine((data) => data.password === data.confirmPassword, {
+      message: "Passwords don't match",
+      path: ["confirmPassword"],
+   });
+
 export type SignupFormData = z.infer<typeof signupSchema>;
 export type SigninFormData = z.infer<typeof signinSchema>;
 export type PasswordResetFormData = z.infer<typeof passwordResetSchema>;
 export type NewPasswordFormData = z.infer<typeof newPasswordSchema>;
+export type AdminCreateUserFormData = z.infer<typeof adminCreateUserSchema>;
