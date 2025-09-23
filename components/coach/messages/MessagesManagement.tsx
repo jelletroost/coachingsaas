@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAuth } from "@/lib/providers/authProvider";
 import {
    getMemberRooms,
    getMessages,
@@ -15,6 +16,7 @@ import MessageList from "./MessageList";
 import { Conversation, Message } from "./mockData";
 
 export default function MessagesManagement() {
+   const { user } = useAuth();
    const [selectedConversationId, setSelectedConversationId] = useState<
       string | undefined
    >();
@@ -67,8 +69,8 @@ export default function MessagesManagement() {
       useMutation({
          mutationFn: (newMessage: Message) =>
             sendMessage(
-               newMessage.conversationId,
-               newMessage.senderId,
+               newMessage.room_id!,
+               newMessage.sender_id,
                newMessage.content
             ),
          onSuccess: () => {
@@ -87,12 +89,18 @@ export default function MessagesManagement() {
    };
 
    const handleSendMessage = (content: string) => {
-      if (!selectedConversationId || !selectedConversation?.room_id) return;
+      if (
+         !selectedConversationId ||
+         !selectedConversation?.room_id ||
+         !user?.id
+      )
+         return;
 
       const newMessage: Message = {
          id: `msg_${Date.now()}`,
          conversationId: selectedConversationId,
-         senderId: "coach_1", // This should be the actual coach ID from auth
+         room_id: selectedConversation.room_id, // Add room_id for API call
+         sender_id: user.id, // Use authenticated user's ID
          senderType: "coach",
          content,
          timestamp: new Date().toISOString(),
@@ -182,6 +190,7 @@ export default function MessagesManagement() {
                         onTyping={handleTyping}
                         isMessagesPending={isMessagesPending}
                         isSendMessagePending={isSendMessagePending}
+                        currentUserId={user?.id}
                      />
                   </div>
                </div>

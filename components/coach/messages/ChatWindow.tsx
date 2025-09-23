@@ -29,6 +29,7 @@ interface ChatWindowProps {
    onTyping: (isTyping: boolean) => void;
    isMessagesPending?: boolean;
    isSendMessagePending?: boolean;
+   currentUserId?: string;
 }
 
 export default function ChatWindow({
@@ -38,6 +39,7 @@ export default function ChatWindow({
    onTyping,
    isMessagesPending,
    isSendMessagePending,
+   currentUserId,
 }: ChatWindowProps) {
    const [newMessage, setNewMessage] = useState("");
    const [isTyping, setIsTyping] = useState(false);
@@ -199,7 +201,7 @@ export default function ChatWindow({
                </div>
             ) : (
                messages.map((message, index) => {
-                  const isOwnMessage = message.senderType === "coach";
+                  const isOwnMessage = message.sender_id === currentUserId;
                   const showDate =
                      index === 0 ||
                      formatMessageDate(message.timestamp) !==
