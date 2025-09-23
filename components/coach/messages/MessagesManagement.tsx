@@ -3,7 +3,14 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useRealtimeMeetings } from "@/hooks/useRealtimeMeetings";
+import { useRealtimeMessages } from "@/hooks/useRealtimeMessages";
 import { useAuth } from "@/lib/providers/authProvider";
+import {
+   checkEnvironmentVariables,
+   testDatabaseConnection,
+   testRealtimeConnection,
+} from "@/lib/supabase/realtimeTest";
 import {
    getMemberRooms,
    getMessages,
@@ -11,7 +18,7 @@ import {
    updateMeeting,
 } from "@/services/message.service";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ChatWindow from "./ChatWindow";
 import MessageList from "./MessageList";
 import { Conversation, Message } from "./mockData";
@@ -22,6 +29,7 @@ export default function MessagesManagement() {
       string | undefined
    >();
    const [messages, setMessages] = useState<Message[]>([]);
+   const [debugInfo, setDebugInfo] = useState<any>(null);
 
    // Fetch conversations using useQuery
    const {
@@ -56,14 +64,47 @@ export default function MessagesManagement() {
       staleTime: 2 * 60 * 1000, // 2 minutes
    });
 
-   // Load messages from API data
+   // Realtime messages for selected conversation
+   const {
+      messages: realtimeMessages,
+      connectionStatus: messagesConnectionStatus,
+      addMessage: addRealtimeMessage,
+   } = useRealtimeMessages({
+      roomId: selectedConversation?.room_id,
+      enabled: !!selectedConversation?.room_id,
+   });
+
+   // Realtime meetings for selected conversation
+   const { updateMeeting: updateRealtimeMeeting } = useRealtimeMeetings({
+      roomId: selectedConversation?.room_id,
+      enabled: !!selectedConversation?.room_id,
+   });
+
+   // Merge fetched messages with realtime messages
+   const allMessages = useMemo(() => {
+      const fetchedMessages = messagesData?.data || [];
+      const combined = [...fetchedMessages, ...realtimeMessages];
+
+      // Remove duplicates and sort by timestamp
+      const uniqueMessages = combined.reduce(
+         (acc: Message[], message: Message) => {
+            const exists = acc.some((msg: Message) => msg.id === message.id);
+            if (!exists) acc.push(message);
+            return acc;
+         },
+         [] as Message[]
+      );
+
+      return uniqueMessages.sort(
+         (a: Message, b: Message) =>
+            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      );
+   }, [messagesData?.data, realtimeMessages]);
+
+   // Load messages from combined data
    useEffect(() => {
-      if (messagesData?.data) {
-         setMessages(messagesData.data);
-      } else {
-         setMessages([]);
-      }
-   }, [messagesData]);
+      setMessages(allMessages);
+   }, [allMessages]);
 
    // Send message mutation
    const { mutate: sendMessageMutation, isPending: isSendMessagePending } =
@@ -104,6 +145,7 @@ export default function MessagesManagement() {
          return;
 
       const newMessage: Message = {
+         id: `temp_${Date.now()}`, // Temporary ID for optimistic update
          conversationId: selectedConversationId,
          room_id: selectedConversation.room_id,
          sender_id: user.id,
@@ -114,16 +156,41 @@ export default function MessagesManagement() {
          is_error: false,
       };
 
-      // Add message to local state immediately
-      setMessages((prev) => [...prev, newMessage]);
+      // Add message to local state immediately (optimistic update)
+      addRealtimeMessage(newMessage);
 
-      // Send message via API
+      // Send message via API - realtime will handle the actual message
       sendMessageMutation(newMessage);
    };
 
    const handleTyping = (isTyping: boolean) => {
       // Handle typing indicator logic here
       console.log("Typing:", isTyping);
+   };
+
+   const testConnection = async () => {
+      console.log("Testing connections...");
+
+      // Check environment variables first
+      const envCheck = checkEnvironmentVariables();
+
+      const [realtimeResult, dbResult] = await Promise.all([
+         testRealtimeConnection(),
+         testDatabaseConnection(),
+      ]);
+
+      setDebugInfo({
+         environment: envCheck,
+         realtime: realtimeResult,
+         database: dbResult,
+         timestamp: new Date().toISOString(),
+      });
+
+      console.log("Connection test results:", {
+         envCheck,
+         realtimeResult,
+         dbResult,
+      });
    };
 
    const handleAcceptMeeting = async (
@@ -151,6 +218,13 @@ export default function MessagesManagement() {
             )
          );
 
+         // Also update realtime meeting
+         updateRealtimeMeeting(meetingId, {
+            status: "confirmed",
+            meeting_link: meetingLink,
+            updated_at: new Date().toISOString(),
+         });
+
          console.log("Meeting accepted successfully:", meetingId);
       } catch (error) {
          console.error("Failed to accept meeting:", error);
@@ -174,6 +248,12 @@ export default function MessagesManagement() {
                   : msg
             )
          );
+
+         // Also update realtime meeting
+         updateRealtimeMeeting(meetingId, {
+            status: "cancelled",
+            updated_at: new Date().toISOString(),
+         });
 
          console.log("Meeting rejected successfully:", meetingId);
       } catch (error) {
@@ -227,12 +307,86 @@ export default function MessagesManagement() {
                   {totalUnread > 0 && (
                      <Badge variant="destructive">{totalUnread} unread</Badge>
                   )}
+                  {/* Realtime Connection Status */}
+                  <div className="flex items-center space-x-1">
+                     <div
+                        className={`w-2 h-2 rounded-full ${
+                           messagesConnectionStatus === "CONNECTED"
+                              ? "bg-green-500"
+                              : messagesConnectionStatus === "CONNECTING"
+                              ? "bg-yellow-500"
+                              : messagesConnectionStatus === "ERROR"
+                              ? "bg-red-500"
+                              : "bg-gray-400"
+                        }`}
+                     />
+                     <span className="text-xs text-gray-500">
+                        {messagesConnectionStatus === "CONNECTED"
+                           ? process.env.NODE_ENV === "development"
+                              ? "Local Mode"
+                              : "Live"
+                           : messagesConnectionStatus === "CONNECTING"
+                           ? "Connecting..."
+                           : messagesConnectionStatus === "ERROR"
+                           ? "Fallback Mode"
+                           : "Disconnected"}
+                     </span>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={testConnection}>
+                     Test Connection
+                  </Button>
                   <Button variant="outline" size="sm">
                      New Message
                   </Button>
                </div>
             </div>
          </div>
+
+         {/* Debug Info */}
+         {debugInfo && (
+            <Card className="mb-4 p-4 bg-gray-50">
+               <h3 className="text-sm font-medium mb-2">
+                  Connection Debug Info
+               </h3>
+               <div className="space-y-2 text-xs">
+                  <div>
+                     <strong>Environment:</strong>{" "}
+                     {debugInfo.environment.success
+                        ? "✅ Configured"
+                        : "❌ Missing"}
+                     {debugInfo.environment.error && (
+                        <span className="text-red-600 ml-2">
+                           {debugInfo.environment.error}
+                        </span>
+                     )}
+                  </div>
+                  <div>
+                     <strong>Realtime:</strong>{" "}
+                     {debugInfo.realtime.success ? "✅ Connected" : "❌ Failed"}
+                     {debugInfo.realtime.details?.mode === "local-fallback" && (
+                        <span className="text-blue-600 ml-2">(Local Mode)</span>
+                     )}
+                     {debugInfo.realtime.error && (
+                        <span className="text-red-600 ml-2">
+                           {debugInfo.realtime.error}
+                        </span>
+                     )}
+                  </div>
+                  <div>
+                     <strong>Database:</strong>{" "}
+                     {debugInfo.database.success ? "✅ Connected" : "❌ Failed"}
+                     {debugInfo.database.error && (
+                        <span className="text-red-600 ml-2">
+                           {debugInfo.database.error}
+                        </span>
+                     )}
+                  </div>
+                  <div className="text-gray-500">
+                     Tested at: {debugInfo.timestamp}
+                  </div>
+               </div>
+            </Card>
+         )}
 
          {/* Messages Interface */}
          <Card className="h-[calc(100vh-200px)]">

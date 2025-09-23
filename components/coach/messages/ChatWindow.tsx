@@ -10,6 +10,7 @@ import {
    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { useTypingIndicator } from "@/hooks/useTypingIndicator";
 import {
    MessageSquareWarning,
    MoreVertical,
@@ -52,6 +53,14 @@ export default function ChatWindow({
    const messagesEndRef = useRef<HTMLDivElement>(null);
    const inputRef = useRef<HTMLInputElement>(null);
 
+   // Typing indicator for realtime
+   const { typingUsers, setIsTyping: setRealtimeTyping } = useTypingIndicator({
+      roomId: conversation?.room_id,
+      userId: currentUserId,
+      userName: "Coach", // You might want to get this from user context
+      enabled: !!conversation?.room_id,
+   });
+
    const scrollToBottom = () => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
    };
@@ -79,9 +88,11 @@ export default function ChatWindow({
       setNewMessage(e.target.value);
       if (e.target.value.length > 0 && !isTyping) {
          setIsTyping(true);
+         setRealtimeTyping(true);
          onTyping(true);
       } else if (e.target.value.length === 0 && isTyping) {
          setIsTyping(false);
+         setRealtimeTyping(false);
          onTyping(false);
       }
    };
@@ -302,6 +313,29 @@ export default function ChatWindow({
                   );
                })
             )}
+
+            {/* Typing Indicator */}
+            {typingUsers.length > 0 && (
+               <div className="flex items-center space-x-2 px-4 py-2">
+                  <div className="flex space-x-1">
+                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                     <div
+                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.1s" }}
+                     />
+                     <div
+                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.2s" }}
+                     />
+                  </div>
+                  <span className="text-sm text-gray-500">
+                     {typingUsers.length === 1
+                        ? `${typingUsers[0].name || "Someone"} is typing...`
+                        : `${typingUsers.length} people are typing...`}
+                  </span>
+               </div>
+            )}
+
             <div ref={messagesEndRef} />
          </div>
 
