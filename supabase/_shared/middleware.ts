@@ -22,9 +22,11 @@ export const checkRole = (allowedRoles: string[]) => {
 
       const { data, error: roleError } = await edgeAdminClient
          .from("users")
-         .select(`
+         .select(
+            `
             role:user_roles(name)
-         `)
+         `
+         )
          .eq("id", user.id)
          .single();
 
@@ -36,4 +38,30 @@ export const checkRole = (allowedRoles: string[]) => {
       c.set("user", user);
       await next();
    };
+};
+
+export const verifyUser = async (c: Context, next: Next) => {
+   try {
+      const authHeader = c.req.header("Authorization");
+      const token = authHeader?.replace("Bearer ", "");
+      if (!token) {
+         return c.json({ error: "Unauthorized Access" }, 401);
+      }
+
+      // Get user data
+      const {
+         data: { user },
+         error,
+      } = await edgeAdminClient.auth.getUser(token);
+      if (error || !user) {
+         return c.json({ error: "Unauthorized Access" }, 401);
+      }
+
+      // Store user in context for use in route handlers
+      c.set("user", user);
+      await next();
+   } catch (error) {
+      console.error(error);
+      return c.json({ error: "Internal server error" }, 500);
+   }
 };

@@ -5,13 +5,21 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Paperclip, Send, Smile } from "lucide-react";
+import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
-import MeetingMessage from "./MeetingMessage";
 import MeetingScheduler, { MeetingData } from "./MeetingScheduler";
 import { Conversation, Message } from "./mockData";
 
+interface PatientProfile {
+   id: string;
+   name: string;
+   email: string;
+   avatar?: string;
+}
+
 interface ChatWindowProps {
-   conversation?: Conversation;
+   patientProfile: PatientProfile;
+   conversation: Conversation;
    messages: Message[];
    onSendMessage: (content: string) => void;
    onTyping: (isTyping: boolean) => void;
@@ -19,6 +27,7 @@ interface ChatWindowProps {
 }
 
 export default function ChatWindow({
+   patientProfile,
    conversation,
    messages,
    onSendMessage,
@@ -65,28 +74,28 @@ export default function ChatWindow({
       }
    };
 
-   const formatMessageTime = (timestamp: string) => {
-      const date = new Date(timestamp);
-      return date.toLocaleTimeString([], {
-         hour: "2-digit",
-         minute: "2-digit",
-      });
-   };
+   // const formatMessageTime = (timestamp: string) => {
+   //    const date = new Date(timestamp);
+   //    return date.toLocaleTimeString([], {
+   //       hour: "2-digit",
+   //       minute: "2-digit",
+   //    });
+   // };
 
-   const formatMessageDate = (timestamp: string) => {
-      const date = new Date(timestamp);
-      const today = new Date();
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
+   // const formatMessageDate = (timestamp: string) => {
+   //    const date = new Date(timestamp);
+   //    const today = new Date();
+   //    const yesterday = new Date(today);
+   //    yesterday.setDate(yesterday.getDate() - 1);
 
-      if (date.toDateString() === today.toDateString()) {
-         return "Today";
-      } else if (date.toDateString() === yesterday.toDateString()) {
-         return "Yesterday";
-      } else {
-         return date.toLocaleDateString();
-      }
-   };
+   //    if (date.toDateString() === today.toDateString()) {
+   //       return "Today";
+   //    } else if (date.toDateString() === yesterday.toDateString()) {
+   //       return "Yesterday";
+   //    } else {
+   //       return date.toLocaleDateString();
+   //    }
+   // };
 
    const handleMeetingSubmit = (meetingData: MeetingData) => {
       // Create a meeting message and add it to the chat
@@ -101,35 +110,6 @@ export default function ChatWindow({
          }\nDate: ${meetingData.date.toDateString()}\nTime: ${meetingData.time}`
       );
    };
-
-   if (!conversation) {
-      return (
-         <div className="flex-1 flex items-center justify-center bg-gray-50">
-            <div className="text-center">
-               <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg
-                     className="w-8 h-8 text-gray-400"
-                     fill="none"
-                     stroke="currentColor"
-                     viewBox="0 0 24 24">
-                     <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                     />
-                  </svg>
-               </div>
-               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Select a conversation
-               </h3>
-               <p className="text-gray-500">
-                  Choose a coach to start messaging
-               </p>
-            </div>
-         </div>
-      );
-   }
 
    return (
       <div className="flex flex-col h-full">
@@ -178,7 +158,7 @@ export default function ChatWindow({
 
          {/* Messages Area */}
          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-            {messages.length === 0 ? (
+            {messages?.length === 0 ? (
                <div className="flex flex-col items-center justify-center h-full text-gray-500">
                   <div className="text-center">
                      <p className="text-sm">No messages yet</p>
@@ -188,19 +168,23 @@ export default function ChatWindow({
                   </div>
                </div>
             ) : (
-               messages.map((message, index) => {
-                  const isOwnMessage = message.senderType === "patient";
+               messages?.map((message, index) => {
+                  const isOwnMessage = message.sender_id === patientProfile?.id;
                   const showDate =
                      index === 0 ||
-                     formatMessageDate(message.timestamp) !==
-                        formatMessageDate(messages[index - 1]?.timestamp);
+                     moment(message.created_at).format("YYYY-MM-DD") !==
+                        moment(messages[index - 1]?.created_at).format(
+                           "YYYY-MM-DD"
+                        );
 
                   return (
                      <div key={message.id}>
                         {showDate && (
                            <div className="flex justify-center mb-4">
                               <Badge variant="secondary" className="text-xs">
-                                 {formatMessageDate(message.timestamp)}
+                                 {moment(message.created_at).format(
+                                    "YYYY-MM-DD"
+                                 )}
                               </Badge>
                            </div>
                         )}
@@ -228,11 +212,12 @@ export default function ChatWindow({
                                     </AvatarFallback>
                                  </Avatar>
                               )}
-                              {message.messageType === "meeting" ? (
-                                 <MeetingMessage
-                                    message={message}
-                                    isOwnMessage={isOwnMessage}
-                                 />
+                              {message.content.includes("Meeting scheduled") ? (
+                                 // <MeetingMessage
+                                 //    message={message}
+                                 //    isOwnMessage={isOwnMessage}
+                                 // />
+                                 <p>Meeting</p>
                               ) : (
                                  <div
                                     className={`rounded-lg px-3 py-2 ${
@@ -247,12 +232,12 @@ export default function ChatWindow({
                                              ? "text-blue-100"
                                              : "text-gray-500"
                                        }`}>
-                                       {formatMessageTime(message.timestamp)}
+                                       {/* {formatMessageTime(message.timestamp)}
                                        {isOwnMessage && (
                                           <span className="ml-2">
                                              {message.isRead ? "✓✓" : "✓"}
                                           </span>
-                                       )}
+                                       )} */}
                                     </p>
                                  </div>
                               )}

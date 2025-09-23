@@ -20,33 +20,33 @@ interface MeetingMessageProps {
 }
 
 const getStatusColor = (status: string) => {
-   switch (status) {
-      case "pending":
-         return "bg-yellow-100 text-yellow-800";
-      case "confirmed":
-         return "bg-green-100 text-green-800";
-      case "cancelled":
-         return "bg-red-100 text-red-800";
-      case "completed":
-         return "bg-gray-100 text-gray-800";
-      default:
-         return "bg-gray-100 text-gray-800";
-   }
+    switch (status) {
+       case "pending":
+          return "bg-yellow-100 text-yellow-800";
+       case "confirmed":
+          return "bg-green-100 text-green-800";
+       case "cancelled":
+          return "bg-red-100 text-red-800";
+       case "completed":
+          return "bg-gray-100 text-gray-800";
+       default:
+          return "bg-gray-100 text-gray-800";
+    }
 };
 
 const getStatusText = (status: string) => {
-   switch (status) {
-      case "pending":
-         return "Pending";
-      case "confirmed":
-         return "Confirmed";
-      case "cancelled":
-         return "Cancelled";
-      case "completed":
-         return "Completed";
-      default:
-         return "Unknown";
-   }
+    switch (status) {
+       case "pending":
+          return "Pending";
+       case "confirmed":
+          return "Confirmed";
+       case "cancelled":
+          return "Cancelled";
+       case "completed":
+          return "Completed";
+       default:
+          return "Unknown";
+    }
 };
 
 export default function MeetingMessage({
@@ -70,6 +70,7 @@ export default function MeetingMessage({
          alert("Initiating phone call...");
       }
    };
+
 
    const handleCancel = () => {
       // In a real app, this would cancel the meeting
@@ -125,41 +126,41 @@ export default function MeetingMessage({
                )}
             </div>
 
-            <div className="flex space-x-2">
-               <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsDetailsOpen(true)}
-                  className="text-xs">
-                  View Details
-               </Button>
+             <div className="flex space-x-2">
+                <Button
+                   variant="outline"
+                   size="sm"
+                   onClick={() => setIsDetailsOpen(true)}
+                   className="text-xs">
+                   View Details
+                </Button>
 
-               {meetingData.status === "confirmed" && !isPastMeeting && (
-                  <Button
-                     variant="default"
-                     size="sm"
-                     onClick={handleJoinMeeting}
-                     className="text-xs">
-                     {meetingData.type === "phone"
-                        ? "Call Now"
-                        : "Join Meeting"}
-                  </Button>
-               )}
+                {meetingData.status === "confirmed" && !isPastMeeting && (
+                   <Button
+                      variant="default"
+                      size="sm"
+                      onClick={handleJoinMeeting}
+                      className="text-xs">
+                      {meetingData.type === "phone"
+                         ? "Call Now"
+                         : "Join Meeting"}
+                   </Button>
+                )}
 
-               {meetingData.status === "pending" && !isPastMeeting && (
+                {meetingData.status === "pending" && i
                   <Button
-                     variant="ghost"
-                     size="sm"
-                     onClick={handleCancel}
-                     className="text-xs text-red-600 hover:text-red-700">
-                     Cancel
+            ghost"
+                   size="sm"
+                    onClick={handeCancel}
+                    className"text-xs txt-red-600 hover:text-ed-700">
+                   Cancel
                   </Button>
                )}
             </div>
          </div>
 
-         {/* Meeting Details Dialog */}
-         <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+       {/*eeting Details Dialog */}
+         <Dialog op={i sDetailsOpen} onOpenChange={setIsDetailsOpen}>
             <DialogContent className="sm:max-w-[500px]">
                <DialogHeader>
                   <DialogTitle className="flex items-center space-x-2">
@@ -263,20 +264,21 @@ export default function MeetingMessage({
 
                <div className="flex justify-end space-x-2 pt-4">
                   <Button
-                     variant="outline"
-                     onClick={() => setIsDetailsOpen(false)}>
-                     Close
-                  </Button>
-                  {meetingData.status === "confirmed" && !isPastMeeting && (
-                     <Button onClick={handleJoinMeeting}>
+                     var iant="outline"
+                     onClick={() =>  setIsDetailsOpen(false)}>
+                      Close
+                   </Button>
+                  {meetingData.status === "confirmed" && !isPastMe eting  && (
+                     <B utton onClick={handleJoinMeeting}>
                         {meetingData.type === "phone"
-                           ? "Call Now"
-                           : "Join Meeting"}
+                            ? "Call Now"
+                            : "Join Meeting"}
                      </Button>
-                  )}
-               </div>
+                   )}
+                </div>
             </DialogContent>
-         </Dialog>
-      </>
+         </Dialog> 
+      </> 
    );
 }
+ 

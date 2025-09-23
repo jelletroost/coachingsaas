@@ -1,27 +1,10 @@
 // Message and conversation data for patient messaging system
 export interface Message {
-   id: string;
-   conversationId: string;
-   senderId: string;
-   senderType: "coach" | "patient";
+   id?: string;
+   room_id: string;
+   sender_id: string;
    content: string;
-   timestamp: string;
-   isRead: boolean;
-   messageType?: "text" | "meeting";
-   attachments?: {
-      type: "image" | "document" | "video";
-      url: string;
-      name: string;
-   }[];
-   meetingData?: {
-      type: "phone" | "google-meet";
-      date: string;
-      time: string;
-      duration: string;
-      notes?: string;
-      status: "pending" | "confirmed" | "cancelled" | "completed";
-      meetingId?: string;
-   };
+   created_at?: string;
 }
 
 export interface Conversation {
@@ -79,7 +62,7 @@ export const coachesData: Coach[] = [
    },
 ];
 
-// Mock conversations data
+// Mock conversations data - Patient only has one assigned coach
 export const conversationsData: Conversation[] = [
    {
       id: "conv_1",
@@ -95,159 +78,54 @@ export const conversationsData: Conversation[] = [
       lastActivity: "2024-01-20T10:30:00Z",
       coachStatus: "online",
    },
-   {
-      id: "conv_2",
-      coachId: "coach_2",
-      coachName: "Dr. Michael Rodriguez",
-      coachAvatar: "/avatars/michael-rodriguez.jpg",
-      coachSpecialty: "Nutrition & Wellness",
-      lastMessage:
-         "Great progress on your meal plan! Let's discuss your next goals.",
-      lastMessageTime: "2024-01-20T09:00:00Z",
-      unreadCount: 2,
-      status: "active",
-      lastActivity: "2024-01-20T09:15:00Z",
-      coachStatus: "away",
-   },
-   {
-      id: "conv_3",
-      coachId: "coach_3",
-      coachName: "Dr. Emily Johnson",
-      coachAvatar: "/avatars/emily-johnson.jpg",
-      coachSpecialty: "Mental Health",
-      lastMessage: "How are you feeling with the new meditation techniques?",
-      lastMessageTime: "2024-01-19T16:30:00Z",
-      unreadCount: 1,
-      status: "active",
-      lastActivity: "2024-01-19T16:45:00Z",
-      coachStatus: "offline",
-   },
 ];
 
-// Mock messages data
-export const messagesData: Message[] = [
-   // Conversation 1 - Dr. Sarah Chen
-   {
-      id: "msg_1_1",
-      conversationId: "conv_1",
-      senderId: "coach_1",
-      senderType: "coach",
-      content: "Hi! How are you feeling today?",
-      timestamp: "2024-01-20T10:00:00Z",
-      isRead: true,
-   },
-   {
-      id: "msg_1_2",
-      conversationId: "conv_1",
-      senderId: "patient_1",
-      senderType: "patient",
-      content:
-         "I'm doing well, thank you! I've been following the exercise routine you recommended.",
-      timestamp: "2024-01-20T10:05:00Z",
-      isRead: true,
-   },
-   {
-      id: "msg_1_3",
-      conversationId: "conv_1",
-      senderId: "coach_1",
-      senderType: "coach",
-      content:
-         "That's excellent! How many days have you been able to exercise this week?",
-      timestamp: "2024-01-20T10:10:00Z",
-      isRead: true,
-   },
-   {
-      id: "msg_1_4",
-      conversationId: "conv_1",
-      senderId: "patient_1",
-      senderType: "patient",
-      content:
-         "I've been able to exercise 4 days this week. Feeling much stronger!",
-      timestamp: "2024-01-20T10:30:00Z",
-      isRead: true,
-   },
-   {
-      id: "msg_1_5",
-      conversationId: "conv_1",
-      senderId: "patient_1",
-      senderType: "patient",
-      content: "Meeting scheduled: Phone Call on Mon Jan 22 2024 at 14:00",
-      timestamp: "2024-01-20T11:00:00Z",
-      isRead: true,
-      messageType: "meeting",
-      meetingData: {
-         type: "phone",
-         date: "2024-01-22T00:00:00Z",
-         time: "14:00",
-         duration: "30",
-         notes: "Weekly check-in about exercise progress",
-         status: "pending",
-      },
-   },
-   {
-      id: "msg_1_6",
-      conversationId: "conv_1",
-      senderId: "coach_1",
-      senderType: "coach",
-      content: "Meeting confirmed: Google Meet on Tomorrow at 15:30",
-      timestamp: "2024-01-20T12:00:00Z",
-      isRead: true,
-      messageType: "meeting",
-      meetingData: {
-         type: "google-meet",
-         date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
-         time: "15:30",
-         duration: "45",
-         notes: "Follow-up discussion about your progress",
-         status: "confirmed",
-         meetingId: "abc-defg-hij",
-      },
-   },
-
-   // Conversation 2 - Dr. Michael Rodriguez
-   {
-      id: "msg_2_1",
-      conversationId: "conv_2",
-      senderId: "coach_2",
-      senderType: "coach",
-      content:
-         "Great progress on your meal plan! Let's discuss your next goals.",
-      timestamp: "2024-01-20T09:00:00Z",
-      isRead: false,
-   },
-   {
-      id: "msg_2_2",
-      conversationId: "conv_2",
-      senderId: "coach_2",
-      senderType: "coach",
-      content:
-         "I've prepared some new recipes that should help with your energy levels.",
-      timestamp: "2024-01-20T09:15:00Z",
-      isRead: false,
-   },
-
-   // Conversation 3 - Dr. Emily Johnson
-   {
-      id: "msg_3_1",
-      conversationId: "conv_3",
-      senderId: "coach_3",
-      senderType: "coach",
-      content: "How are you feeling with the new meditation techniques?",
-      timestamp: "2024-01-19T16:30:00Z",
-      isRead: false,
-   },
-];
+// // Mock messages data - Only messages from assigned coach
+// export const messagesData: Message[] = [
+//    // Conversation with assigned coach - Dr. Sarah Chen
+//    {
+//       room_id: "conv_1",
+//       sender_id: "coach_1",
+//       content: "Hi! How are you feeling today?",
+//    },
+//    {
+//       room_id: "conv_1",
+//       sender_id: "patient_1",
+//       content:
+//          "I'm doing well, thank you! I've been following the exercise routine you recommended.",
+//    },
+//    {
+//       room_id: "conv_1",
+//       sender_id: "coach_1",
+//       content:
+//          "That's excellent! How many days have you been able to exercise this week?",
+//    },
+//    {
+//       room_id: "conv_1",
+//       sender_id: "patient_1",
+//       content:
+//          "I've been able to exercise 4 days this week. Feeling much stronger!",
+//    },
+//    {
+//       room_id: "conv_1",
+//       sender_id: "patient_1",
+//       content: "Meeting scheduled: Phone Call on Mon Jan 22 2024 at 14:00",
+//    },
+//    {
+//       room_id: "conv_1",
+//       sender_id: "coach_1",
+//       content: "Meeting confirmed: Google Meet on Tomorrow at 15:30",
+//    },
+// ];
 
 // Helper functions
 export const getConversationById = (id: string): Conversation | undefined => {
    return conversationsData.find((conv) => conv.id === id);
 };
 
-export const getMessagesByConversationId = (
-   conversationId: string
-): Message[] => {
-   return messagesData.filter((msg) => msg.conversationId === conversationId);
-};
+// export const getMessagesByConversationId = (roomId: string): Message[] => {
+//    return messagesData.filter((msg) => msg.room_id === roomId);
+// };
 
 export const getTotalUnreadMessages = (): number => {
    return conversationsData.reduce(

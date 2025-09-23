@@ -1,97 +1,84 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import {
+   createRoom,
+   getMessages,
+   sendMessage,
+} from "@/services/message.service";
+import { getPatientProfile } from "@/services/patients_services";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import ChatWindow from "./ChatWindow";
-import { MeetingData } from "./MeetingScheduler";
-import MessageList from "./MessageList";
-import {
-   Conversation,
-   conversationsData,
-   getConversationById,
-   getMessagesByConversationId,
-   Message,
-} from "./mockData";
+import { Conversation, Message } from "./mockData";
 
 export default function MessagesManagement() {
-   const [conversations, setConversations] =
-      useState<Conversation[]>(conversationsData);
-   const [selectedConversationId, setSelectedConversationId] = useState<
-      string | undefined
-   >();
+   // Patient is assigned to only one coach - Dr. Sarah Chen
+
+   const [assignedConversation] = useState<Conversation>({
+      id: "122",
+      coachId: "122",
+      coachName: "Dr. Sarah Chen",
+      coachAvatar: "/avatars/sarah-chen.jpg",
+      coachSpecialty: "Cardiovascular Health",
+      lastMessage:
+         "That's excellent! How many days have you been able to exercise this week?",
+      lastMessageTime: "2024-01-20T10:10:00Z",
+      unreadCount: 0,
+      status: "active",
+      lastActivity: "2024-01-20T10:30:00Z",
+      coachStatus: "online",
+   });
+
    const [messages, setMessages] = useState<Message[]>([]);
-   const [searchQuery, setSearchQuery] = useState("");
-   const [filteredConversations, setFilteredConversations] =
-      useState<Conversation[]>(conversations);
 
-   // Load messages when conversation is selected
+   const { data: patientProfile } = useQuery({
+      queryKey: ["patientProfile"],
+      queryFn: getPatientProfile,
+   });
+
+   // CreaMessagete or get room
+   const { data: room } = useQuery({
+      queryKey: ["room"],
+      queryFn: () =>
+         createRoom(patientProfile?.assigned_coach_id, patientProfile?.id),
+      enabled: !!patientProfile?.assigned_coach_id && !!patientProfile?.id,
+   });
+
+   // Get messages
+   const { data: messagesData } = useQuery({
+      queryKey: ["messagesData"],
+      queryFn: () => getMessages(room?.data?.room_id),
+      enabled: !!room?.data?.room_id,
+   });
+
+   // Load messages for the assigned coach
    useEffect(() => {
-      if (selectedConversationId) {
-         const conversationMessages = getMessagesByConversationId(
-            selectedConversationId
-         );
-         setMessages(conversationMessages);
-      } else {
-         setMessages([]);
-      }
-   }, [selectedConversationId]);
+      console.log("messagesData", messagesData?.data);
+      setMessages(messagesData?.data);
+   }, [messagesData]);
 
-   // Filter conversations based on search query
-   useEffect(() => {
-      let filtered = conversations;
-
-      // Filter by search query
-      if (searchQuery) {
-         filtered = filtered.filter(
-            (conv) =>
-               conv.coachName
-                  .toLowerCase()
-                  .includes(searchQuery.toLowerCase()) ||
-               conv.lastMessage
-                  .toLowerCase()
-                  .includes(searchQuery.toLowerCase())
-         );
-      }
-
-      setFilteredConversations(filtered);
-   }, [conversations, searchQuery]);
-
-   const handleSelectConversation = (conversationId: string) => {
-      setSelectedConversationId(conversationId);
-   };
+   // Send message mutation
+   const { mutate: sendMessageMutation } = useMutation({
+      mutationFn: (newMessage: Message) =>
+         sendMessage(
+            newMessage.room_id,
+            newMessage.sender_id,
+            newMessage.content
+         ),
+   });
 
    const handleSendMessage = (content: string) => {
-      if (!selectedConversationId) return;
-
       const newMessage: Message = {
-         id: `msg_${Date.now()}`,
-         conversationId: selectedConversationId,
-         senderId: "patient_1",
-         senderType: "patient",
+         room_id: room?.data?.room_id,
+         sender_id: patientProfile?.id,
          content,
-         timestamp: new Date().toISOString(),
-         isRead: false,
       };
+
+      sendMessageMutation(newMessage);
 
       // Add message to messages list
       setMessages((prev) => [...prev, newMessage]);
-
-      // Update conversation's last message
-      const updatedConversations = conversations.map((conv) =>
-         conv.id === selectedConversationId
-            ? {
-                 ...conv,
-                 lastMessage: content,
-                 lastMessageTime: new Date().toISOString(),
-                 lastActivity: new Date().toISOString(),
-              }
-            : conv
-      );
-      setConversations(updatedConversations);
-   };
-
-   const handleSearch = (query: string) => {
-      setSearchQuery(query);
    };
 
    const handleTyping = (isTyping: boolean) => {
@@ -99,56 +86,33 @@ export default function MessagesManagement() {
       console.log("Typing:", isTyping);
    };
 
-   const handleAddMeetingMessage = (meetingData: MeetingData) => {
-      if (!selectedConversationId) return;
+   // const handleAddMeetingMessage = (meetingData: MeetingData) => {
+   //    const newMeetingMessage: Message = {
+   //       room_id: room?.data?.room_id,
+   //       sender_id: patientProfile?.id,
+   //       content: `Meeting scheduled: ${
+   //          meetingData.type === "phone" ? "Phone Call" : "Google Meet"
+   //       } on ${meetingData.date.toDateString()} at ${meetingData.time}`,
+   //       content: `Meeting scheduled: ${
+   //          meetingData.type === "phone" ? "Phone Call" : "Google Meet"
+   //       } on ${meetingData.date.toDateString()} at ${meetingData.time}`,
+   //       meetingData: {
+   //          type: meetingData.type,
+   //          date: meetingData.date.toISOString(),
+   //          time: meetingData.time,
+   //          duration: meetingData.duration,
+   //          notes: meetingData.notes,
+   //          status: "pending",
+   //          meetingId:
+   //             meetingData.type === "google-meet"
+   //                ? `meet-${Date.now()}`
+   //                : undefined,
+   //       },
+   //    };
 
-      const newMeetingMessage: Message = {
-         id: `meeting_${Date.now()}`,
-         conversationId: selectedConversationId,
-         senderId: "patient_1",
-         senderType: "patient",
-         content: `Meeting scheduled: ${
-            meetingData.type === "phone" ? "Phone Call" : "Google Meet"
-         } on ${meetingData.date.toDateString()} at ${meetingData.time}`,
-         timestamp: new Date().toISOString(),
-         isRead: false,
-         messageType: "meeting",
-         meetingData: {
-            type: meetingData.type,
-            date: meetingData.date.toISOString(),
-            time: meetingData.time,
-            duration: meetingData.duration,
-            notes: meetingData.notes,
-            status: "pending",
-            meetingId:
-               meetingData.type === "google-meet"
-                  ? `meet-${Date.now()}`
-                  : undefined,
-         },
-      };
-
-      // Add meeting message to messages list
-      setMessages((prev) => [...prev, newMeetingMessage]);
-
-      // Update conversation's last message
-      const updatedConversations = conversations.map((conv) =>
-         conv.id === selectedConversationId
-            ? {
-                 ...conv,
-                 lastMessage: `Meeting scheduled: ${
-                    meetingData.type === "phone" ? "Phone Call" : "Google Meet"
-                 }`,
-                 lastMessageTime: new Date().toISOString(),
-                 lastActivity: new Date().toISOString(),
-              }
-            : conv
-      );
-      setConversations(updatedConversations);
-   };
-
-   const selectedConversation = selectedConversationId
-      ? getConversationById(selectedConversationId)
-      : undefined;
+   //    // Add meeting message to messages list
+   //    setMessages((prev) => [...prev, newMeetingMessage]);
+   // };
 
    return (
       <div className="h-full">
@@ -156,24 +120,15 @@ export default function MessagesManagement() {
          <Card className="h-[calc(100vh-200px)]">
             <CardContent className="p-0 h-full">
                <div className="flex h-full">
-                  {/* Message List */}
-                  <div className="w-1/3 border-r border-gray-200">
-                     <MessageList
-                        conversations={filteredConversations}
-                        selectedConversationId={selectedConversationId}
-                        onSelectConversation={handleSelectConversation}
-                        onSearch={handleSearch}
-                     />
-                  </div>
-
-                  {/* Chat Window */}
+                  {/* Chat Window - Direct chat with assigned coach */}
                   <div className="flex-1">
                      <ChatWindow
-                        conversation={selectedConversation}
+                        patientProfile={patientProfile}
+                        conversation={assignedConversation}
                         messages={messages}
                         onSendMessage={handleSendMessage}
                         onTyping={handleTyping}
-                        onAddMeetingMessage={handleAddMeetingMessage}
+                        // onAddMeetingMessage={handleAddMeetingMessage}
                      />
                   </div>
                </div>
