@@ -47,7 +47,7 @@ export default function MessagesManagement() {
       enabled: !!patientProfile?.assigned_coach_id && !!patientProfile?.user_id,
    });
 
-   // Get messages
+   // Get messages with polling for real-time updates
    const {
       data: messagesData,
       refetch: refetchMessages,
@@ -56,6 +56,9 @@ export default function MessagesManagement() {
       queryKey: ["messagesData"],
       queryFn: () => getMessages(room?.data?.room_id),
       enabled: !!room?.data?.room_id,
+      staleTime: 0, // Always consider data stale
+      refetchInterval: 3000, // Poll every 3 seconds
+      refetchIntervalInBackground: true, // Continue polling when tab is not active
    });
 
    // Load messages for the assigned coach
@@ -63,22 +66,40 @@ export default function MessagesManagement() {
       setMessages(messagesData?.data);
    }, [messagesData]);
 
-   // Send message mutation
-   const {
-      mutate: sendMessageMutation,
-      isError: isSendMessageError,
-      isPending: isSendMessagePending,
-   } = useMutation({
-      mutationFn: (newMessage: Message) =>
-         sendMessage(
-            newMessage.room_id,
-            newMessage.sender_id,
-            newMessage.content
-         ),
-      onSuccess: () => {
-         refetchMessages();
-      },
-   });
+   // Send message mutation with optimistic updates
+   const { mutate: sendMessageMutation, isPending: isSendMessagePending } =
+      useMutation({
+         mutationFn: (newMessage: Message) =>
+            sendMessage(
+               newMessage.room_id,
+               newMessage.sender_id,
+               newMessage.content
+            ),
+         onMutate: async (newMessage) => {
+            // Cancel any outgoing refetches
+            await refetchMessages();
+
+            // Optimistically update the UI
+            const optimisticMessage = {
+               ...newMessage,
+               id: `temp_${Date.now()}`,
+               timestamp: new Date().toISOString(),
+            };
+
+            setMessages((prev) => [...prev, optimisticMessage]);
+         },
+         onSuccess: () => {
+            // Refetch messages to get the real message from server
+            refetchMessages();
+         },
+         onError: (error) => {
+            console.error("Failed to send message:", error);
+            // Remove the optimistic message on error
+            setMessages((prev) =>
+               prev.filter((msg) => msg.id !== `temp_${Date.now()}`)
+            );
+         },
+      });
 
    const handleSendMessage = (content: string) => {
       const newMessage: Message = {
@@ -87,11 +108,8 @@ export default function MessagesManagement() {
          content,
       };
 
+      // Send message via API (optimistic update handled in mutation)
       sendMessageMutation(newMessage);
-
-      // Add message to messages list
-      newMessage.is_error = isSendMessageError;
-      setMessages((prev) => [...prev, newMessage]);
    };
 
    const { mutate: createMeetingMutation, isError: isCreateMeetingError } =

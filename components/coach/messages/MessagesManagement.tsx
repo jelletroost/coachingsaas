@@ -93,7 +93,7 @@ export default function MessagesManagement() {
             refetchMessages();
             refetchConversations();
          },
-         onError: (error, newMessage) => {
+         onError: (error) => {
             console.error("Failed to send message:", error);
             // Remove the optimistic message on error
             setMessages((prev) =>
